@@ -1,0 +1,2763 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "cloudglue API",
+    "description": "API for cloudglue",
+    "license": {
+      "name": "Elastic License 2.0",
+      "url": "https://www.elastic.co/licensing/elastic-license"
+    },
+    "version": "0.0.9"
+  },
+  "servers": [
+    {
+      "url": "https://api.cloudglue.dev/v1"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/extract": {
+      "post": {
+        "tags": ["Extract"],
+        "summary": "Create a new extract job",
+        "operationId": "createExtract",
+        "description": "Creates a new extract",
+        "requestBody": {
+          "description": "Extract structured data from a video",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewExtract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Extract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing required prompt/schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extract job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "509": {
+            "description": "Monthly extract jobs limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/extract/{job_id}": {
+      "get": {
+        "tags": ["Extract"],
+        "summary": "Retrieve the current state of an extraction job",
+        "operationId": "getExtract",
+        "description": "Retrieve the current state of an extraction job",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the extraction job",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with job details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Extract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/describe": {
+      "post": {
+        "tags": ["Describe"],
+        "summary": "Create a new describe job",
+        "operationId": "createDescribe",
+        "description": "Creates a new describe job for comprehensive video description and transcription",
+        "requestBody": {
+          "description": "Generate rich, multimodal descriptions of video content",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewDescribe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Describe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or describe config requires at least one option enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Describe job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "509": {
+            "description": "Monthly describe jobs limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/describe/{job_id}": {
+      "get": {
+        "tags": ["Describe"],
+        "summary": "Retrieve the current state of a describe job",
+        "operationId": "getDescribe",
+        "description": "Retrieve the current state of a describe job",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the describe job",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with job details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Describe"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files": {
+      "post": {
+        "tags": ["Files"],
+        "summary": "Upload a video file that can be used with CloudGlue services",
+        "operationId": "uploadFile",
+        "description": "Upload a video file that can be used with CloudGlue services",
+        "requestBody": {
+          "description": "Upload a video file",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/FileUpload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful file upload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/File"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request, missing file, invalid metadata, or video duration exceeds limits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported file type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "509": {
+            "description": "Resource limits exceeded (monthly upload limit, total duration, file size, or total files)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Files"],
+        "summary": "List files that have been uploaded to CloudGlue",
+        "operationId": "listFiles",
+        "description": "List files that have been uploaded to CloudGlue",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter files by processing status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "processing",
+                "ready",
+                "completed",
+                "failed",
+                "not_applicable"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of files to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of files to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Order the files by a specific field",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["created_at", "filename"],
+              "default": "created_at"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort the files in ascending or descending order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of files",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileList"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{file_id}": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "Retrieve details about a specific file",
+        "operationId": "getFile",
+        "description": "Retrieve details about a specific file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file to retrieve",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/File"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Files"],
+        "summary": "Delete a file",
+        "operationId": "deleteFile",
+        "description": "Delete a file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileDelete"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections": {
+      "post": {
+        "tags": ["Collections"],
+        "summary": "Create a new collection to organize and process video files",
+        "operationId": "createCollection",
+        "description": "Create a new collection to organize and process video files",
+        "requestBody": {
+          "description": "Collection creation parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCollection"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful collection creation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Collection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or malformed YouTube URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Collection name already exists for this account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "509": {
+            "description": "Resource limits exceeded (total collections or files per collection)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Collections"],
+        "summary": "List all collections",
+        "operationId": "listCollections",
+        "description": "List all collections",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of collections to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of collections to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Order the collections by a specific field",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["name", "created_at"],
+              "default": "created_at"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort the collections in ascending or descending order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionList"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "Retrieve details about a specific collection",
+        "operationId": "getCollection",
+        "description": "Retrieve details about a specific collection",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection to retrieve",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collection details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Collection"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Collections"],
+        "summary": "Delete a collection",
+        "operationId": "deleteCollection",
+        "description": "Delete a collection",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionDelete"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/videos": {
+      "post": {
+        "tags": ["Collections"],
+        "summary": "Add a video to a collection",
+        "operationId": "addVideo",
+        "description": "Add a video to a collection",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection to add the video file to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "File association parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCollectionFile"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful file addition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Collections"],
+        "summary": "List all files in a collection",
+        "operationId": "listVideos",
+        "description": "List all files in a collection",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of files to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of files to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by processing status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "processing",
+                "ready",
+                "completed",
+                "failed",
+                "not_applicable"
+              ]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Order the files by a specific field",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["added_at", "filename"],
+              "default": "added_at"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort the files in ascending or descending order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of files in the collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionFileList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/videos/{file_id}": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "Retrieve information about a specific video file in a collection",
+        "operationId": "getVideo",
+        "description": "Retrieve information about a specific video file in a collection",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File details within the collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionFile"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Collections"],
+        "summary": "Remove a video file from a collection",
+        "operationId": "deleteVideo",
+        "description": "Remove a video file from a collection",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file to remove",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful removal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionFileDelete"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/videos/{file_id}/entities": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "Retrieve all extracted entities for a specific file in a collection",
+        "operationId": "getEntities",
+        "description": "Retrieve all extracted entities for a specific file in a collection",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of segments to return (for segment entities)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of segments to skip (for segment entities)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileEntities"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/videos/{file_id}/description": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "Retrieve the processed video summary description and segment documents for a file in a collection",
+        "operationId": "getDescription",
+        "description": "Retrieve the processed video summary description and segment documents for a file in a collection",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of segments to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of segments to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileDescription"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/youtube": {
+      "post": {
+        "tags": ["Collections"],
+        "summary": "Add a YouTube video to a collection",
+        "operationId": "addYouTubeVideo",
+        "description": "Add a YouTube video to a collection by URL",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection to add the YouTube video to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "YouTube video URL parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddYouTubeCollectionFile"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful video addition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or YouTube URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/completions": {
+      "post": {
+        "tags": ["Chat"],
+        "summary": "Generate a model response to a conversation that can include references to video content",
+        "operationId": "createCompletion",
+        "description": "Generate a model response to a conversation that can include references to video content",
+        "requestBody": {
+          "description": "Chat completion parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collections not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "509": {
+            "description": "Chat completion limits reached (monthly or daily)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Extract": {
+        "required": ["job_id", "status"],
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "completed",
+              "failed",
+              "not_applicable"
+            ]
+          },
+          "data": {
+            "description": "The structured data extracted from the video based on prompt or schema",
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "entities": {
+                "type": "object",
+                "description": "Entities extracted from the video level"
+              },
+              "segment_entities": {
+                "type": "array",
+                "description": "Array of video entities extracted from individual time segments",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "segment_id": {
+                      "oneOf": [
+                        {
+                          "type": "string",
+                          "description": "Unique identifier for the segment as a string"
+                        },
+                        {
+                          "type": "number",
+                          "description": "Unique identifier for the segment as a number"
+                        }
+                      ],
+                      "description": "Unique identifier for the segment"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of the segment in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of the segment in seconds"
+                    },
+                    "entities": {
+                      "type": "object",
+                      "description": "Entities extracted from the segment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if status is 'failed'"
+          }
+        }
+      },
+      "NewExtract": {
+        "allOf": [
+          {
+            "required": ["url"],
+            "type": "object",
+            "properties": {
+              "url": {
+                "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.",
+                "type": "string"
+              },
+              "prompt": {
+                "description": "A natural language prompt describing the data you want to extract. Required if no schema is provided.",
+                "type": "string"
+              },
+              "schema": {
+                "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided.",
+                "type": "object"
+              }
+            }
+          }
+        ]
+      },
+      "Describe": {
+        "required": ["job_id", "status"],
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "completed",
+              "failed",
+              "not_applicable"
+            ]
+          },
+          "data": {
+            "description": "The comprehensive description data for the video",
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "The URL of the processed video"
+              },
+              "title": {
+                "type": "string",
+                "description": "Generated title for the video"
+              },
+              "summary": {
+                "type": "string",
+                "description": "Generated summary of the video content"
+              },
+              "segment_docs": {
+                "type": "array",
+                "description": "Array of video segments with detailed information",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "segment_id": {
+                      "oneOf": [
+                        {
+                          "type": "string",
+                          "description": "Unique identifier for the segment as a string"
+                        },
+                        {
+                          "type": "number",
+                          "description": "Unique identifier for the segment as a number"
+                        }
+                      ],
+                      "description": "Unique identifier for the segment"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of the segment in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of the segment in seconds"
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Generated title for the segment"
+                    },
+                    "summary": {
+                      "type": "string",
+                      "description": "Generated summary for the segment"
+                    },
+                    "visual_description": {
+                      "type": "array",
+                      "description": "Description of visual content in the segment",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "description": "Description of visual content in the segment"
+                          },
+                          "start_time": {
+                            "type": "number",
+                            "description": "Start time of the visual content in seconds"
+                          },
+                          "end_time": {
+                            "type": "number",
+                            "description": "End time of the visual content in seconds"
+                          }
+                        }
+                      }
+                    },
+                    "scene_text": {
+                      "type": "array",
+                      "description": "Text detected on screen in the segment",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "description": "Text detected on screen"
+                          },
+                          "start_time": {
+                            "type": "number",
+                            "description": "Start time of the text in seconds"
+                          },
+                          "end_time": {
+                            "type": "number",
+                            "description": "End time of the text in seconds"
+                          }
+                        }
+                      }
+                    },
+                    "speech": {
+                      "type": "array",
+                      "description": "Transcription of speech in the segment",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "speaker": {
+                            "type": "string",
+                            "description": "Identified speaker"
+                          },
+                          "text": {
+                            "type": "string",
+                            "description": "Transcribed speech text"
+                          },
+                          "start_time": {
+                            "type": "number",
+                            "description": "Start time of speech in seconds"
+                          },
+                          "end_time": {
+                            "type": "number",
+                            "description": "End time of speech in seconds"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if status is 'failed'"
+          }
+        }
+      },
+      "NewDescribe": {
+        "required": ["url"],
+        "type": "object",
+        "properties": {
+          "url": {
+            "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.",
+            "type": "string"
+          },
+          "enable_speech": {
+            "description": "Whether to generate speech transcript.",
+            "type": "boolean",
+            "default": true
+          },
+          "enable_scene_text": {
+            "description": "Whether to generate scene text.",
+            "type": "boolean",
+            "default": true
+          },
+          "enable_visual_scene_description": {
+            "description": "Whether to generate visual scene description.",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "File": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the file"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "completed",
+              "failed",
+              "not_applicable"
+            ],
+            "description": "Processing status of the file"
+          },
+          "bytes": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "description": "Size of the file in bytes"
+              },
+              {
+                "type": "null",
+                "description": "No size information available"
+              }
+            ],
+            "description": "Size of the file in bytes, null if not available"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the file was created"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Original filename"
+          },
+          "uri": {
+            "type": "string",
+            "description": "CloudGlue URI for the file, to be used in other API calls"
+          },
+          "metadata": {
+            "oneOf": [
+              {
+                "type": "object",
+                "description": "User-provided metadata about the file"
+              },
+              {
+                "type": "null",
+                "description": "No metadata provided"
+              }
+            ],
+            "description": "User-provided metadata about the file, null if none provided"
+          },
+          "video_info": {
+            "type": "object",
+            "properties": {
+              "duration_seconds": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "description": "Duration of the video in seconds"
+                  },
+                  {
+                    "type": "null",
+                    "description": "Duration information not available"
+                  }
+                ],
+                "description": "Duration of the video in seconds, null if not available"
+              },
+              "height": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "description": "Height of the video in pixels"
+                  },
+                  {
+                    "type": "null",
+                    "description": "Height information not available"
+                  }
+                ],
+                "description": "Height of the video in pixels, null if not available"
+              },
+              "width": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "description": "Width of the video in pixels"
+                  },
+                  {
+                    "type": "null",
+                    "description": "Width information not available"
+                  }
+                ],
+                "description": "Width of the video in pixels, null if not available"
+              },
+              "format": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Format of the video file"
+                  },
+                  {
+                    "type": "null",
+                    "description": "Format information not available"
+                  }
+                ],
+                "description": "Format of the video file, null if not available"
+              },
+              "has_audio": {
+                "oneOf": [
+                  {
+                    "type": "boolean",
+                    "description": "Whether the video has audio"
+                  },
+                  {
+                    "type": "null",
+                    "description": "Audio information not available"
+                  }
+                ],
+                "description": "Whether the video has audio, null if not available"
+              }
+            },
+            "description": "Information about the video content"
+          }
+        },
+        "required": ["id", "uri", "status"]
+      },
+      "FileUpload": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "The video file to be uploaded"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "User-provided metadata about the file"
+          }
+        },
+        "required": ["file"]
+      },
+      "FileList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/File"
+            },
+            "description": "Array of file objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of files matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        },
+        "required": ["object", "data", "total", "limit", "offset"]
+      },
+      "FileDelete": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of the deleted file"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["file"],
+            "description": "Object type, always 'file'"
+          }
+        },
+        "required": ["id", "object"]
+      },
+      "Collection": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the collection"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["collection"],
+            "description": "Object type, always 'collection'"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the collection"
+          },
+          "description": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Description of the collection's purpose or contents"
+              },
+              {
+                "type": "null",
+                "description": "No description provided"
+              }
+            ],
+            "description": "Description of the collection's purpose or contents, null if none provided"
+          },
+          "describe_config": {
+            "type": "object",
+            "description": "Configuration for how videos in this collection are described and clipped",
+            "properties": {
+              "enable_speech": {
+                "type": "boolean",
+                "description": "Whether to generate speech transcript.",
+                "default": true
+              },
+              "enable_scene_text": {
+                "type": "boolean",
+                "description": "Whether to generate scene text.",
+                "default": true
+              },
+              "enable_visual_scene_description": {
+                "type": "boolean",
+                "description": "Whether to generate visual scene description.",
+                "default": true
+              }
+            }
+          },
+          "extract_config": {
+            "type": "object",
+            "description": "Configuration for automatic entity extraction from videos",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "description": "A natural language prompt describing the data to extract. Required if no schema is provided."
+              },
+              "schema": {
+                "type": "object",
+                "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided."
+              }
+            }
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the collection was created"
+          },
+          "file_count": {
+            "type": "integer",
+            "description": "Number of files in the collection"
+          }
+        },
+        "required": ["id", "object", "name", "created_at", "file_count"]
+      },
+      "NewCollection": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the collection (must be unique within an organization)"
+          },
+          "description": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Description of the collection's purpose or contents"
+              },
+              {
+                "type": "null",
+                "description": "No description provided"
+              }
+            ],
+            "description": "Description of the collection's purpose or contents, null if none provided"
+          },
+          "describe_config": {
+            "type": "object",
+            "description": "Configuration for how videos in this collection are described and clipped",
+            "properties": {
+              "enable_speech": {
+                "type": "boolean",
+                "description": "Whether to generate speech transcript.",
+                "default": true
+              },
+              "enable_scene_text": {
+                "type": "boolean",
+                "description": "Whether to generate scene text.",
+                "default": true
+              },
+              "enable_visual_scene_description": {
+                "type": "boolean",
+                "description": "Whether to generate visual scene description.",
+                "default": true
+              }
+            }
+          },
+          "extract_config": {
+            "type": "object",
+            "description": "Configuration for automatic entity extraction from videos",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "description": "A natural language prompt describing the data to extract. Required if no schema is provided."
+              },
+              "schema": {
+                "type": "object",
+                "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided."
+              }
+            }
+          }
+        },
+        "required": ["name"]
+      },
+      "CollectionList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Collection"
+            },
+            "description": "Array of collection objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of collections matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        },
+        "required": ["object", "data", "total", "limit", "offset"]
+      },
+      "CollectionDelete": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of the deleted collection"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["collection"],
+            "description": "Object type, always 'collection'"
+          }
+        },
+        "required": ["id", "object"]
+      },
+      "AddCollectionFile": {
+        "type": "object",
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "description": "The ID of the file to add to the collection"
+          }
+        },
+        "required": ["file_id"]
+      },
+      "AddYouTubeCollectionFile": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL of the YouTube video to add to the collection.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "User-provided metadata about the YouTube video"
+          }
+        },
+        "required": ["url"]
+      },
+      "CollectionFile": {
+        "type": "object",
+        "properties": {
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the collection"
+          },
+          "file_id": {
+            "type": "string",
+            "description": "ID of the file"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["collection_file"],
+            "description": "Object type, always 'collection_file'"
+          },
+          "added_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the file was added to the collection"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "completed",
+              "failed",
+              "not_applicable"
+            ],
+            "description": "Overall processing status of the file in this collection"
+          },
+          "describe_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "completed",
+              "failed",
+              "not_applicable"
+            ],
+            "description": "Status of the video description processing"
+          },
+          "extract_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "completed",
+              "failed",
+              "not_applicable"
+            ],
+            "description": "Status of the entity extraction processing"
+          },
+          "searchable_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "completed",
+              "failed",
+              "not_applicable"
+            ],
+            "description": "Status of the searchable index processing"
+          },
+          "file": {
+            "$ref": "#/components/schemas/File",
+            "description": "The file object"
+          }
+        },
+        "required": ["collection_id", "file_id", "object", "added_at", "status"]
+      },
+      "CollectionFileList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CollectionFile"
+            },
+            "description": "Array of collection file objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of files matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        },
+        "required": ["object", "data", "total", "limit", "offset"]
+      },
+      "CollectionFileDelete": {
+        "type": "object",
+        "properties": {
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the collection"
+          },
+          "file_id": {
+            "type": "string",
+            "description": "ID of the file"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["collection_file"],
+            "description": "Object type, always 'collection_file'"
+          }
+        },
+        "required": ["collection_id", "file_id", "object"]
+      },
+      "FileEntities": {
+        "type": "object",
+        "properties": {
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the collection"
+          },
+          "file_id": {
+            "type": "string",
+            "description": "ID of the file"
+          },
+          "entities": {
+            "oneOf": [
+              {
+                "type": "object",
+                "description": "Map of entity type to array of entities"
+              },
+              {
+                "type": "array",
+                "description": "List of entities "
+              }
+            ],
+            "description": "Entities extracted from the file at the video level"
+          },
+          "segment_entities": {
+            "type": "array",
+            "description": "Array of video entities extracted from individual time segments",
+            "items": {
+              "type": "object",
+              "properties": {
+                "segment_id": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Unique identifier for the segment as a string"
+                    },
+                    {
+                      "type": "number",
+                      "description": "Unique identifier for the segment as a number"
+                    }
+                  ],
+                  "description": "Unique identifier for the segment"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of the segment in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of the segment in seconds"
+                },
+                "entities": {
+                  "type": "object",
+                  "description": "Entities extracted from the segment"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of segments with extracted entities"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of segments returned in this response (for segment entities)"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list (for segment entities)"
+          }
+        },
+        "required": [
+          "collection_id",
+          "file_id",
+          "entities",
+          "total",
+          "limit",
+          "offset"
+        ]
+      },
+      "FileDescription": {
+        "type": "object",
+        "properties": {
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the collection"
+          },
+          "file_id": {
+            "type": "string",
+            "description": "ID of the file"
+          },
+          "title": {
+            "type": "string",
+            "description": "Generated title for the video"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Generated summary of the video content"
+          },
+          "segment_docs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "segment_id": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Unique identifier for the segment as a string"
+                    },
+                    {
+                      "type": "number",
+                      "description": "Unique identifier for the segment as a number"
+                    }
+                  ],
+                  "description": "Unique identifier for the segment"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of the segment in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of the segment in seconds"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Generated title for the segment"
+                },
+                "summary": {
+                  "type": "string",
+                  "description": "Generated summary for the segment"
+                },
+                "visual_description": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "description": "Description of visual content in the segment"
+                      },
+                      "start_time": {
+                        "type": "number",
+                        "description": "Start time of the visual content in seconds"
+                      },
+                      "end_time": {
+                        "type": "number",
+                        "description": "End time of the visual content in seconds"
+                      }
+                    }
+                  },
+                  "description": "Description of visual content in the segment"
+                },
+                "scene_text": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "description": "Text detected on screen"
+                      },
+                      "start_time": {
+                        "type": "number",
+                        "description": "Start time of the text in seconds"
+                      },
+                      "end_time": {
+                        "type": "number",
+                        "description": "End time of the text in seconds"
+                      }
+                    }
+                  },
+                  "description": "Text detected on screen in the segment"
+                },
+                "speech": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "speaker": {
+                        "type": "string",
+                        "description": "Identified speaker"
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "Transcribed speech text"
+                      },
+                      "start_time": {
+                        "type": "number",
+                        "description": "Start time of speech in seconds"
+                      },
+                      "end_time": {
+                        "type": "number",
+                        "description": "End time of speech in seconds"
+                      }
+                    }
+                  },
+                  "description": "Transcription of speech in the segment"
+                }
+              }
+            },
+            "description": "Array of video segments with detailed information"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of segments"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of segments returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the segments list"
+          }
+        },
+        "required": ["collection_id", "file_id"]
+      },
+      "Error": {
+        "required": ["error"],
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "ChatCompletionRequest": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "ID of the video understanding model to use",
+            "enum": ["nimbus-001"]
+          },
+          "messages": {
+            "type": "array",
+            "description": "A list of messages comprising the conversation so far",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            }
+          },
+          "collections": {
+            "type": "array",
+            "description": "List of collection IDs to use as context for the chat",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "filter": {
+            "type": "object",
+            "description": "Filter criteria to constrain search results used in chat",
+            "properties": {
+              "metadata": {
+                "type": "array",
+                "description": "Filter by file metadata using JSON path expressions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "JSON path on file (e.g. 'metadata.my_custom_field' or 'video_info.has_audio')"
+                    },
+                    "operator": {
+                      "type": "string",
+                      "enum": [
+                        "NotEqual",
+                        "Equal",
+                        "LessThan",
+                        "GreaterThan",
+                        "In",
+                        "ContainsAny",
+                        "ContainsAll"
+                      ],
+                      "description": "Comparison operator to apply"
+                    },
+                    "valueText": {
+                      "type": "string",
+                      "description": "Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, In)"
+                    },
+                    "valueTextArray": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Array of values for array comparisons (used with ContainsAny, ContainsAll)"
+                    }
+                  },
+                  "required": ["path", "operator"]
+                }
+              }
+            }
+          },
+          "force_search": {
+            "type": "boolean",
+            "description": "Whether to force the model to always perform a search when answering questions, even if it believes it knows the answer",
+            "default": false
+          },
+          "result_format": {
+            "type": "string",
+            "description": "Format for responses",
+            "enum": ["text", "markdown", "json"],
+            "default": "text"
+          },
+          "include_citations": {
+            "type": "boolean",
+            "description": "Whether to include citations to specific video segments",
+            "default": true
+          },
+          "temperature": {
+            "type": "number",
+            "description": "Sampling temperature to use, between 0 and 2",
+            "minimum": 0,
+            "maximum": 2,
+            "default": 0.7
+          },
+          "top_p": {
+            "type": "number",
+            "description": "An alternative to sampling with temperature, called nucleus sampling",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 1.0
+          },
+          "max_tokens": {
+            "type": "integer",
+            "description": "The maximum number of tokens to generate in the chat completion",
+            "default": 1024
+          }
+        },
+        "required": ["model", "messages", "collections"]
+      },
+      "ChatMessage": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "The role of the message author",
+            "enum": ["system", "user", "assistant"]
+          },
+          "content": {
+            "type": "string",
+            "description": "The content of the message"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the author of this message"
+          }
+        },
+        "required": ["role", "content"]
+      },
+      "ChatCompletionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this chat completion"
+          },
+          "object": {
+            "type": "string",
+            "description": "Object type, always \"chat.completion\""
+          },
+          "created": {
+            "type": "integer",
+            "description": "Unix timestamp of when the chat completion was created"
+          },
+          "model": {
+            "type": "string",
+            "description": "The model used for the chat completion"
+          },
+          "choices": {
+            "type": "array",
+            "description": "The generated responses",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "description": "The index of this choice"
+                },
+                "message": {
+                  "$ref": "#/components/schemas/ChatMessage",
+                  "description": "The chat message generated by the model"
+                },
+                "citations": {
+                  "type": "array",
+                  "description": "Citations to specific video segments that informed the response",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "collection_id": {
+                        "type": "string",
+                        "description": "ID of the collection containing the cited video"
+                      },
+                      "file_id": {
+                        "type": "string",
+                        "description": "ID of the file being cited"
+                      },
+                      "segment_id": {
+                        "type": "string",
+                        "description": "ID of the segment being cited"
+                      },
+                      "start_time": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "description": "Start time of the cited segment in seconds"
+                          },
+                          {
+                            "type": "number",
+                            "description": "Start time of the cited segment in seconds"
+                          }
+                        ],
+                        "description": "Start time of the cited segment in seconds"
+                      },
+                      "end_time": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "description": "End time of the cited segment in seconds"
+                          },
+                          {
+                            "type": "number",
+                            "description": "End time of the cited segment in seconds"
+                          }
+                        ],
+                        "description": "End time of the cited segment in seconds"
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "(Deprecated) Relevant text from the segment; use context and relevant_sources instead"
+                      },
+                      "context": {
+                        "type": "string",
+                        "description": "Short explanation of the relevance of the segment to the query provided as context"
+                      },
+                      "relevant_sources": {
+                        "type": "array",
+                        "description": "List of source modalities in segment that are relevant for this citation",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string",
+                              "description": "Source modality, one of visual_description, scene_text, speech"
+                            }
+                          }
+                        }
+                      },
+                      "visual_description": {
+                        "type": "array",
+                        "description": "Description of visual content in the segment",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string",
+                              "description": "Description of visual content in the segment"
+                            },
+                            "start_time": {
+                              "type": "number",
+                              "description": "Start time of the visual content in seconds"
+                            },
+                            "end_time": {
+                              "type": "number",
+                              "description": "End time of the visual content in seconds"
+                            }
+                          }
+                        }
+                      },
+                      "scene_text": {
+                        "type": "array",
+                        "description": "Text detected on screen in the segment",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string",
+                              "description": "Text detected on screen"
+                            },
+                            "start_time": {
+                              "type": "number",
+                              "description": "Start time of the text in seconds"
+                            },
+                            "end_time": {
+                              "type": "number",
+                              "description": "End time of the text in seconds"
+                            }
+                          }
+                        }
+                      },
+                      "speech": {
+                        "type": "array",
+                        "description": "Transcription of speech in the segment",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "speaker": {
+                              "type": "string",
+                              "description": "Identified speaker"
+                            },
+                            "text": {
+                              "type": "string",
+                              "description": "Transcribed speech text"
+                            },
+                            "start_time": {
+                              "type": "number",
+                              "description": "Start time of speech in seconds"
+                            },
+                            "end_time": {
+                              "type": "number",
+                              "description": "End time of speech in seconds"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "usage": {
+            "type": "object",
+            "description": "Usage statistics for the completion request",
+            "properties": {
+              "prompt_tokens": {
+                "type": "integer",
+                "description": "Number of tokens in the prompt"
+              },
+              "completion_tokens": {
+                "type": "integer",
+                "description": "Number of tokens in the generated completion"
+              },
+              "total_tokens": {
+                "type": "integer",
+                "description": "Total number of tokens used in the request"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
