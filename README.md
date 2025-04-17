@@ -19,4 +19,4 @@ This repo defines the structure, endpoints, and schemas of the CloudGlue API. Fo
 ## Contact
 
 * [Open an Issue](https://github.com/aviaryhq/cloudglue-api-spec/issues/new)
-* [Email](mailto:support@aviaryhq.com)
+* [Email](mailto:support@cloudglue.dev)
