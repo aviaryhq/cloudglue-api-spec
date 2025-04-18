@@ -155,6 +155,7 @@
     "/describe": {
       "post": {
         "tags": ["Describe"],
+        "deprecated": true,
         "summary": "Create a new describe job",
         "operationId": "createDescribe",
         "description": "Creates a new describe job for comprehensive video description and transcription",
@@ -236,6 +237,7 @@
     "/describe/{job_id}": {
       "get": {
         "tags": ["Describe"],
+        "deprecated": true,
         "summary": "Retrieve the current state of a describe job",
         "operationId": "getDescribe",
         "description": "Retrieve the current state of a describe job",
