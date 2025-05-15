@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "cloudglue API",
-    "description": "API for cloudglue",
+    "title": "Cloudglue API",
+    "description": "API for Cloudglue",
     "license": {
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
@@ -396,9 +396,9 @@
     "/files": {
       "post": {
         "tags": ["Files"],
-        "summary": "Upload a video file that can be used with CloudGlue services",
+        "summary": "Upload a video file that can be used with Cloudglue services",
         "operationId": "uploadFile",
-        "description": "Upload a video file that can be used with CloudGlue services",
+        "description": "Upload a video file that can be used with Cloudglue services",
         "requestBody": {
           "description": "Upload a video file",
           "content": {
@@ -465,9 +465,9 @@
       },
       "get": {
         "tags": ["Files"],
-        "summary": "List files that have been uploaded to CloudGlue",
+        "summary": "List files that have been uploaded to Cloudglue",
         "operationId": "listFiles",
-        "description": "List files that have been uploaded to CloudGlue",
+        "description": "List files that have been uploaded to Cloudglue",
         "parameters": [
           {
             "name": "status",
@@ -1917,7 +1917,7 @@
             "type": "object",
             "properties": {
               "url": {
-                "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.",
+                "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.",
                 "type": "string"
               },
               "prompt": {
@@ -2084,7 +2084,7 @@
         "type": "object",
         "properties": {
           "url": {
-            "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.",
+            "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.",
             "type": "string"
           },
           "enable_speech": {
@@ -2145,7 +2145,7 @@
           },
           "uri": {
             "type": "string",
-            "description": "CloudGlue URI for the file, to be used in other API calls"
+            "description": "Cloudglue URI for the file, to be used in other API calls"
           },
           "metadata": {
             "oneOf": [
@@ -3266,7 +3266,7 @@
         "required": ["url"],
         "properties": {
           "url": {
-            "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech level understanding only.",
+            "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech level understanding only.",
             "type": "string"
           },
           "enable_summary": {
