@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.0.9"
+    "version": "0.0.10"
   },
   "servers": [
     {
@@ -69,7 +69,7 @@
             }
           },
           "429": {
-            "description": "Too many requests",
+            "description": "Monthly extract jobs limit reached",
             "content": {
               "application/json": {
                 "schema": {
@@ -78,7 +78,114 @@
               }
             }
           },
-          "509": {
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Extract"],
+        "summary": "List all extract jobs",
+        "operationId": "listExtracts",
+        "description": "List all extract jobs with optional filtering",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of extract jobs to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of extract jobs to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter extract jobs by status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "processing",
+                "completed",
+                "failed",
+                "not_applicable"
+              ]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter extract jobs created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter extract jobs created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of extract jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or extract config requires at least one option enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extract job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
             "description": "Monthly extract jobs limit reached",
             "content": {
               "application/json": {
@@ -335,16 +442,6 @@
             }
           },
           "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "509": {
             "description": "Resource limits exceeded (monthly upload limit, total duration, file size, or total files)",
             "content": {
               "application/json": {
@@ -382,11 +479,30 @@
               "enum": [
                 "pending",
                 "processing",
-                "ready",
                 "completed",
                 "failed",
                 "not_applicable"
               ]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter files created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter files created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
             }
           },
           {
@@ -928,11 +1044,30 @@
               "enum": [
                 "pending",
                 "processing",
-                "ready",
                 "completed",
                 "failed",
                 "not_applicable"
               ]
+            }
+          },
+          {
+            "name": "added_before",
+            "in": "query",
+            "description": "Filter files added before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "added_after",
+            "in": "query",
+            "description": "Filter files added after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
             }
           },
           {
@@ -1393,7 +1528,7 @@
             }
           },
           "429": {
-            "description": "Too many requests",
+            "description": "Chat completion limits reached (monthly or daily)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1411,9 +1546,240 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/transcribe": {
+      "post": {
+        "tags": ["Transcribe"],
+        "summary": "Create a new transcription job",
+        "operationId": "createTranscribe",
+        "description": "Creates a new transcription job for video content",
+        "requestBody": {
+          "description": "Transcription job parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTranscribe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transcribe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing required url/file_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Chat completion limits reached (monthly or daily)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "509": {
-            "description": "Chat completion limits reached (monthly or daily)",
+            "description": "Monthly transcription jobs limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Transcribe"],
+        "summary": "List all transcription jobs",
+        "operationId": "listTranscribes",
+        "description": "List all transcription jobs with optional filtering",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of transcription jobs to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of transcription jobs to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter transcription jobs by status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "processing",
+                "completed",
+                "failed",
+                "not_applicable"
+              ]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter transcription jobs created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter transcription jobs created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Format for the response",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of transcription jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscribeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transcribe/{job_id}": {
+      "get": {
+        "tags": ["Transcribe"],
+        "summary": "Retrieve the current state of a transcription job",
+        "operationId": "getTranscribe",
+        "description": "Retrieve the current state of a transcription job",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the transcription job",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Format for the response",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with job details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transcribe"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
             "content": {
               "application/json": {
                 "schema": {
@@ -1440,54 +1806,69 @@
             "enum": [
               "pending",
               "processing",
-              "ready",
               "completed",
               "failed",
               "not_applicable"
             ]
           },
+          "url": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the job was created"
+          },
+          "extract_config": {
+            "type": "object",
+            "description": "Configuration for automatic entity extraction from videos",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "description": "A natural language prompt describing the data to extract. Required if no schema is provided."
+              },
+              "schema": {
+                "type": "object",
+                "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided."
+              }
+            }
+          },
           "data": {
             "description": "The structured data extracted from the video based on prompt or schema",
             "type": "object",
-            "properties": {
-              "url": {
-                "type": "string"
-              },
-              "entities": {
+            "entities": {
+              "type": "object",
+              "description": "Entities extracted from the video level"
+            },
+            "segment_entities": {
+              "type": "array",
+              "description": "Array of video entities extracted from individual time segments",
+              "items": {
                 "type": "object",
-                "description": "Entities extracted from the video level"
-              },
-              "segment_entities": {
-                "type": "array",
-                "description": "Array of video entities extracted from individual time segments",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "segment_id": {
-                      "oneOf": [
-                        {
-                          "type": "string",
-                          "description": "Unique identifier for the segment as a string"
-                        },
-                        {
-                          "type": "number",
-                          "description": "Unique identifier for the segment as a number"
-                        }
-                      ],
-                      "description": "Unique identifier for the segment"
-                    },
-                    "start_time": {
-                      "type": "number",
-                      "description": "Start time of the segment in seconds"
-                    },
-                    "end_time": {
-                      "type": "number",
-                      "description": "End time of the segment in seconds"
-                    },
-                    "entities": {
-                      "type": "object",
-                      "description": "Entities extracted from the segment"
-                    }
+                "properties": {
+                  "segment_id": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "description": "Unique identifier for the segment as a string"
+                      },
+                      {
+                        "type": "number",
+                        "description": "Unique identifier for the segment as a number"
+                      }
+                    ],
+                    "description": "Unique identifier for the segment"
+                  },
+                  "start_time": {
+                    "type": "number",
+                    "description": "Start time of the segment in seconds"
+                  },
+                  "end_time": {
+                    "type": "number",
+                    "description": "End time of the segment in seconds"
+                  },
+                  "entities": {
+                    "type": "object",
+                    "description": "Entities extracted from the segment"
                   }
                 }
               }
@@ -1498,6 +1879,36 @@
             "description": "Error message if status is 'failed'"
           }
         }
+      },
+      "ExtractList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Extract"
+            },
+            "description": "Array of extract job objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of extract jobs matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        },
+        "required": ["object", "data", "total", "limit", "offset"]
       },
       "NewExtract": {
         "allOf": [
@@ -1705,7 +2116,6 @@
             "enum": [
               "pending",
               "processing",
-              "ready",
               "completed",
               "failed",
               "not_applicable"
@@ -1913,27 +2323,6 @@
             ],
             "description": "Description of the collection's purpose or contents, null if none provided"
           },
-          "describe_config": {
-            "type": "object",
-            "description": "Configuration for how videos in this collection are described and clipped",
-            "properties": {
-              "enable_speech": {
-                "type": "boolean",
-                "description": "Whether to generate speech transcript.",
-                "default": true
-              },
-              "enable_scene_text": {
-                "type": "boolean",
-                "description": "Whether to generate scene text.",
-                "default": true
-              },
-              "enable_visual_scene_description": {
-                "type": "boolean",
-                "description": "Whether to generate visual scene description.",
-                "default": true
-              }
-            }
-          },
           "extract_config": {
             "type": "object",
             "description": "Configuration for automatic entity extraction from videos",
@@ -1978,27 +2367,6 @@
               }
             ],
             "description": "Description of the collection's purpose or contents, null if none provided"
-          },
-          "describe_config": {
-            "type": "object",
-            "description": "Configuration for how videos in this collection are described and clipped",
-            "properties": {
-              "enable_speech": {
-                "type": "boolean",
-                "description": "Whether to generate speech transcript.",
-                "default": true
-              },
-              "enable_scene_text": {
-                "type": "boolean",
-                "description": "Whether to generate scene text.",
-                "default": true
-              },
-              "enable_visual_scene_description": {
-                "type": "boolean",
-                "description": "Whether to generate visual scene description.",
-                "default": true
-              }
-            }
           },
           "extract_config": {
             "type": "object",
@@ -2111,31 +2479,17 @@
             "enum": [
               "pending",
               "processing",
-              "ready",
               "completed",
               "failed",
               "not_applicable"
             ],
             "description": "Overall processing status of the file in this collection"
           },
-          "describe_status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "ready",
-              "completed",
-              "failed",
-              "not_applicable"
-            ],
-            "description": "Status of the video description processing"
-          },
           "extract_status": {
             "type": "string",
             "enum": [
               "pending",
               "processing",
-              "ready",
               "completed",
               "failed",
               "not_applicable"
@@ -2147,7 +2501,6 @@
             "enum": [
               "pending",
               "processing",
-              "ready",
               "completed",
               "failed",
               "not_applicable"
@@ -2661,7 +3014,7 @@
                           }
                         }
                       },
-                      "visual_description": {
+                      "visual_scene_description": {
                         "type": "array",
                         "description": "Description of visual content in the segment",
                         "items": {
@@ -2753,6 +3106,195 @@
             }
           }
         }
+      },
+      "Transcribe": {
+        "required": ["job_id", "status"],
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "not_applicable"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL of the processed video"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the job was created"
+          },
+          "transcribe_config": {
+            "type": "object",
+            "description": "Configuration for rich transcription from videos",
+            "properties": {
+              "enable_summary ": {
+                "type": "boolean",
+                "description": "Whether the user requested to generate a video level summary and title"
+              },
+              "enable_speech": {
+                "type": "boolean",
+                "description": "Whether the user requested to generate speech transcript"
+              },
+              "enable_visual_scene_description": {
+                "type": "boolean",
+                "description": "Whether the user requested to generate visual scene description"
+              },
+              "enable_scene_text": {
+                "type": "boolean",
+                "description": "Whether the user requested to generate scene text"
+              }
+            }
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested"
+              },
+              "title": {
+                "type": "string",
+                "description": "Generated title of the video; for YouTube videos, this is the title of the video as it appears on YouTube"
+              },
+              "summary": {
+                "type": "string",
+                "description": "Generated video level summary; for YouTube videos, this is the summary of the video as it appears on YouTube"
+              },
+              "speech": {
+                "type": "array",
+                "description": "Array of speech transcriptions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Transcribed speech text"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of speech in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of speech in seconds"
+                    }
+                  }
+                }
+              },
+              "visual_scene_description": {
+                "type": "array",
+                "description": "Array of visual descriptions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Description of visual content"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of visual content in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of visual content in seconds"
+                    }
+                  }
+                }
+              },
+              "scene_text": {
+                "type": "array",
+                "description": "Array of scene text extractions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Text detected on screen"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of text in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of text in seconds"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if status is 'failed'"
+          }
+        }
+      },
+      "NewTranscribe": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech level understanding only.",
+            "type": "string"
+          },
+          "enable_summary": {
+            "description": "Whether to generate a video level summary and title",
+            "type": "boolean",
+            "default": true
+          },
+          "enable_speech": {
+            "description": "Whether to generate speech transcript",
+            "type": "boolean",
+            "default": true
+          },
+          "enable_visual_scene_description": {
+            "description": "Whether to generate visual scene description",
+            "type": "boolean",
+            "default": false
+          },
+          "enable_scene_text": {
+            "description": "Whether to generate scene text extraction",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "TranscribeList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transcribe"
+            },
+            "description": "Array of transcription job objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of transcription jobs matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          }
+        },
+        "required": ["object", "data", "total", "limit"]
       }
     },
     "securitySchemes": {
