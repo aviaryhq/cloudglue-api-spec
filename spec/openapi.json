@@ -3009,7 +3009,28 @@
                           "properties": {
                             "text": {
                               "type": "string",
-                              "description": "Source modality, one of visual_description, scene_text, speech"
+                              "description": "Source modality, one of visual_scene_description, scene_text, speech"
+                            }
+                          }
+                        }
+                      },
+                      "visual_description": {
+                        "type": "array",
+                        "description": "Description of visual content in the segment",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string",
+                              "description": "Description of visual content in the segment"
+                            },
+                            "start_time": {
+                              "type": "number",
+                              "description": "Start time of the visual content in seconds"
+                            },
+                            "end_time": {
+                              "type": "number",
+                              "description": "End time of the visual content in seconds"
                             }
                           }
                         }
