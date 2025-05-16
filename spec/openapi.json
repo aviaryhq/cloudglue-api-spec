@@ -1684,6 +1684,290 @@
           }
         }
       }
+    },
+    "/webhooks": {
+      "get": {
+        "tags": ["Webhooks"],
+        "summary": "List all webhooks",
+        "operationId": "listWebhooks",
+        "description": "List all webhooks",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of collections to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of collections to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Order the collections by a specific field",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["name", "created_at"],
+              "default": "created_at"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort the collections in ascending or descending order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of webhooks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookList"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Create a webhook",
+        "operationId": "createWebhook",
+        "description": "Create a webhook",
+        "requestBody": {
+          "description": "Webhook creation parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Webhook"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Webhook not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/{webhook_id}": {
+      "get": {
+        "tags": ["Webhooks"],
+        "summary": "Get a webhook by ID",
+        "operationId": "getWebhookById",
+        "description": "Get a webhook by ID",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the webhook to get",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A webhook",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Webhook"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Webhook not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Webhooks"],
+        "summary": "Delete a webhook",
+        "operationId": "deleteWebhook",
+        "description": "Delete a webhook",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the webhook to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful removal of webhook",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookDeleteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Webhook not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Webhooks"],
+        "summary": "Update a webhook",
+        "operationId": "updateWebhook",
+        "description": "Update a webhook",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the webhook to update",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Webhook update parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Webhook"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Webhook not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2946,10 +3230,7 @@
       },
       "RichTranscript": {
         "type": "object",
-        "required": [
-          "collection_id",
-          "file_id"
-        ],
+        "required": ["collection_id", "file_id"],
         "properties": {
           "collection_id": {
             "type": "string",
@@ -3033,6 +3314,165 @@
                 }
               }
             }
+          }
+        }
+      },
+      "Webhook": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the webhook"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["webhook"],
+            "description": "Object type, always 'webhook'"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the webhook was created"
+          },
+          "webhook_secret": {
+            "type": "string",
+            "description": "Secret used to verify the webhook request"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "URL of the webhook endpoint"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the webhook is active"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the webhook"
+          },
+          "subscribed_events": {
+            "type": "array",
+            "description": "Events that the webhook is subscribed to",
+            "items": {
+              "$ref": "#/components/schemas/WebhookEvents"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "object",
+          "created_at",
+          "subscribed_events",
+          "active",
+          "endpoint",
+          "webhook_secret"
+        ]
+      },
+      "WebhookList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Webhook"
+            },
+            "description": "Array of webhook objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of webhooks matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        },
+        "required": ["object", "data", "total", "limit", "offset"]
+      },
+      "WebhookEvents": {
+        "type": "string",
+        "enum": [
+          "transcribe.job.processing",
+          "transcribe.job.completed",
+          "transcribe.job.failed",
+          "extract.job.processing",
+          "extract.job.completed",
+          "extract.job.failed",
+          "file.job.processing",
+          "file.job.completed",
+          "file.job.failed",
+          "file.job.deleted",
+          "collection.file.job.processing",
+          "collection.file.job.completed",
+          "collection.file.job.failed",
+          "collection.file.job.deleted"
+        ],
+        "description": "Webhook events that can be subscribed to"
+      },
+      "WebhookDeleteResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the webhook"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["webhook"],
+            "description": "Object type, always 'webhook'"
+          }
+        },
+        "required": ["id", "object"]
+      },
+      "WebhookCreateRequest": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Description of the webhook"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "URL of the webhook endpoint"
+          },
+          "subscribed_events": {
+            "type": "array",
+            "description": "Events that the webhook is subscribed to",
+            "items": {
+              "$ref": "#/components/schemas/WebhookEvents"
+            }
+          }
+        }
+      },
+      "WebhookUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Description of the webhook"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "URL of the webhook endpoint"
+          },
+          "subscribed_events": {
+            "type": "array",
+            "description": "Events that the webhook is subscribed to",
+            "items": {
+              "$ref": "#/components/schemas/WebhookEvents"
+            }
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the webhook is active"
           }
         }
       }
