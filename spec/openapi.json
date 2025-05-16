@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.0.10"
+    "version": "0.0.11"
   },
   "servers": [
     {
@@ -232,140 +232,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Extract"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Job not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "An unexpected error occurred on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/describe": {
-      "post": {
-        "tags": ["Describe"],
-        "deprecated": true,
-        "summary": "Create a new describe job",
-        "operationId": "createDescribe",
-        "description": "Creates a new describe job for comprehensive video description and transcription",
-        "requestBody": {
-          "description": "Generate rich, multimodal descriptions of video content",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewDescribe"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Describe"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request or describe config requires at least one option enabled",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Describe job not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "509": {
-            "description": "Monthly describe jobs limit reached",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "An unexpected error occurred on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/describe/{job_id}": {
-      "get": {
-        "tags": ["Describe"],
-        "deprecated": true,
-        "summary": "Retrieve the current state of a describe job",
-        "operationId": "getDescribe",
-        "description": "Retrieve the current state of a describe job",
-        "parameters": [
-          {
-            "name": "job_id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the describe job",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response with job details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Describe"
                 }
               }
             }
@@ -722,16 +588,6 @@
             }
           },
           "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "509": {
             "description": "Resource limits exceeded (total collections or files per collection)",
             "content": {
               "application/json": {
@@ -1326,87 +1182,6 @@
         }
       }
     },
-    "/collections/{collection_id}/videos/{file_id}/description": {
-      "get": {
-        "tags": ["Collections"],
-        "summary": "Retrieve the processed video summary description and segment documents for a file in a collection",
-        "operationId": "getDescription",
-        "description": "Retrieve the processed video summary description and segment documents for a file in a collection",
-        "parameters": [
-          {
-            "name": "collection_id",
-            "in": "path",
-            "required": true,
-            "description": "The ID of the collection",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "file_id",
-            "in": "path",
-            "required": true,
-            "description": "The ID of the file",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Maximum number of segments to return",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 50,
-              "maximum": 100
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "description": "Number of segments to skip",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "File description",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileDescription"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Collection or file not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "An unexpected error occurred on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/collections/{collection_id}/youtube": {
       "post": {
         "tags": ["Collections"],
@@ -1835,40 +1610,42 @@
           "data": {
             "description": "The structured data extracted from the video based on prompt or schema",
             "type": "object",
-            "entities": {
-              "type": "object",
-              "description": "Entities extracted from the video level"
-            },
-            "segment_entities": {
-              "type": "array",
-              "description": "Array of video entities extracted from individual time segments",
-              "items": {
+            "properties": {
+              "entities": {
                 "type": "object",
-                "properties": {
-                  "segment_id": {
-                    "oneOf": [
-                      {
-                        "type": "string",
-                        "description": "Unique identifier for the segment as a string"
-                      },
-                      {
-                        "type": "number",
-                        "description": "Unique identifier for the segment as a number"
-                      }
-                    ],
-                    "description": "Unique identifier for the segment"
-                  },
-                  "start_time": {
-                    "type": "number",
-                    "description": "Start time of the segment in seconds"
-                  },
-                  "end_time": {
-                    "type": "number",
-                    "description": "End time of the segment in seconds"
-                  },
-                  "entities": {
-                    "type": "object",
-                    "description": "Entities extracted from the segment"
+                "description": "Entities extracted from the video level"
+              },
+              "segment_entities": {
+                "type": "array",
+                "description": "Array of video entities extracted from individual time segments",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "segment_id": {
+                      "oneOf": [
+                        {
+                          "type": "string",
+                          "description": "Unique identifier for the segment as a string"
+                        },
+                        {
+                          "type": "number",
+                          "description": "Unique identifier for the segment as a number"
+                        }
+                      ],
+                      "description": "Unique identifier for the segment"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of the segment in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of the segment in seconds"
+                    },
+                    "entities": {
+                      "type": "object",
+                      "description": "Entities extracted from the segment"
+                    }
                   }
                 }
               }
@@ -1931,178 +1708,6 @@
             }
           }
         ]
-      },
-      "Describe": {
-        "required": ["job_id", "status"],
-        "type": "object",
-        "properties": {
-          "job_id": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "ready",
-              "completed",
-              "failed",
-              "not_applicable"
-            ]
-          },
-          "data": {
-            "description": "The comprehensive description data for the video",
-            "type": "object",
-            "properties": {
-              "url": {
-                "type": "string",
-                "description": "The URL of the processed video"
-              },
-              "title": {
-                "type": "string",
-                "description": "Generated title for the video"
-              },
-              "summary": {
-                "type": "string",
-                "description": "Generated summary of the video content"
-              },
-              "segment_docs": {
-                "type": "array",
-                "description": "Array of video segments with detailed information",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "segment_id": {
-                      "oneOf": [
-                        {
-                          "type": "string",
-                          "description": "Unique identifier for the segment as a string"
-                        },
-                        {
-                          "type": "number",
-                          "description": "Unique identifier for the segment as a number"
-                        }
-                      ],
-                      "description": "Unique identifier for the segment"
-                    },
-                    "start_time": {
-                      "type": "number",
-                      "description": "Start time of the segment in seconds"
-                    },
-                    "end_time": {
-                      "type": "number",
-                      "description": "End time of the segment in seconds"
-                    },
-                    "title": {
-                      "type": "string",
-                      "description": "Generated title for the segment"
-                    },
-                    "summary": {
-                      "type": "string",
-                      "description": "Generated summary for the segment"
-                    },
-                    "visual_description": {
-                      "type": "array",
-                      "description": "Description of visual content in the segment",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "text": {
-                            "type": "string",
-                            "description": "Description of visual content in the segment"
-                          },
-                          "start_time": {
-                            "type": "number",
-                            "description": "Start time of the visual content in seconds"
-                          },
-                          "end_time": {
-                            "type": "number",
-                            "description": "End time of the visual content in seconds"
-                          }
-                        }
-                      }
-                    },
-                    "scene_text": {
-                      "type": "array",
-                      "description": "Text detected on screen in the segment",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "text": {
-                            "type": "string",
-                            "description": "Text detected on screen"
-                          },
-                          "start_time": {
-                            "type": "number",
-                            "description": "Start time of the text in seconds"
-                          },
-                          "end_time": {
-                            "type": "number",
-                            "description": "End time of the text in seconds"
-                          }
-                        }
-                      }
-                    },
-                    "speech": {
-                      "type": "array",
-                      "description": "Transcription of speech in the segment",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "speaker": {
-                            "type": "string",
-                            "description": "Identified speaker"
-                          },
-                          "text": {
-                            "type": "string",
-                            "description": "Transcribed speech text"
-                          },
-                          "start_time": {
-                            "type": "number",
-                            "description": "Start time of speech in seconds"
-                          },
-                          "end_time": {
-                            "type": "number",
-                            "description": "End time of speech in seconds"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "error": {
-            "type": "string",
-            "description": "Error message if status is 'failed'"
-          }
-        }
-      },
-      "NewDescribe": {
-        "required": ["url"],
-        "type": "object",
-        "properties": {
-          "url": {
-            "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.",
-            "type": "string"
-          },
-          "enable_speech": {
-            "description": "Whether to generate speech transcript.",
-            "type": "boolean",
-            "default": true
-          },
-          "enable_scene_text": {
-            "description": "Whether to generate scene text.",
-            "type": "boolean",
-            "default": true
-          },
-          "enable_visual_scene_description": {
-            "description": "Whether to generate visual scene description.",
-            "type": "boolean",
-            "default": true
-          }
-        }
       },
       "File": {
         "type": "object",
@@ -2643,145 +2248,6 @@
           "offset"
         ]
       },
-      "FileDescription": {
-        "type": "object",
-        "properties": {
-          "collection_id": {
-            "type": "string",
-            "description": "ID of the collection"
-          },
-          "file_id": {
-            "type": "string",
-            "description": "ID of the file"
-          },
-          "title": {
-            "type": "string",
-            "description": "Generated title for the video"
-          },
-          "summary": {
-            "type": "string",
-            "description": "Generated summary of the video content"
-          },
-          "segment_docs": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "segment_id": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Unique identifier for the segment as a string"
-                    },
-                    {
-                      "type": "number",
-                      "description": "Unique identifier for the segment as a number"
-                    }
-                  ],
-                  "description": "Unique identifier for the segment"
-                },
-                "start_time": {
-                  "type": "number",
-                  "description": "Start time of the segment in seconds"
-                },
-                "end_time": {
-                  "type": "number",
-                  "description": "End time of the segment in seconds"
-                },
-                "title": {
-                  "type": "string",
-                  "description": "Generated title for the segment"
-                },
-                "summary": {
-                  "type": "string",
-                  "description": "Generated summary for the segment"
-                },
-                "visual_description": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "text": {
-                        "type": "string",
-                        "description": "Description of visual content in the segment"
-                      },
-                      "start_time": {
-                        "type": "number",
-                        "description": "Start time of the visual content in seconds"
-                      },
-                      "end_time": {
-                        "type": "number",
-                        "description": "End time of the visual content in seconds"
-                      }
-                    }
-                  },
-                  "description": "Description of visual content in the segment"
-                },
-                "scene_text": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "text": {
-                        "type": "string",
-                        "description": "Text detected on screen"
-                      },
-                      "start_time": {
-                        "type": "number",
-                        "description": "Start time of the text in seconds"
-                      },
-                      "end_time": {
-                        "type": "number",
-                        "description": "End time of the text in seconds"
-                      }
-                    }
-                  },
-                  "description": "Text detected on screen in the segment"
-                },
-                "speech": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "speaker": {
-                        "type": "string",
-                        "description": "Identified speaker"
-                      },
-                      "text": {
-                        "type": "string",
-                        "description": "Transcribed speech text"
-                      },
-                      "start_time": {
-                        "type": "number",
-                        "description": "Start time of speech in seconds"
-                      },
-                      "end_time": {
-                        "type": "number",
-                        "description": "End time of speech in seconds"
-                      }
-                    }
-                  },
-                  "description": "Transcription of speech in the segment"
-                }
-              }
-            },
-            "description": "Array of video segments with detailed information"
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of segments"
-          },
-          "limit": {
-            "type": "integer",
-            "description": "Number of segments returned in this response"
-          },
-          "offset": {
-            "type": "integer",
-            "description": "Offset from the start of the segments list"
-          }
-        },
-        "required": ["collection_id", "file_id"]
-      },
       "Error": {
         "required": ["error"],
         "type": "object",
@@ -3010,27 +2476,6 @@
                             "text": {
                               "type": "string",
                               "description": "Source modality, one of visual_scene_description, scene_text, speech"
-                            }
-                          }
-                        }
-                      },
-                      "visual_description": {
-                        "type": "array",
-                        "description": "Description of visual content in the segment",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "text": {
-                              "type": "string",
-                              "description": "Description of visual content in the segment"
-                            },
-                            "start_time": {
-                              "type": "number",
-                              "description": "Start time of the visual content in seconds"
-                            },
-                            "end_time": {
-                              "type": "number",
-                              "description": "End time of the visual content in seconds"
                             }
                           }
                         }
