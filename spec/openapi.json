@@ -544,7 +544,7 @@
         "tags": ["Collections"],
         "summary": "Create a new collection to organize and process video files",
         "operationId": "createCollection",
-        "description": "Create a new collection to organize and process video files",
+        "description": "Create a new collection to organize and process video files. Collections are used to group files together and process them in a consistent way.",
         "requestBody": {
           "description": "Collection creation parameters",
           "content": {
@@ -1106,7 +1106,7 @@
         "tags": ["Collections"],
         "summary": "Retrieve all extracted entities for a specific file in a collection",
         "operationId": "getEntities",
-        "description": "Retrieve all extracted entities for a specific file in a collection",
+        "description": "Retrieve all extracted entities for a specific file in a collection. This API is only available when the a collection is created with collection_type 'entities'",
         "parameters": [
           {
             "name": "collection_id",
@@ -1155,6 +1155,97 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FileEntities"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Collection type is not 'entities'",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/videos/{file_id}/rich-transcripts": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "Retrieve rich transcription data for a specific file in a collection",
+        "operationId": "getTranscripts",
+        "description": "Retrieve rich transcription data for a specific file in a collection. This API is only available when the a collection is created with collection_type 'rich-transcripts'",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Format for the response",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rich transcription data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RichTranscript"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Collection type is not 'rich-transcripts'",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -1928,9 +2019,14 @@
             ],
             "description": "Description of the collection's purpose or contents, null if none provided"
           },
+          "collection_type": {
+            "type": "string",
+            "enum": ["entities", "rich-transcripts"],
+            "description": "Type of collection, determines how videos are processed and what data is extracted"
+          },
           "extract_config": {
             "type": "object",
-            "description": "Configuration for automatic entity extraction from videos",
+            "description": "Configuration for automatic entity extraction from videos. Required when collection_type is 'entities'.",
             "properties": {
               "prompt": {
                 "type": "string",
@@ -1939,6 +2035,32 @@
               "schema": {
                 "type": "object",
                 "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided."
+              }
+            }
+          },
+          "transcribe_config": {
+            "type": "object",
+            "description": "Configuration for rich transcription from videos. Used when collection_type is 'rich-transcripts'. If not provided, default values will be used.",
+            "properties": {
+              "enable_summary": {
+                "type": "boolean",
+                "description": "Whether to generate a video level summary and title",
+                "default": true
+              },
+              "enable_speech": {
+                "type": "boolean",
+                "description": "Whether to generate speech transcript",
+                "default": true
+              },
+              "enable_scene_text": {
+                "type": "boolean",
+                "description": "Whether to generate scene text extraction",
+                "default": false
+              },
+              "enable_visual_scene_description": {
+                "type": "boolean",
+                "description": "Whether to generate visual scene description",
+                "default": false
               }
             }
           },
@@ -1951,11 +2073,23 @@
             "description": "Number of files in the collection"
           }
         },
-        "required": ["id", "object", "name", "created_at", "file_count"]
+        "required": [
+          "id",
+          "object",
+          "name",
+          "created_at",
+          "file_count",
+          "collection_type"
+        ]
       },
       "NewCollection": {
         "type": "object",
         "properties": {
+          "collection_type": {
+            "type": "string",
+            "enum": ["entities", "rich-transcripts"],
+            "description": "Type of collection, determines how videos are processed and what data is extracted.\n\n- **entities** is intended for entity extraction.\n- **rich-transcripts** is intended for rich transcription of videos and use in chat completion.."
+          },
           "name": {
             "type": "string",
             "description": "Name of the collection (must be unique within an organization)"
@@ -1975,7 +2109,7 @@
           },
           "extract_config": {
             "type": "object",
-            "description": "Configuration for automatic entity extraction from videos",
+            "description": "Configuration for automatic entity extraction from videos. Required when collection_type is 'entities'.",
             "properties": {
               "prompt": {
                 "type": "string",
@@ -1986,9 +2120,35 @@
                 "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided."
               }
             }
+          },
+          "transcribe_config": {
+            "type": "object",
+            "description": "Configuration for rich transcription from videos. Used when collection_type is 'rich-transcripts'. If not provided, default values will be used.",
+            "properties": {
+              "enable_summary": {
+                "type": "boolean",
+                "description": "Whether to generate a video level summary and title",
+                "default": true
+              },
+              "enable_speech": {
+                "type": "boolean",
+                "description": "Whether to generate speech transcript",
+                "default": true
+              },
+              "enable_scene_text": {
+                "type": "boolean",
+                "description": "Whether to generate scene text extraction",
+                "default": false
+              },
+              "enable_visual_scene_description": {
+                "type": "boolean",
+                "description": "Whether to generate visual scene description",
+                "default": false
+              }
+            }
           }
         },
-        "required": ["name"]
+        "required": ["collection_type", "name"]
       },
       "CollectionList": {
         "type": "object",
@@ -2262,7 +2422,7 @@
         "properties": {
           "model": {
             "type": "string",
-            "description": "ID of the video understanding model to use",
+            "description": "Name of the video understanding model to use.",
             "enum": ["nimbus-001"]
           },
           "messages": {
@@ -2274,7 +2434,7 @@
           },
           "collections": {
             "type": "array",
-            "description": "List of collection IDs to use as context for the chat",
+            "description": "List of collection IDs to use as context for the chat.\n\nNote that 'nimbus-001' only supports collections with collection_type 'rich-transcripts'",
             "items": {
               "type": "string"
             },
@@ -2761,6 +2921,103 @@
           }
         },
         "required": ["object", "data", "total", "limit"]
+      },
+      "RichTranscript": {
+        "type": "object",
+        "required": [
+          "collection_id",
+          "file_id",
+          "title",
+          "summary",
+          "speech",
+          "visual_scene_description",
+          "scene_text"
+        ],
+        "properties": {
+          "collection_id": {
+            "type": "string",
+            "description": "The ID of the collection"
+          },
+          "file_id": {
+            "type": "string",
+            "description": "The ID of the file"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested"
+          },
+          "title": {
+            "type": "string",
+            "description": "Generated title of the video"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Generated video level summary"
+          },
+          "speech": {
+            "type": "array",
+            "description": "Array of speech transcriptions",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Transcribed speech text"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of speech in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of speech in seconds"
+                }
+              }
+            }
+          },
+          "visual_scene_description": {
+            "type": "array",
+            "description": "Array of visual descriptions",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Description of visual content"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of visual content in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of visual content in seconds"
+                }
+              }
+            }
+          },
+          "scene_text": {
+            "type": "array",
+            "description": "Array of scene text extractions",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Text detected on screen"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of text in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of text in seconds"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
