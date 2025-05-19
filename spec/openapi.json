@@ -2948,8 +2948,7 @@
         "type": "object",
         "required": [
           "collection_id",
-          "file_id",
-          "title"
+          "file_id"
         ],
         "properties": {
           "collection_id": {
