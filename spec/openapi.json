@@ -2518,12 +2518,6 @@
             "description": "Whether to force the model to always perform a search when answering questions, even if it believes it knows the answer",
             "default": false
           },
-          "response_format": {
-            "type": "string",
-            "description": "Format for responses",
-            "enum": ["text", "markdown", "json"],
-            "default": "text"
-          },
           "include_citations": {
             "type": "boolean",
             "description": "Whether to include citations to specific video segments",
