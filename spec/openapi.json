@@ -152,6 +152,15 @@
               "type": "string",
               "format": "date"
             }
+          },
+          {
+            "name": "url",
+            "in": "query",
+            "description": "Filter extract jobs by the input URL used for extraction",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -656,6 +665,16 @@
               "type": "string",
               "enum": ["asc", "desc"],
               "default": "desc"
+            }
+          },
+          {
+            "name": "collection_type",
+            "in": "query",
+            "description": "Filter collections by type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["entities", "rich-transcripts"]
             }
           }
         ],
@@ -1547,6 +1566,15 @@
             "schema": {
               "type": "string",
               "format": "date"
+            }
+          },
+          {
+            "name": "url",
+            "in": "query",
+            "description": "Filter transcription jobs by the input URL used for transcription",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -2490,7 +2518,7 @@
             "description": "Whether to force the model to always perform a search when answering questions, even if it believes it knows the answer",
             "default": false
           },
-          "result_format": {
+          "response_format": {
             "type": "string",
             "description": "Format for responses",
             "enum": ["text", "markdown", "json"],
