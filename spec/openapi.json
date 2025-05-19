@@ -2949,11 +2949,7 @@
         "required": [
           "collection_id",
           "file_id",
-          "title",
-          "summary",
-          "speech",
-          "visual_scene_description",
-          "scene_text"
+          "title"
         ],
         "properties": {
           "collection_id": {
