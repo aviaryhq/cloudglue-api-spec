@@ -1695,7 +1695,7 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Maximum number of collections to return",
+            "description": "Maximum number of webhooks to return",
             "required": false,
             "schema": {
               "type": "integer",
