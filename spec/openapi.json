@@ -1706,7 +1706,7 @@
           {
             "name": "offset",
             "in": "query",
-            "description": "Number of collections to skip",
+            "description": "Number of webhooks to skip",
             "required": false,
             "schema": {
               "type": "integer",
@@ -1716,18 +1716,18 @@
           {
             "name": "order",
             "in": "query",
-            "description": "Order the collections by a specific field",
+            "description": "Order the webhooks by a specific field",
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["name", "created_at"],
+              "enum": ["created_at"],
               "default": "created_at"
             }
           },
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort the collections in ascending or descending order",
+            "description": "Sort the webhooks in ascending or descending order",
             "required": false,
             "schema": {
               "type": "string",
