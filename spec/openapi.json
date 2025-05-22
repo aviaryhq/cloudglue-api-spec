@@ -2024,10 +2024,6 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "segment_id": {
-                      "type": "string",
-                      "description": "Unique identifier for the segment"
-                    },
                     "start_time": {
                       "type": "number",
                       "description": "Start time of the segment in seconds"
@@ -2652,10 +2648,6 @@
             "items": {
               "type": "object",
               "properties": {
-                "segment_id": {
-                  "type": "string",
-                  "description": "Unique identifier for the segment"
-                },
                 "start_time": {
                   "type": "number",
                   "description": "Start time of the segment in seconds"
