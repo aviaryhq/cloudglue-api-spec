@@ -2024,19 +2024,6 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "segment_id": {
-                      "oneOf": [
-                        {
-                          "type": "string",
-                          "description": "Unique identifier for the segment as a string"
-                        },
-                        {
-                          "type": "number",
-                          "description": "Unique identifier for the segment as a number"
-                        }
-                      ],
-                      "description": "Unique identifier for the segment"
-                    },
                     "start_time": {
                       "type": "number",
                       "description": "Start time of the segment in seconds"
@@ -2652,16 +2639,7 @@
             "description": "ID of the file"
           },
           "entities": {
-            "oneOf": [
-              {
-                "type": "object",
-                "description": "Map of entity type to array of entities"
-              },
-              {
-                "type": "array",
-                "description": "List of entities "
-              }
-            ],
+            "type": "object",
             "description": "Entities extracted from the file at the video level"
           },
           "segment_entities": {
@@ -2670,19 +2648,6 @@
             "items": {
               "type": "object",
               "properties": {
-                "segment_id": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Unique identifier for the segment as a string"
-                    },
-                    {
-                      "type": "number",
-                      "description": "Unique identifier for the segment as a number"
-                    }
-                  ],
-                  "description": "Unique identifier for the segment"
-                },
                 "start_time": {
                   "type": "number",
                   "description": "Start time of the segment in seconds"
