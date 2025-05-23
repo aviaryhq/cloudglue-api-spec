@@ -1511,7 +1511,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
+              "default": 20,
               "maximum": 100
             }
           },
@@ -1777,7 +1777,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
+              "default": 20,
               "maximum": 100
             }
           },
