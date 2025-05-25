@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.0.14"
+    "version": "0.0.15"
   },
   "servers": [
     {
@@ -1144,27 +1144,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Maximum number of segments to return (for segment entities)",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 50,
-              "maximum": 100
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "description": "Number of segments to skip (for segment entities)",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 0
-            }
           }
         ],
         "responses": {
@@ -2266,6 +2245,16 @@
               "schema": {
                 "type": "object",
                 "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided."
+              },
+              "enable_video_level_entities": {
+                "type": "boolean",
+                "description": "Whether to extract entities at the video level",
+                "default": false
+              },
+              "enable_segment_level_entities": {
+                "type": "boolean",
+                "description": "Whether to extract entities at the segment level",
+                "default": true
               }
             }
           },
@@ -2353,6 +2342,16 @@
               "schema": {
                 "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided.",
                 "type": "object"
+              },
+              "enable_video_level_entities": {
+                "type": "boolean",
+                "description": "Whether to extract entities at the video level",
+                "default": false
+              },
+              "enable_segment_level_entities": {
+                "type": "boolean",
+                "description": "Whether to extract entities at the segment level",
+                "default": true
               }
             }
           }
@@ -2593,6 +2592,16 @@
               "schema": {
                 "type": "object",
                 "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided."
+              },
+              "enable_video_level_entities": {
+                "type": "boolean",
+                "description": "Whether to extract entities at the video level",
+                "default": false
+              },
+              "enable_segment_level_entities": {
+                "type": "boolean",
+                "description": "Whether to extract entities at the segment level",
+                "default": true
               }
             }
           },
@@ -2676,6 +2685,16 @@
               "schema": {
                 "type": "object",
                 "description": "A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided."
+              },
+              "enable_video_level_entities": {
+                "type": "boolean",
+                "description": "Whether to extract entities at the video level",
+                "default": false
+              },
+              "enable_segment_level_entities": {
+                "type": "boolean",
+                "description": "Whether to extract entities at the segment level",
+                "default": true
               }
             }
           },
@@ -2921,18 +2940,6 @@
                 }
               }
             }
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of segments with extracted entities"
-          },
-          "limit": {
-            "type": "integer",
-            "description": "Number of segments returned in this response (for segment entities)"
-          },
-          "offset": {
-            "type": "integer",
-            "description": "Offset from the start of the list (for segment entities)"
           }
         },
         "required": [
