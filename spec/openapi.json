@@ -2249,7 +2249,7 @@
               "enable_video_level_entities": {
                 "type": "boolean",
                 "description": "Whether to extract entities at the video level",
-                "default": true
+                "default": false
               },
               "enable_segment_level_entities": {
                 "type": "boolean",
@@ -2346,7 +2346,7 @@
               "enable_video_level_entities": {
                 "type": "boolean",
                 "description": "Whether to extract entities at the video level",
-                "default": true
+                "default": false
               },
               "enable_segment_level_entities": {
                 "type": "boolean",
@@ -2596,7 +2596,7 @@
               "enable_video_level_entities": {
                 "type": "boolean",
                 "description": "Whether to extract entities at the video level",
-                "default": true
+                "default": false
               },
               "enable_segment_level_entities": {
                 "type": "boolean",
@@ -2689,7 +2689,7 @@
               "enable_video_level_entities": {
                 "type": "boolean",
                 "description": "Whether to extract entities at the video level",
-                "default": true
+                "default": false
               },
               "enable_segment_level_entities": {
                 "type": "boolean",
