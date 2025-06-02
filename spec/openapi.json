@@ -3034,7 +3034,7 @@
                   "properties": {
                     "path": {
                       "type": "string",
-                      "description": "JSON path on video_info object (e.g. 'has_audio', 'duration_seconds', 'format')"
+                      "description": "JSON path on video_info object (e.g. 'has_audio', 'duration_seconds')"
                     },
                     "operator": {
                       "type": "string",
@@ -3072,7 +3072,7 @@
                   "properties": {
                     "path": {
                       "type": "string",
-                      "description": "JSON path on file object (e.g. 'filename', 'created_at', 'bytes')"
+                      "description": "JSON path on file object (e.g. 'uri', 'id', 'filename', 'created_at', 'bytes')"
                     },
                     "operator": {
                       "type": "string",
