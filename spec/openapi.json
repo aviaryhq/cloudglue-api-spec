@@ -2996,7 +2996,83 @@
                   "properties": {
                     "path": {
                       "type": "string",
-                      "description": "JSON path on file (e.g. 'metadata.my_custom_field' or 'video_info.has_audio')"
+                      "description": "JSON path on metadata object (e.g. 'my_custom_field', 'category.subcategory')"
+                    },
+                    "operator": {
+                      "type": "string",
+                      "enum": [
+                        "NotEqual",
+                        "Equal",
+                        "LessThan",
+                        "GreaterThan",
+                        "In",
+                        "ContainsAny",
+                        "ContainsAll"
+                      ],
+                      "description": "Comparison operator to apply"
+                    },
+                    "valueText": {
+                      "type": "string",
+                      "description": "Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, In)"
+                    },
+                    "valueTextArray": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Array of values for array comparisons (used with ContainsAny, ContainsAll)"
+                    }
+                  },
+                  "required": ["path", "operator"]
+                }
+              },
+              "video_info": {
+                "type": "array",
+                "description": "Filter by video information using JSON path expressions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "JSON path on video_info object (e.g. 'has_audio', 'duration_seconds')"
+                    },
+                    "operator": {
+                      "type": "string",
+                      "enum": [
+                        "NotEqual",
+                        "Equal",
+                        "LessThan",
+                        "GreaterThan",
+                        "In",
+                        "ContainsAny",
+                        "ContainsAll"
+                      ],
+                      "description": "Comparison operator to apply"
+                    },
+                    "valueText": {
+                      "type": "string",
+                      "description": "Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, In)"
+                    },
+                    "valueTextArray": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Array of values for array comparisons (used with ContainsAny, ContainsAll)"
+                    }
+                  },
+                  "required": ["path", "operator"]
+                }
+              },
+              "file": {
+                "type": "array",
+                "description": "Filter by file properties using JSON path expressions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "JSON path on file object (e.g. 'uri', 'id', 'filename', 'created_at', 'bytes')"
                     },
                     "operator": {
                       "type": "string",
