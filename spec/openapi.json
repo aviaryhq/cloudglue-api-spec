@@ -546,6 +546,56 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": ["Files"],
+        "summary": "Update a file",
+        "operationId": "updateFile",
+        "description": "Update a file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file to update",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "File update parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful file update",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/File"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or malformed file update parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/collections": {
@@ -2546,6 +2596,19 @@
           }
         },
         "required": ["id", "object"]
+      },
+      "FileUpdate": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Optional user-provided metadata about the file"
+          },
+          "filename": {
+            "type": "string",
+            "description": "New filename for the file"
+          }
+        }
       },
       "Collection": {
         "type": "object",
