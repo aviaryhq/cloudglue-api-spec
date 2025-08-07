@@ -598,6 +598,152 @@
         }
       }
     },
+    "/files/{file_id}/segmentations": {
+      "post": {
+        "tags": ["Files"],
+        "summary": "Create a new segmentation for a file",
+        "operationId": "createFileSegmentation",
+        "description": "Create a new segmentation for a file using the specified segmentation configuration",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file to segment",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Segmentation configuration",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SegmentationConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Segmentation created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Segmentation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or file duration is less than window size",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Files"],
+        "summary": "List segmentations for a file",
+        "operationId": "listFileSegmentations",
+        "description": "List all segmentations for a specific file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of segmentations to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of segmentations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SegmentationList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/collections": {
       "post": {
         "tags": ["Collections"],
@@ -1973,6 +2119,7 @@
         }
       }
     },
+
     "/webhooks": {
       "get": {
         "tags": ["Webhooks"],
@@ -2256,6 +2403,139 @@
           }
         }
       }
+    },
+    "/segmentations/{segmentation_id}": {
+      "get": {
+        "tags": ["Segmentations"],
+        "summary": "Get a specific segmentation",
+        "operationId": "getSegmentation",
+        "description": "Retrieve details about a specific segmentation including its segments",
+        "parameters": [
+          {
+            "name": "segmentation_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segmentation to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of segments to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the segments list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Segmentation details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Segmentation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Segmentation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Segmentations"],
+        "summary": "Delete a segmentation",
+        "operationId": "deleteSegmentation",
+        "description": "Delete a specific segmentation",
+        "parameters": [
+          {
+            "name": "segmentation_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segmentation to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Segmentation deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the deleted segmentation"
+                    }
+                  },
+                  "required": ["id"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Segmentation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2404,6 +2684,9 @@
                 "default": true
               }
             }
+          },
+          {
+            "$ref": "#/components/schemas/FileSegmentationConfig"
           }
         ]
       },
@@ -2694,6 +2977,10 @@
               }
             }
           },
+          "default_segmentation_config": {
+            "$ref": "#/components/schemas/SegmentationConfig",
+            "description": "Default segmentation configuration used for files in this collection"
+          },
           "created_at": {
             "type": "integer",
             "description": "Unix timestamp of when the collection was created"
@@ -2718,7 +3005,7 @@
           "collection_type": {
             "type": "string",
             "enum": ["entities", "rich-transcripts"],
-            "description": "Type of collection, determines how videos are processed and what data is extracted.\n\n- **entities** is intended for entity extraction.\n- **rich-transcripts** is intended for rich transcription of videos and use in chat completion.."
+            "description": "Type of collection, determines how videos are processed and what data is extracted.\n\n**Collection Types:**\n- **entities**: Extract structured data/entities from videos (requires `extract_config`)\n- **rich-transcripts**: Generate rich transcriptions with speech and visual descriptions (use `transcribe_config`)\n\n⚠️ **Important**: Only provide the config that matches your collection_type. Other configs will be ignored."
           },
           "name": {
             "type": "string",
@@ -2739,7 +3026,7 @@
           },
           "extract_config": {
             "type": "object",
-            "description": "Configuration for automatic entity extraction from videos. Required when collection_type is 'entities'.",
+            "description": "🎯 **Use ONLY when collection_type = 'entities'**\n\nConfiguration for automatic entity extraction from videos. Required for entities collections. This config will be ignored for other collection types.",
             "properties": {
               "prompt": {
                 "type": "string",
@@ -2763,7 +3050,7 @@
           },
           "transcribe_config": {
             "type": "object",
-            "description": "Configuration for rich transcription from videos. Used when collection_type is 'rich-transcripts'. If not provided, default values will be used.",
+            "description": "🎯 **Use ONLY when collection_type = 'rich-transcripts'**\n\nConfiguration for rich transcription from videos. Optional - if not provided, default values will be used. This config will be ignored for other collection types.",
             "properties": {
               "enable_summary": {
                 "type": "boolean",
@@ -2786,6 +3073,10 @@
                 "default": false
               }
             }
+          },
+          "default_segmentation_config": {
+            "$ref": "#/components/schemas/SegmentationConfig",
+            "description": "Default segmentation configuration to use for files added to this collection. If not provided, a default uniform segmentation will be used."
           }
         },
         "required": ["collection_type", "name"]
@@ -2836,28 +3127,42 @@
         "required": ["id", "object"]
       },
       "AddCollectionFile": {
-        "type": "object",
-        "properties": {
-          "file_id": {
-            "type": "string",
-            "description": "The ID of the file to add to the collection"
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "file_id": {
+                "type": "string",
+                "description": "The ID of the file to add to the collection"
+              }
+            },
+            "required": ["file_id"]
+          },
+          {
+            "$ref": "#/components/schemas/FileSegmentationConfig"
           }
-        },
-        "required": ["file_id"]
+        ]
       },
       "AddYouTubeCollectionFile": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string",
-            "description": "The URL of the YouTube video to add to the collection.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input."
-          },
-          "metadata": {
+        "allOf": [
+          {
             "type": "object",
-            "description": "User-provided metadata about the YouTube video"
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "The URL of the YouTube video to add to the collection.\n\nNote that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input."
+              },
+              "metadata": {
+                "type": "object",
+                "description": "User-provided metadata about the YouTube video"
+              }
+            },
+            "required": ["url"]
+          },
+          {
+            "$ref": "#/components/schemas/FileSegmentationConfig"
           }
-        },
-        "required": ["url"]
+        ]
       },
       "CollectionFile": {
         "type": "object",
@@ -2890,31 +3195,41 @@
             ],
             "description": "Overall processing status of the file in this collection"
           },
-          "extract_status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed",
-              "not_applicable"
-            ],
-            "description": "Status of the entity extraction processing"
-          },
-          "searchable_status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed",
-              "not_applicable"
-            ],
-            "description": "Status of the searchable index processing"
-          },
           "file": {
             "$ref": "#/components/schemas/File",
             "description": "The file object"
+          },
+          "segmentation": {
+            "type": "object",
+            "description": "Segmentation information for this file in the collection. Only present when the file has been segmented.",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier for the segmentation"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "processing",
+                  "completed",
+                  "failed",
+                  "not_applicable"
+                ],
+                "description": "Status of the segmentation job"
+              },
+              "file_id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "ID of the file that was segmented"
+              },
+              "segmentation_config": {
+                "$ref": "#/components/schemas/SegmentationConfig",
+                "description": "Configuration used for this segmentation"
+              }
+            },
+            "required": ["id", "status", "file_id", "segmentation_config"]
           }
         },
         "required": ["collection_id", "file_id", "object", "added_at", "status"]
@@ -3438,7 +3753,7 @@
             "type": "object",
             "description": "Configuration for rich transcription from videos",
             "properties": {
-              "enable_summary ": {
+              "enable_summary": {
                 "type": "boolean",
                 "description": "Whether the user requested to generate a video level summary and title"
               },
@@ -3543,34 +3858,41 @@
         }
       },
       "NewTranscribe": {
-        "type": "object",
-        "required": ["url"],
-        "properties": {
-          "url": {
-            "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech level understanding only.",
-            "type": "string"
+        "allOf": [
+          {
+            "type": "object",
+            "required": ["url"],
+            "properties": {
+              "url": {
+                "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech level understanding only.",
+                "type": "string"
+              },
+              "enable_summary": {
+                "description": "Whether to generate a video level summary and title",
+                "type": "boolean",
+                "default": true
+              },
+              "enable_speech": {
+                "description": "Whether to generate speech transcript",
+                "type": "boolean",
+                "default": true
+              },
+              "enable_visual_scene_description": {
+                "description": "Whether to generate visual scene description",
+                "type": "boolean",
+                "default": false
+              },
+              "enable_scene_text": {
+                "description": "Whether to generate scene text extraction",
+                "type": "boolean",
+                "default": false
+              }
+            }
           },
-          "enable_summary": {
-            "description": "Whether to generate a video level summary and title",
-            "type": "boolean",
-            "default": true
-          },
-          "enable_speech": {
-            "description": "Whether to generate speech transcript",
-            "type": "boolean",
-            "default": true
-          },
-          "enable_visual_scene_description": {
-            "description": "Whether to generate visual scene description",
-            "type": "boolean",
-            "default": false
-          },
-          "enable_scene_text": {
-            "description": "Whether to generate scene text extraction",
-            "type": "boolean",
-            "default": false
+          {
+            "$ref": "#/components/schemas/FileSegmentationConfig"
           }
-        }
+        ]
       },
       "TranscribeList": {
         "type": "object",
@@ -4030,6 +4352,222 @@
           }
         },
         "required": ["object", "data", "total", "limit", "offset"]
+      },
+      "SegmentationUniformConfig": {
+        "type": "object",
+        "required": ["window_seconds"],
+        "properties": {
+          "window_seconds": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 60,
+            "description": "The duration of each segment in seconds"
+          },
+          "hop_seconds": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 60,
+            "description": "The offset between the start of new windows. This means there can be overlap between segments. If not provided, defaults to window_seconds."
+          }
+        }
+      },
+      "SegmentationShotDetectorConfig": {
+        "type": "object",
+        "required": ["detector"],
+        "properties": {
+          "threshold": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Detection sensitivity threshold - lower values create more segments:\n\n• **adaptive**: Sensitivity to scene changes (default: 3.0). Lower values detect more subtle transitions.\n• **content**: Sensitivity to visual differences (default: 27.0). Lower values detect smaller changes in color/lighting."
+          },
+          "min_seconds": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 60,
+            "nullable": true,
+            "description": "The minimum length of a shot in seconds"
+          },
+          "max_seconds": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 60,
+            "nullable": true,
+            "description": "The maximum length of a shot in seconds"
+          },
+          "detector": {
+            "type": "string",
+            "enum": ["adaptive", "content"],
+            "description": "The detector strategy to use:\n\n• **adaptive**: Designed for dynamic footage with camera movement, panning, or action. Examples: sports broadcasts, drone footage, handheld documentaries, action movies, live events.\n• **content**: Optimized for controlled footage with clear visual transitions. Examples: studio interviews, corporate videos, educational content, product demos, scripted content."
+          }
+        }
+      },
+      "SegmentationConfig": {
+        "type": "object",
+        "description": "Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**\n\n• **uniform**: Provide `uniform_config`, do NOT provide `shot_detector_config`\n• **shot-detector**: Provide `shot_detector_config`, do NOT provide `uniform_config`\n\nOptionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.",
+        "required": ["strategy"],
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "enum": ["uniform", "shot-detector"],
+            "description": "Segmentation strategy - determines which config you must provide"
+          },
+          "uniform_config": {
+            "$ref": "#/components/schemas/SegmentationUniformConfig",
+            "description": "🎯 **REQUIRED when strategy = 'uniform'** - Configuration for uniform segmentation. Do NOT provide when using shot-detector strategy."
+          },
+          "shot_detector_config": {
+            "$ref": "#/components/schemas/SegmentationShotDetectorConfig",
+            "description": "🎯 **REQUIRED when strategy = 'shot-detector'** - Configuration for shot detection segmentation. Do NOT provide when using uniform strategy."
+          },
+          "start_time_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Optional: The start time of the video in seconds to start segmenting from"
+          },
+          "end_time_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Optional: The end time of the video in seconds to stop segmenting at"
+          }
+        }
+      },
+      "FileSegmentationConfig": {
+        "type": "object",
+        "properties": {
+          "segmentation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config."
+          },
+          "segmentation_config": {
+            "$ref": "#/components/schemas/SegmentationConfig",
+            "description": "Configuration for video segmentation. Cannot be provided together with segmentation_id."
+          }
+        }
+      },
+      "Segmentation": {
+        "type": "object",
+        "required": [
+          "segmentation_id",
+          "status",
+          "created_at",
+          "file_id",
+          "segmentation_config"
+        ],
+        "properties": {
+          "segmentation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the segmentation job"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "not_applicable"
+            ],
+            "description": "Status of the segmentation job"
+          },
+          "created_at": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Unix timestamp of when the segmentation was created"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file this segmentation belongs to"
+          },
+          "segmentation_config": {
+            "$ref": "#/components/schemas/SegmentationConfig"
+          },
+          "total_segments": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Total number of segments in this segmentation (only present when status is completed)"
+          },
+          "data": {
+            "type": "object",
+            "description": "Segment data with pagination (only present when status is completed and segments exist)",
+            "required": ["object", "segments", "total", "limit", "offset"],
+            "properties": {
+              "object": {
+                "type": "string",
+                "enum": ["list"],
+                "description": "Object type, always 'list'"
+              },
+              "segments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "start_time", "end_time"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique identifier for the segment"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of the segment in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of the segment in seconds"
+                    }
+                  }
+                }
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total number of segments"
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Number of segments returned in this response"
+              },
+              "offset": {
+                "type": "integer",
+                "description": "Offset from the start of the segments list"
+              }
+            }
+          }
+        }
+      },
+
+      "SegmentationList": {
+        "type": "object",
+        "required": ["object", "data", "total", "limit", "offset"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Segmentation"
+            },
+            "description": "Array of segmentation objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of segmentations matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        }
       }
     },
     "securitySchemes": {
