@@ -3217,7 +3217,7 @@
                   "failed",
                   "not_applicable"
                 ],
-                "description": "Status of the segmentation job"
+                "description": "Status of the segmentation job. If a job has the status 'not_applicable' it means that we were unable to find any appropriate scenes for this video. This can be possible if you use the shot-detector strategy."
               },
               "file_id": {
                 "type": "string",
