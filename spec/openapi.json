@@ -3133,10 +3133,13 @@
             "properties": {
               "file_id": {
                 "type": "string",
-                "description": "The ID of the file to add to the collection"
+                "description": "The ID of the file to add to the collection. If provided, url will be ignored"
+              },
+              "url": {
+                "type": "string",
+                "description": "The URL of the file to add to the collection. Either file_id or url must be provided."
               }
-            },
-            "required": ["file_id"]
+            }
           },
           {
             "$ref": "#/components/schemas/FileSegmentationConfig"
