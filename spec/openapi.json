@@ -3130,16 +3130,28 @@
         "allOf": [
           {
             "type": "object",
-            "properties": {
-              "file_id": {
-                "type": "string",
-                "description": "The ID of the file to add to the collection. If provided, url will be ignored"
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "file_id": {
+                    "type": "string",
+                    "description": "The ID of the file to add to the collection"
+                  }
+                },
+                "required": ["file_id"]
               },
-              "url": {
-                "type": "string",
-                "description": "The URL of the file to add to the collection. Either file_id or url must be provided."
+              {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "description": "The URL of the file to add to the collection"
+                  }
+                },
+                "required": ["url"]
               }
-            }
+            ]
           },
           {
             "$ref": "#/components/schemas/FileSegmentationConfig"
@@ -3220,7 +3232,7 @@
                   "failed",
                   "not_applicable"
                 ],
-                "description": "Status of the segmentation job. If a job has the status 'not_applicable' it means that we were unable to find any appropriate scenes for this video. This can be possible if you use the shot-detector strategy."
+                "description": "Status of the segmentation job"
               },
               "file_id": {
                 "type": "string",
@@ -4101,6 +4113,9 @@
           "extract.job.processing",
           "extract.job.completed",
           "extract.job.failed",
+          "describe.job.processing",
+          "describe.job.completed",
+          "describe.job.failed",
           "file.job.processing",
           "file.job.completed",
           "file.job.failed",
@@ -4473,7 +4488,7 @@
               "failed",
               "not_applicable"
             ],
-            "description": "Status of the segmentation job"
+            "description": "Status of the segmentation job. If a job has the status 'not_applicable' it means that we were unable to find any appropriate scenes for this video. This can be possible if you use the shot-detector strategy."
           },
           "created_at": {
             "type": "number",
