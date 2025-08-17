@@ -870,7 +870,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["entities", "rich-transcripts"]
+              "enum": ["entities", "rich-transcripts", "media-descriptions"]
             }
           }
         ],
@@ -2924,7 +2924,7 @@
           },
           "collection_type": {
             "type": "string",
-            "enum": ["entities", "rich-transcripts"],
+            "enum": ["entities", "rich-transcripts", "media-descriptions"],
             "description": "Type of collection, determines how videos are processed and what data is extracted"
           },
           "extract_config": {
