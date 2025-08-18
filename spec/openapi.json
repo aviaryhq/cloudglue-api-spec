@@ -2404,6 +2404,67 @@
         }
       }
     },
+    "/search": {
+      "post": {
+        "tags": ["Search"],
+        "summary": "Search across video files and segments to find relevant content",
+        "operationId": "searchContent",
+        "description": "Search for videos or video segments in collections to find relevant videos or moments/clips in a video. Supports filtering by metadata, video info, and file properties.\n\n**Important:** Currently only rich-transcript collections support search. For file-level search (scope='file'), the collection must be configured with 'enable_summary: true' in the transcribe_config.",
+        "requestBody": {
+          "description": "Search parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/segmentations/{segmentation_id}": {
       "get": {
         "tags": ["Segmentations"],
@@ -4581,6 +4642,334 @@
           "offset": {
             "type": "integer",
             "description": "Offset from the start of the list"
+          }
+        }
+      },
+      "SearchRequest": {
+        "type": "object",
+        "required": ["scope", "collections", "query"],
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": ["file", "segment"],
+            "description": "Search scope - 'file' searches at file level (requires collections with enable_summary=true), 'segment' searches at segment level"
+          },
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "description": "List of collection IDs to search within. Must be rich-transcript collections (collection_type='rich-transcripts'). For file-level search, collections must have 'enable_summary: true' in transcribe_config."
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Text search query to find relevant content"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10,
+            "description": "Maximum number of search results to return"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/SearchFilter"
+          }
+        }
+      },
+      "SearchFilter": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "type": "array",
+            "description": "Filter by file metadata using JSON path expressions",
+            "items": {
+              "$ref": "#/components/schemas/SearchFilterCriteria"
+            }
+          },
+          "video_info": {
+            "type": "array",
+            "description": "Filter by video information",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SearchFilterCriteria"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "enum": ["duration_seconds", "has_audio"]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "file": {
+            "type": "array",
+            "description": "Filter by file properties",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SearchFilterCriteria"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "enum": ["bytes", "filename", "uri", "created_at", "id"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SearchFilterCriteria": {
+        "type": "object",
+        "required": ["path", "operator"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "JSON path for the field to filter on"
+          },
+          "operator": {
+            "type": "string",
+            "enum": [
+              "NotEqual",
+              "Equal",
+              "LessThan",
+              "GreaterThan",
+              "ContainsAny",
+              "ContainsAll",
+              "In"
+            ],
+            "description": "Comparison operator to apply"
+          },
+          "valueText": {
+            "type": "string",
+            "description": "Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)"
+          },
+          "valueTextArray": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of values for array comparisons (used with ContainsAny, ContainsAll, In)"
+          }
+        }
+      },
+      "SearchResponse": {
+        "type": "object",
+        "required": ["object", "query", "scope", "results", "total", "limit"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["search"],
+            "description": "Object type, always 'search'"
+          },
+          "query": {
+            "type": "string",
+            "description": "The search query that was executed"
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["file", "segment"],
+            "description": "The search scope that was used"
+          },
+          "results": {
+            "type": "array",
+            "description": "Array of search results ranked by relevance score",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FileSearchResult"
+                },
+                {
+                  "$ref": "#/components/schemas/SegmentSearchResult"
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of results returned"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The limit that was applied to the search"
+          }
+        }
+      },
+      "FileSearchResult": {
+        "type": "object",
+        "required": ["type", "file_id", "collection_id", "score", "id"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["file"],
+            "description": "Result type, always 'file'"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file"
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the collection containing this file"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the search document"
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Relevance score (0-1, higher is more relevant)"
+          },
+          "filename": {
+            "type": "string",
+            "nullable": true,
+            "description": "Original filename of the video"
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true,
+            "description": "Generated summary of the video"
+          },
+          "generated_title": {
+            "type": "string",
+            "nullable": true,
+            "description": "Generated title of the video"
+          }
+        }
+      },
+      "SegmentSearchResult": {
+        "type": "object",
+        "required": [
+          "type",
+          "file_id",
+          "collection_id",
+          "segment_id",
+          "score",
+          "id",
+          "start_time",
+          "end_time"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["segment"],
+            "description": "Result type, always 'segment'"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file"
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the collection containing this file"
+          },
+          "segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the segment"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the search document"
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Relevance score (0-1, higher is more relevant)"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Start time of the segment in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "End time of the segment in seconds"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true,
+            "description": "Title associated with the segment"
+          },
+          "filename": {
+            "type": "string",
+            "nullable": true,
+            "description": "Original filename of the video"
+          },
+          "visual_description": {
+            "type": "array",
+            "description": "Visual descriptions for the segment",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "start_time": {
+                  "type": "number"
+                },
+                "end_time": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "scene_text": {
+            "type": "array",
+            "description": "Text detected on screen in the segment",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "start_time": {
+                  "type": "number"
+                },
+                "end_time": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "speech": {
+            "type": "array",
+            "description": "Speech transcription for the segment",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "start_time": {
+                  "type": "number"
+                },
+                "end_time": {
+                  "type": "number"
+                }
+              }
+            }
           }
         }
       }
