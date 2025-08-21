@@ -744,6 +744,101 @@
         }
       }
     },
+    "/files/{file_id}/thumbnails": {
+      "get": {
+        "tags": ["Files", "Thumbnails"],
+        "summary": "Get thumbnails for a file",
+        "operationId": "getThumbnails",
+        "description": "Get all thumbnails for a file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "is_default",
+            "in": "query",
+            "description": "Filter thumbnails by default status. If true, will only return the default thumbnail for the file",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "segmentation_id",
+            "in": "query",
+            "description": "Filter thumbnails by segmentation ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of thumbnails to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of thumbnails",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThumbnailList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/collections": {
       "post": {
         "tags": ["Collections"],
@@ -2571,6 +2666,90 @@
                     }
                   },
                   "required": ["id"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Segmentation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/segmentations/{segmentation_id}/thumbnails": {
+      "get": {
+        "tags": ["Segmentations", "Thumbnails"],
+        "summary": "Get thumbnails for a segmentation",
+        "operationId": "getSegmentationThumbnails",
+        "description": "Get all thumbnails for a segmentation",
+        "parameters": [
+          {
+            "name": "segmentation_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segmentation to retrieve thumbnails for",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "segment_ids",
+            "in": "query",
+            "description": "Filter thumbnails by segment IDs. If provided, will only return thumbnails for the specified segments. Comma separated list of segment IDs.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of thumbnails to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Segmentation thumbnails",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThumbnailList"
                 }
               }
             }
@@ -5045,6 +5224,64 @@
                 }
               }
             }
+          }
+        }
+      },
+      "ThumbnailList": {
+        "type": "object",
+        "required": ["object", "total", "limit", "offset", "data"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of segmentations matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Thumbnail"
+            }
+          }
+        }
+      },
+      "Thumbnail": {
+        "type": "object",
+        "required": ["id", "url", "time"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the thumbnail"
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL of the thumbnail"
+          },
+          "time": {
+            "type": "number",
+            "description": "The time of the thumbnail in seconds relative to the start of the video"
+          },
+          "segmentation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segmentation"
+          },
+          "segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segment"
           }
         }
       }
