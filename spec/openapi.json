@@ -3018,7 +3018,7 @@
             "properties": {
               "enable_summary": {
                 "type": "boolean",
-                "description": "Whether to generate a video level summary and title",
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
                 "default": true
               },
               "enable_speech": {
@@ -3115,7 +3115,7 @@
             "properties": {
               "enable_summary": {
                 "type": "boolean",
-                "description": "Whether to generate a video level summary and title",
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
                 "default": true
               },
               "enable_speech": {
@@ -3831,7 +3831,7 @@
             "properties": {
               "enable_summary": {
                 "type": "boolean",
-                "description": "Whether the user requested to generate a video level summary and title"
+                "description": "Whether the user requested to generate video-level and segment-level (moment-level) summaries and titles"
               },
               "enable_speech": {
                 "type": "boolean",
@@ -3924,6 +3924,31 @@
                     }
                   }
                 }
+              },
+              "segment_summary": {
+                "type": "array",
+                "description": "Array of summary information for each segment of the video. Only available when enable_summary is set to true in the transcribe configuration.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "description": "Generated segment-level title"
+                    },
+                    "summary": {
+                      "type": "string",
+                      "description": "Generated segment-level summary"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of segment in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of segment in seconds"
+                    }
+                  }
+                }
               }
             }
           },
@@ -3944,7 +3969,7 @@
                 "type": "string"
               },
               "enable_summary": {
-                "description": "Whether to generate a video level summary and title",
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
                 "type": "boolean",
                 "default": true
               },
@@ -4079,6 +4104,31 @@
                 "end_time": {
                   "type": "number",
                   "description": "End time of text in seconds"
+                }
+              }
+            }
+          },
+          "segment_summary": {
+            "type": "array",
+            "description": "Array of summary information for each segment of the video. Only available when enable_summary is set to true in the transcribe configuration.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Generated segment-level title"
+                },
+                "summary": {
+                  "type": "string",
+                  "description": "Generated segment-level summary"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of segment in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of segment in seconds"
                 }
               }
             }
@@ -4403,6 +4453,31 @@
                           "end_time": {
                             "type": "number",
                             "description": "End time of text in seconds"
+                          }
+                        }
+                      }
+                    },
+                    "segment_summary": {
+                      "type": "array",
+                      "description": "Array of summary information for each segment of the video. Only available when enable_summary is set to true in the transcribe configuration.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "description": "Generated segment-level title"
+                          },
+                          "summary": {
+                            "type": "string",
+                            "description": "Generated segment-level summary"
+                          },
+                          "start_time": {
+                            "type": "number",
+                            "description": "Start time of segment in seconds"
+                          },
+                          "end_time": {
+                            "type": "number",
+                            "description": "End time of segment in seconds"
                           }
                         }
                       }
