@@ -3084,6 +3084,11 @@
           "metadata": {
             "type": "object",
             "description": "User-provided metadata about the file"
+          },
+          "enable_segment_thumbnails": {
+            "type": "boolean",
+            "description": "Whether to generate thumbnails for each segment",
+            "default": false
           }
         },
         "required": ["file"]
