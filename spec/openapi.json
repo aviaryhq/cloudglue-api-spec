@@ -3339,6 +3339,10 @@
           "default_segmentation_config": {
             "$ref": "#/components/schemas/SegmentationConfig",
             "description": "Default segmentation configuration to use for files added to this collection. If not provided, a default uniform segmentation will be used."
+          },
+          "default_thumbnails_config": {
+            "$ref": "#/components/schemas/ThumbnailsConfig",
+            "description": "Default thumbnails configuration to use for files added to this collection. If not provided, a default thumbnails configuration will be used."
           }
         },
         "required": ["collection_type", "name"]
