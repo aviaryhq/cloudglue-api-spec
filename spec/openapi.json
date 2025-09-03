@@ -3073,6 +3073,11 @@
           "thumbnail_url": {
             "type": "string",
             "description": "URL of the thumbnail for the file"
+          },
+          "source": {
+            "type": "string",
+            "enum": ["video", "youtube", "s3", "dropbox", "http", "upload"],
+            "description": "Source of the file"
           }
         },
         "required": ["id", "uri", "status"]
