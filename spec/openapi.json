@@ -5018,121 +5018,110 @@
         "type": "object",
         "required": ["collection_id", "file_id"],
         "properties": {
-          "object": {
+          "collection_id": {
             "type": "string",
-            "enum": ["collection_file"],
-            "description": "Object type, always 'collection_file'"
+            "description": "Unique identifier for the collection"
           },
           "file_id": {
             "type": "string",
-            "format": "uuid",
             "description": "Unique identifier for the file"
           },
-          "added_at": {
-            "type": "integer",
-            "description": "Unix timestamp of when the file was added to the collection"
+          "content": {
+            "type": "string",
+            "description": "Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested"
           },
-          "data": {
-            "type": "object",
-            "properties": {
-              "content": {
-                "type": "string",
-                "description": "Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested"
-              },
-              "title": {
-                "type": "string",
-                "description": "Generated title of the video"
-              },
-              "summary": {
-                "type": "string",
-                "description": "Generated video level summary"
-              },
-              "speech": {
-                "type": "array",
-                "description": "Array of speech transcriptions",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "text": {
-                      "type": "string",
-                      "description": "Transcribed speech text"
-                    },
-                    "start_time": {
-                      "type": "number",
-                      "description": "Start time of speech in seconds"
-                    },
-                    "end_time": {
-                      "type": "number",
-                      "description": "End time of speech in seconds"
-                    }
-                  }
+          "title": {
+            "type": "string",
+            "description": "Generated title of the video"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Generated video level summary"
+          },
+          "speech": {
+            "type": "array",
+            "description": "Array of speech transcriptions",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Transcribed speech text"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of speech in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of speech in seconds"
                 }
-              },
-              "visual_scene_description": {
-                "type": "array",
-                "description": "Array of visual descriptions",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "text": {
-                      "type": "string",
-                      "description": "Description of visual content"
-                    },
-                    "start_time": {
-                      "type": "number",
-                      "description": "Start time of visual content in seconds"
-                    },
-                    "end_time": {
-                      "type": "number",
-                      "description": "End time of visual content in seconds"
-                    }
-                  }
+              }
+            }
+          },
+          "visual_scene_description": {
+            "type": "array",
+            "description": "Array of visual descriptions",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Description of visual content"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of visual content in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of visual content in seconds"
                 }
-              },
-              "scene_text": {
-                "type": "array",
-                "description": "Array of scene text extractions",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "text": {
-                      "type": "string",
-                      "description": "Extracted scene text"
-                    },
-                    "start_time": {
-                      "type": "number",
-                      "description": "Start time of scene text in seconds"
-                    },
-                    "end_time": {
-                      "type": "number",
-                      "description": "End time of scene text in seconds"
-                    }
-                  }
+              }
+            }
+          },
+          "scene_text": {
+            "type": "array",
+            "description": "Array of scene text extractions",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Extracted scene text"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of scene text in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of scene text in seconds"
                 }
-              },
-              "segment_summary": {
-                "type": "array",
-                "description": "Array of summary information for each segment of the video",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "title": {
-                      "type": "string",
-                      "description": "Generated segment-level title"
-                    },
-                    "summary": {
-                      "type": "string",
-                      "description": "Generated segment-level summary"
-                    },
-                    "start_time": {
-                      "type": "number",
-                      "description": "Start time of segment in seconds"
-                    },
-                    "end_time": {
-                      "type": "number",
-                      "description": "End time of segment in seconds"
-                    }
-                  }
+              }
+            }
+          },
+          "segment_summary": {
+            "type": "array",
+            "description": "Array of summary information for each segment of the video",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Generated segment-level title"
+                },
+                "summary": {
+                  "type": "string",
+                  "description": "Generated segment-level summary"
+                },
+                "start_time": {
+                  "type": "number",
+                  "description": "Start time of segment in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "End time of segment in seconds"
                 }
               }
             }
@@ -5637,7 +5626,7 @@
               "properties": {
                 "file_id": {
                   "type": "string",
-                  "description": "ID of the file"
+                  "description": "Unique identifier for the file"
                 },
                 "added_at": {
                   "type": "integer",
@@ -5728,7 +5717,7 @@
                     },
                     "segment_summary": {
                       "type": "array",
-                      "description": "Array of summary information for each segment of the video. Only available when enable_summary is set to true in the describe configuration.",
+                      "description": "Array of summary information for each segment of the video",
                       "items": {
                         "type": "object",
                         "properties": {
