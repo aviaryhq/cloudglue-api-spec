@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "servers": [
     {
@@ -1903,6 +1903,222 @@
         }
       }
     },
+    "/collections/{collection_id}/media-descriptions": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "List all media description data for files in a collection",
+        "operationId": "listCollectionMediaDescriptions",
+        "description": "List all media description data for files in a collection. This API is only available when a collection is created with collection_type 'media-descriptions'",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of files to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of files to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Order the files by a specific field",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["added_at", "filename"],
+              "default": "added_at"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort the files in ascending or descending order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          },
+          {
+            "name": "added_before",
+            "in": "query",
+            "description": "Filter files added before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "added_after",
+            "in": "query",
+            "description": "Filter files added after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Format for the response",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of media description data in the collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionMediaDescriptionsList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Collection type is not 'media-descriptions'",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/videos/{file_id}/media-descriptions": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "Retrieve media description data for a specific file in a collection",
+        "operationId": "getMediaDescriptions",
+        "description": "Retrieve media description data for a specific file in a collection. This API is only available when the collection is created with collection_type 'media-descriptions'",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Format for the response",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Media description data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaDescription"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Collection type is not 'media-descriptions'",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/chat/completions": {
       "post": {
         "tags": ["Chat"],
@@ -2197,6 +2413,256 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Transcribe"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/describe": {
+      "post": {
+        "tags": ["Describe"],
+        "summary": "Create a new media description job",
+        "operationId": "createDescribe",
+        "description": "Creates a new media description job for video content",
+        "requestBody": {
+          "description": "Media description job parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewDescribe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Describe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing required url/file_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Chat completion limits reached (monthly or daily)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "509": {
+            "description": "Monthly description jobs limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Describe"],
+        "summary": "List all media description jobs",
+        "operationId": "listDescribes",
+        "description": "List all media description jobs with optional filtering",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of description jobs to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of description jobs to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter description jobs by status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "processing",
+                "completed",
+                "failed",
+                "not_applicable"
+              ]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter description jobs created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter description jobs created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "url",
+            "in": "query",
+            "description": "Filter description jobs by the input URL used for description",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Format for the response",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of description jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DescribeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/describe/{job_id}": {
+      "get": {
+        "tags": ["Describe"],
+        "summary": "Retrieve the current state of a media description job",
+        "operationId": "getDescribe",
+        "description": "Retrieve the current state of a media description job",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the description job",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Format for the response",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with job details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Describe"
                 }
               }
             }
@@ -3244,6 +3710,32 @@
               }
             }
           },
+          "describe_config": {
+            "type": "object",
+            "description": "Configuration for comprehensive media description from videos. Used when collection_type is 'media-descriptions'. If not provided, default values will be used.",
+            "properties": {
+              "enable_summary": {
+                "type": "boolean",
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
+                "default": true
+              },
+              "enable_speech": {
+                "type": "boolean",
+                "description": "Whether to generate speech transcript",
+                "default": true
+              },
+              "enable_scene_text": {
+                "type": "boolean",
+                "description": "Whether to generate scene text extraction",
+                "default": true
+              },
+              "enable_visual_scene_description": {
+                "type": "boolean",
+                "description": "Whether to generate visual scene description",
+                "default": true
+              }
+            }
+          },
           "default_segmentation_config": {
             "$ref": "#/components/schemas/SegmentationConfig",
             "description": "Default segmentation configuration used for files in this collection"
@@ -3275,8 +3767,8 @@
         "properties": {
           "collection_type": {
             "type": "string",
-            "enum": ["entities", "rich-transcripts"],
-            "description": "Type of collection, determines how videos are processed and what data is extracted.\n\n**Collection Types:**\n- **entities**: Extract structured data/entities from videos (requires `extract_config`)\n- **rich-transcripts**: Generate rich transcriptions with speech and visual descriptions (use `transcribe_config`)\n\n⚠️ **Important**: Only provide the config that matches your collection_type. Other configs will be ignored."
+            "enum": ["entities", "rich-transcripts", "media-descriptions"],
+            "description": "Type of collection, determines how videos are processed and what data is extracted.\n\n**Collection Types:**\n- **entities**: Extract structured data/entities from videos (requires `extract_config`)\n- **rich-transcripts**: Generate rich transcriptions with speech and visual descriptions (use `transcribe_config`)\n- **media-descriptions**: Generate comprehensive media descriptions with speech, visual, and text analysis (use `describe_config`)\n\n⚠️ **Important**: Only provide the config that matches your collection_type. Other configs will be ignored."
           },
           "name": {
             "type": "string",
@@ -3342,6 +3834,32 @@
                 "type": "boolean",
                 "description": "Whether to generate visual scene description",
                 "default": false
+              }
+            }
+          },
+          "describe_config": {
+            "type": "object",
+            "description": "🎯 **Use ONLY when collection_type = 'media-descriptions'**\n\nConfiguration for comprehensive media description from videos. Optional - if not provided, default values will be used. This config will be ignored for other collection types.",
+            "properties": {
+              "enable_summary": {
+                "type": "boolean",
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
+                "default": true
+              },
+              "enable_speech": {
+                "type": "boolean",
+                "description": "Whether to generate speech transcript",
+                "default": true
+              },
+              "enable_scene_text": {
+                "type": "boolean",
+                "description": "Whether to generate scene text extraction",
+                "default": true
+              },
+              "enable_visual_scene_description": {
+                "type": "boolean",
+                "description": "Whether to generate visual scene description",
+                "default": true
               }
             }
           },
@@ -4246,6 +4764,381 @@
         },
         "required": ["object", "data", "total", "limit"]
       },
+      "DescribeConfig": {
+        "type": "object",
+        "description": "Configuration for media description from videos",
+        "properties": {
+          "enable_summary": {
+            "type": "boolean",
+            "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
+            "default": true
+          },
+          "enable_speech": {
+            "type": "boolean",
+            "description": "Whether to generate speech transcript",
+            "default": true
+          },
+          "enable_visual_scene_description": {
+            "type": "boolean",
+            "description": "Whether to generate visual scene description",
+            "default": true
+          },
+          "enable_scene_text": {
+            "type": "boolean",
+            "description": "Whether to generate scene text extraction",
+            "default": true
+          }
+        }
+      },
+      "NewDescribe": {
+        "allOf": [
+          {
+            "type": "object",
+            "required": ["url"],
+            "properties": {
+              "url": {
+                "description": "Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.\n\nNote that YouTube videos are currently limited to speech level understanding only.",
+                "type": "string"
+              },
+              "enable_summary": {
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
+                "type": "boolean",
+                "default": true
+              },
+              "enable_speech": {
+                "description": "Whether to generate speech transcript",
+                "type": "boolean",
+                "default": true
+              },
+              "enable_visual_scene_description": {
+                "description": "Whether to generate visual scene description",
+                "type": "boolean",
+                "default": true
+              },
+              "enable_scene_text": {
+                "description": "Whether to generate scene text extraction",
+                "type": "boolean",
+                "default": true
+              },
+              "thumbnails_config": {
+                "$ref": "#/components/schemas/ThumbnailsConfig"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/FileSegmentationConfig"
+          }
+        ]
+      },
+      "Describe": {
+        "required": ["job_id", "status"],
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "not_applicable"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL of the processed video"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the job was created"
+          },
+          "describe_config": {
+            "type": "object",
+            "description": "Configuration for media description from videos",
+            "properties": {
+              "enable_summary": {
+                "type": "boolean",
+                "description": "Whether the user requested to generate video-level and segment-level (moment-level) summaries and titles"
+              },
+              "enable_speech": {
+                "type": "boolean",
+                "description": "Whether the user requested to generate speech transcript"
+              },
+              "enable_visual_scene_description": {
+                "type": "boolean",
+                "description": "Whether the user requested to generate visual scene description"
+              },
+              "enable_scene_text": {
+                "type": "boolean",
+                "description": "Whether the user requested to generate scene text"
+              }
+            }
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested"
+              },
+              "title": {
+                "type": "string",
+                "description": "Generated title of the video; for YouTube videos, this is the title of the video as it appears on YouTube"
+              },
+              "summary": {
+                "type": "string",
+                "description": "Generated video level summary; for YouTube videos, this is the summary of the video as it appears on YouTube"
+              },
+              "speech": {
+                "type": "array",
+                "description": "Array of speech transcriptions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Transcribed speech text"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of speech in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of speech in seconds"
+                    }
+                  }
+                }
+              },
+              "visual_scene_description": {
+                "type": "array",
+                "description": "Array of visual descriptions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Description of visual content"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of visual content in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of visual content in seconds"
+                    }
+                  }
+                }
+              },
+              "scene_text": {
+                "type": "array",
+                "description": "Array of scene text extractions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Extracted scene text"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of scene text in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of scene text in seconds"
+                    }
+                  }
+                }
+              },
+              "segment_summary": {
+                "type": "array",
+                "description": "Array of summary information for each segment of the video. Only available when enable_summary is set to true in the describe configuration.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "description": "Generated segment-level title"
+                    },
+                    "summary": {
+                      "type": "string",
+                      "description": "Generated segment-level summary"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of segment in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of segment in seconds"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if status is 'failed'"
+          }
+        }
+      },
+      "DescribeList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Describe"
+            },
+            "description": "Array of describe job objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of describe jobs matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          }
+        },
+        "required": ["object", "data", "total", "limit"]
+      },
+      "MediaDescription": {
+        "type": "object",
+        "required": ["collection_id", "file_id"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["collection_file"],
+            "description": "Object type, always 'collection_file'"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the file"
+          },
+          "added_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the file was added to the collection"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested"
+              },
+              "title": {
+                "type": "string",
+                "description": "Generated title of the video"
+              },
+              "summary": {
+                "type": "string",
+                "description": "Generated video level summary"
+              },
+              "speech": {
+                "type": "array",
+                "description": "Array of speech transcriptions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Transcribed speech text"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of speech in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of speech in seconds"
+                    }
+                  }
+                }
+              },
+              "visual_scene_description": {
+                "type": "array",
+                "description": "Array of visual descriptions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Description of visual content"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of visual content in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of visual content in seconds"
+                    }
+                  }
+                }
+              },
+              "scene_text": {
+                "type": "array",
+                "description": "Array of scene text extractions",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Extracted scene text"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of scene text in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of scene text in seconds"
+                    }
+                  }
+                }
+              },
+              "segment_summary": {
+                "type": "array",
+                "description": "Array of summary information for each segment of the video",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "description": "Generated segment-level title"
+                    },
+                    "summary": {
+                      "type": "string",
+                      "description": "Generated segment-level summary"
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "description": "Start time of segment in seconds"
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "description": "End time of segment in seconds"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "RichTranscript": {
         "type": "object",
         "required": ["collection_id", "file_id"],
@@ -4717,6 +5610,157 @@
           "total": {
             "type": "integer",
             "description": "Total number of files with rich transcription data matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        },
+        "required": ["object", "data", "total", "limit", "offset"]
+      },
+      "CollectionMediaDescriptionsList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "file_id": {
+                  "type": "string",
+                  "description": "ID of the file"
+                },
+                "added_at": {
+                  "type": "integer",
+                  "description": "Unix timestamp of when the file was added to the collection"
+                },
+                "object": {
+                  "type": "string",
+                  "enum": ["collection_file"],
+                  "description": "Object type, always 'collection_file'"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "description": "Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested"
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Generated title of the video"
+                    },
+                    "summary": {
+                      "type": "string",
+                      "description": "Generated video level summary"
+                    },
+                    "speech": {
+                      "type": "array",
+                      "description": "Array of speech transcriptions",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "description": "Transcribed speech text"
+                          },
+                          "start_time": {
+                            "type": "number",
+                            "description": "Start time of speech in seconds"
+                          },
+                          "end_time": {
+                            "type": "number",
+                            "description": "End time of speech in seconds"
+                          }
+                        }
+                      }
+                    },
+                    "visual_scene_description": {
+                      "type": "array",
+                      "description": "Array of visual descriptions",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "description": "Description of visual content"
+                          },
+                          "start_time": {
+                            "type": "number",
+                            "description": "Start time of visual content in seconds"
+                          },
+                          "end_time": {
+                            "type": "number",
+                            "description": "End time of visual content in seconds"
+                          }
+                        }
+                      }
+                    },
+                    "scene_text": {
+                      "type": "array",
+                      "description": "Array of scene text extractions",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "description": "Text detected on screen"
+                          },
+                          "start_time": {
+                            "type": "number",
+                            "description": "Start time of text in seconds"
+                          },
+                          "end_time": {
+                            "type": "number",
+                            "description": "End time of text in seconds"
+                          }
+                        }
+                      }
+                    },
+                    "segment_summary": {
+                      "type": "array",
+                      "description": "Array of summary information for each segment of the video. Only available when enable_summary is set to true in the describe configuration.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "description": "Generated segment-level title"
+                          },
+                          "summary": {
+                            "type": "string",
+                            "description": "Generated segment-level summary"
+                          },
+                          "start_time": {
+                            "type": "number",
+                            "description": "Start time of segment in seconds"
+                          },
+                          "end_time": {
+                            "type": "number",
+                            "description": "End time of segment in seconds"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["file_id", "data", "added_at", "object"]
+            },
+            "description": "Array of media description data"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of files with media description data matching the query"
           },
           "limit": {
             "type": "integer",
