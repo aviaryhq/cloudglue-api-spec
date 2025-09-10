@@ -6183,6 +6183,11 @@
             "type": "string",
             "nullable": true,
             "description": "Generated title of the video"
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the thumbnail for the file if available."
           }
         }
       },
@@ -6301,6 +6306,11 @@
                 }
               }
             }
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the thumbnail for the segment if available"
           }
         }
       },
