@@ -422,6 +422,15 @@
               "enum": ["asc", "desc"],
               "default": "desc"
             }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.\n\n**Supported Filter Types:**\n\n• **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory')\n• **video_info** - Filter by video information properties\n  - `duration_seconds` - Video duration in seconds\n  - `has_audio` - Whether the video has audio (true/false)\n\n• **file** - Filter by file properties\n  - `filename` - File name (string)\n  - `uri` - File URI (string)\n  - `id` - File ID (UUID string)\n  - `created_at` - Creation timestamp (ISO 8601 string)\n  - `bytes` - File size in bytes (number)\n\n**Supported Operators:**\n• **Equal** - Exact match (requires valueText)\n• **NotEqual** - Not equal to value (requires valueText)\n• **LessThan** - Less than value (requires valueText)\n• **GreaterThan** - Greater than value (requires valueText)\n• **Like** - Case-insensitive pattern matching with wildcards (requires valueText)\n• **In** - Value is in array (requires valueTextArray)\n• **ContainsAny** - Array contains any of the values (requires valueTextArray)\n• **ContainsAll** - Array contains all of the values (requires valueTextArray)\n\n**Examples:**\n\n**Metadata filtering:**\n```json\n{\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]}\n```\n\n**Video info filtering:**\n```json\n{\"video_info\":[{\"path\":\"video_info.duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]}\n```\n\n**File property filtering:**\n```json\n{\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]}\n```\n```json\n{\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]}\n```\n```json\n{\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]}\n```\n\n**Combined filtering:**\n```json\n{\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"video_info.has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]}\n```",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -6080,13 +6089,14 @@
               "GreaterThan",
               "ContainsAny",
               "ContainsAll",
-              "In"
+              "In",
+              "Like"
             ],
             "description": "Comparison operator to apply"
           },
           "valueText": {
             "type": "string",
-            "description": "Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)"
+            "description": "Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)"
           },
           "valueTextArray": {
             "type": "array",
