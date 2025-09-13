@@ -6109,7 +6109,15 @@
       },
       "SearchResponse": {
         "type": "object",
-        "required": ["object", "query", "scope", "results", "total", "limit"],
+        "required": [
+          "id",
+          "object",
+          "query",
+          "scope",
+          "results",
+          "total",
+          "limit"
+        ],
         "properties": {
           "id": {
             "type": "string",
