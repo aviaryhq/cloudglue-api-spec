@@ -6111,6 +6111,11 @@
         "type": "object",
         "required": ["object", "query", "scope", "results", "total", "limit"],
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the search response"
+          },
           "object": {
             "type": "string",
             "enum": ["search"],
