@@ -123,14 +123,7 @@
             "description": "Filter extract jobs by status",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "processing",
-                "completed",
-                "failed",
-                "not_applicable"
-              ]
+              "$ref": "#/components/schemas/StatusEnum"
             }
           },
           {
@@ -350,14 +343,7 @@
             "description": "Filter files by processing status",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "processing",
-                "completed",
-                "failed",
-                "not_applicable"
-              ]
+              "$ref": "#/components/schemas/StatusEnum"
             }
           },
           {
@@ -1225,14 +1211,7 @@
             "description": "Filter by processing status",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "processing",
-                "completed",
-                "failed",
-                "not_applicable"
-              ]
+              "$ref": "#/components/schemas/StatusEnum"
             }
           },
           {
@@ -2303,14 +2282,7 @@
             "description": "Filter transcription jobs by status",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "processing",
-                "completed",
-                "failed",
-                "not_applicable"
-              ]
+              "$ref": "#/components/schemas/StatusEnum"
             }
           },
           {
@@ -2553,14 +2525,7 @@
             "description": "Filter description jobs by status",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "processing",
-                "completed",
-                "failed",
-                "not_applicable"
-              ]
+              "$ref": "#/components/schemas/StatusEnum"
             }
           },
           {
@@ -3266,6 +3231,17 @@
   },
   "components": {
     "schemas": {
+      "StatusEnum": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "processing",
+          "completed",
+          "failed",
+          "not_applicable"
+        ],
+        "description": "Processing status of given objects"
+      },
       "Extract": {
         "required": ["job_id", "status"],
         "type": "object",
@@ -3274,14 +3250,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed",
-              "not_applicable"
-            ]
+            "$ref": "#/components/schemas/StatusEnum"
           },
           "url": {
             "type": "string",
@@ -3428,14 +3397,7 @@
             "description": "Unique identifier for the file"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed",
-              "not_applicable"
-            ],
+            "$ref": "#/components/schemas/StatusEnum",
             "description": "Processing status of the file"
           },
           "bytes": {
@@ -4012,14 +3974,7 @@
             "description": "Unix timestamp of when the file was added to the collection"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed",
-              "not_applicable"
-            ],
+            "$ref": "#/components/schemas/StatusEnum",
             "description": "Overall processing status of the file in this collection"
           },
           "file": {
@@ -4036,14 +3991,7 @@
                 "description": "Unique identifier for the segmentation"
               },
               "status": {
-                "type": "string",
-                "enum": [
-                  "pending",
-                  "processing",
-                  "completed",
-                  "failed",
-                  "not_applicable"
-                ],
+                "$ref": "#/components/schemas/StatusEnum",
                 "description": "Status of the segmentation job"
               },
               "file_id": {
@@ -4537,14 +4485,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed",
-              "not_applicable"
-            ]
+            "$ref": "#/components/schemas/StatusEnum"
           },
           "url": {
             "type": "string",
@@ -4827,14 +4768,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed",
-              "not_applicable"
-            ]
+            "$ref": "#/components/schemas/StatusEnum"
           },
           "url": {
             "type": "string",
@@ -5871,14 +5805,7 @@
             "description": "Unique identifier for the segmentation job"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "failed",
-              "not_applicable"
-            ],
+            "$ref": "#/components/schemas/StatusEnum",
             "description": "Status of the segmentation job. If a job has the status 'not_applicable' it means that we were unable to find any appropriate scenes for this video. This can be possible if you use the shot-detector strategy."
           },
           "created_at": {
