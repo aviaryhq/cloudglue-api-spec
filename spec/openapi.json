@@ -3179,6 +3179,239 @@
         }
       }
     },
+    "/segments": {
+      "post": {
+        "tags": ["Segments"],
+        "summary": "Create a new video segmentation job",
+        "operationId": "createSegments",
+        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**⚠️ Note: YouTube URLs are not supported for this API.** Use Cloudglue Files, HTTP URLs, or S3/Dropbox URIs instead.",
+        "requestBody": {
+          "description": "Segmentation job parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewSegments"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Segments"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request, missing required parameters, or unsupported URL type (e.g., YouTube URLs are not supported)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Monthly segments jobs limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Segments"],
+        "summary": "List all segmentation jobs",
+        "operationId": "listSegments",
+        "description": "List all segmentation jobs with optional filtering",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of segmentation jobs to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of segmentation jobs to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter segmentation jobs by status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "processing", "completed", "failed"]
+            }
+          },
+          {
+            "name": "criteria",
+            "in": "query",
+            "description": "Filter segmentation jobs by criteria type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["shot", "narrative"]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter segmentation jobs created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter segmentation jobs created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "url",
+            "in": "query",
+            "description": "Filter segmentation jobs by the input URL used for segmentation",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of segmentation jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SegmentsList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/segments/{job_id}": {
+      "get": {
+        "tags": ["Segments"],
+        "summary": "Retrieve the current state of a segmentation job",
+        "operationId": "getSegments",
+        "description": "Retrieve the current state of a segmentation job",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the segmentation job",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with job details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Segments"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/segmentations/{segmentation_id}/thumbnails": {
       "get": {
         "tags": ["Segmentations", "Thumbnails"],
@@ -5327,7 +5560,10 @@
           "collection.file.job.processing",
           "collection.file.job.completed",
           "collection.file.job.failed",
-          "collection.file.job.deleted"
+          "collection.file.job.deleted",
+          "segment.job.processing",
+          "segment.job.completed",
+          "segment.job.failed"
         ],
         "description": "Webhook events that can be subscribed to"
       },
@@ -5773,12 +6009,6 @@
         "type": "object",
         "required": ["detector"],
         "properties": {
-          "threshold": {
-            "type": "number",
-            "minimum": 0,
-            "nullable": true,
-            "description": "Detection sensitivity threshold - lower values create more segments:\n\n• **adaptive**: Sensitivity to scene changes (default: 3.0). Lower values detect more subtle transitions.\n• **content**: Sensitivity to visual differences (default: 27.0). Lower values detect smaller changes in color/lighting."
-          },
           "min_seconds": {
             "type": "number",
             "minimum": 2,
@@ -6394,6 +6624,180 @@
             "description": "The ID of the segment if part of a segmentation job"
           }
         }
+      },
+      "NewSegments": {
+        "type": "object",
+        "required": ["url", "criteria"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public HTTP URLs, and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.\n\n**⚠️ Important: YouTube URLs are NOT supported for the segments API.** This includes both shot-based and narrative-based segmentation. For S3 and Dropbox URI support see our documentation on data connectors for setup information."
+          },
+          "criteria": {
+            "type": "string",
+            "enum": ["shot", "narrative"],
+            "description": "Segmentation criteria:\n• **shot**: Detect scene changes and shot boundaries using computer vision\n• **narrative**: Identify logical narrative segments and chapters using AI analysis"
+          },
+          "shot_config": {
+            "$ref": "#/components/schemas/ShotConfig",
+            "description": "Configuration for shot-based segmentation. Only provide when criteria is 'shot'."
+          },
+          "narrative_config": {
+            "$ref": "#/components/schemas/NarrativeConfig",
+            "description": "Configuration for narrative-based segmentation. Only provide when criteria is 'narrative'."
+          }
+        }
+      },
+      "ShotConfig": {
+        "type": "object",
+        "properties": {
+          "detector": {
+            "type": "string",
+            "enum": ["content", "adaptive"],
+            "default": "adaptive",
+            "description": "Detection algorithm:\n• **adaptive**: Designed for dynamic footage with camera movement and action (default)\n• **content**: Optimized for controlled footage with clear visual transitions"
+          },
+          "max_duration_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3600,
+            "default": 300,
+            "description": "Maximum duration for each segment in seconds (1 second to 1 hour, default: 5 minutes)"
+          },
+          "min_duration_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3600,
+            "default": 1,
+            "description": "Minimum duration for each segment in seconds (1 second to 1 hour, default: 1 second)"
+          }
+        }
+      },
+      "NarrativeConfig": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Optional custom prompt to guide the narrative segmentation analysis. This will be incorporated into the main segmentation prompt as additional guidance."
+          }
+        }
+      },
+      "Segments": {
+        "type": "object",
+        "required": [
+          "file_id",
+          "job_id",
+          "object",
+          "status",
+          "criteria",
+          "created_at"
+        ],
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the segment job"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file this segment belongs to"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["segments"],
+            "description": "Object type, always 'segments'"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"],
+            "description": "Current status of the segment job"
+          },
+          "criteria": {
+            "type": "string",
+            "enum": ["shot", "narrative"],
+            "description": "Segment criteria used for this job"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the job was created"
+          },
+          "shot_config": {
+            "$ref": "#/components/schemas/ShotConfig",
+            "description": "Configuration used for shot-based segmentation (only present when criteria is 'shot')"
+          },
+          "narrative_config": {
+            "$ref": "#/components/schemas/NarrativeConfig",
+            "description": "Configuration used for narrative-based segmentation (only present when criteria is 'narrative')"
+          },
+          "total_segments": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of segments generated (only present when status is 'completed')"
+          },
+          "segments": {
+            "type": "array",
+            "description": "Array of generated segments (only present when status is 'completed')",
+            "items": {
+              "$ref": "#/components/schemas/Segment"
+            }
+          }
+        }
+      },
+      "Segment": {
+        "type": "object",
+        "required": ["start_time", "end_time"],
+        "properties": {
+          "start_time": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Start time of the segment in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "minimum": 0,
+            "description": "End time of the segment in seconds"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the segment content (available for narrative segmentation)"
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Optional URL of the thumbnail for this segment"
+          }
+        }
+      },
+      "SegmentsList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Segments"
+            },
+            "description": "Array of segmentation job objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of segmentation jobs matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        },
+        "required": ["object", "data", "total", "limit", "offset"]
       }
     },
     "securitySchemes": {
