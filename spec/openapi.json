@@ -6418,9 +6418,7 @@
           },
           "score": {
             "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Relevance score (0-1, higher is more relevant)"
+            "description": "Relevance score (higher is more relevant)"
           },
           "filename": {
             "type": "string",
@@ -6484,9 +6482,7 @@
           },
           "score": {
             "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Relevance score (0-1, higher is more relevant)"
+            "description": "Relevance score (higher is more relevant)"
           },
           "start_time": {
             "type": "number",
