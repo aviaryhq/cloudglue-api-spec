@@ -6695,10 +6695,6 @@
             "default": "adaptive",
             "description": "Detection algorithm:\n• **adaptive**: Designed for dynamic footage with camera movement and action (default)\n• **content**: Optimized for controlled footage with clear visual transitions"
           },
-          "threshold": {
-            "type": "number",
-            "description": "Detection algoirthm specific sensitivity threshold (advanced)."
-          },
           "max_duration_seconds": {
             "type": "integer",
             "minimum": 1,
