@@ -4830,6 +4830,10 @@
                 "items": {
                   "type": "object",
                   "properties": {
+                    "speaker": {
+                      "type": "string",
+                      "description": "Identified speaker"
+                    },
                     "text": {
                       "type": "string",
                       "description": "Transcribed speech text"
@@ -5120,6 +5124,10 @@
                 "items": {
                   "type": "object",
                   "properties": {
+                    "speaker": {
+                      "type": "string",
+                      "description": "Identified speaker"
+                    },
                     "text": {
                       "type": "string",
                       "description": "Transcribed speech text"
@@ -5266,6 +5274,10 @@
             "items": {
               "type": "object",
               "properties": {
+                "speaker": {
+                  "type": "string",
+                  "description": "Identified speaker"
+                },
                 "text": {
                   "type": "string",
                   "description": "Transcribed speech text"
@@ -5380,6 +5392,10 @@
             "items": {
               "type": "object",
               "properties": {
+                "speaker": {
+                  "type": "string",
+                  "description": "Identified speaker"
+                },
                 "text": {
                   "type": "string",
                   "description": "Transcribed speech text"
@@ -5732,6 +5748,10 @@
                       "items": {
                         "type": "object",
                         "properties": {
+                          "speaker": {
+                            "type": "string",
+                            "description": "Identified speaker"
+                          },
                           "text": {
                             "type": "string",
                             "description": "Transcribed speech text"
@@ -5883,6 +5903,10 @@
                       "items": {
                         "type": "object",
                         "properties": {
+                          "speaker": {
+                            "type": "string",
+                            "description": "Identified speaker"
+                          },
                           "text": {
                             "type": "string",
                             "description": "Transcribed speech text"
@@ -6009,6 +6033,11 @@
         "type": "object",
         "required": ["detector"],
         "properties": {
+          "threshold": {
+            "type": "number",
+            "nullable": true,
+            "description": "Detection sensitivity threshold - lower values create more segments:\n\n• **content**: Sensitivity to visual differences (default: 27.0). Lower values detect smaller changes in color/lighting.\n• **adaptive**: Does not support threshold parameter - uses internal adaptive algorithm."
+          },
           "min_seconds": {
             "type": "number",
             "minimum": 2,
@@ -6509,13 +6538,16 @@
               "type": "object",
               "properties": {
                 "text": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Description of visual content in the segment"
                 },
                 "start_time": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Start time of the visual content in seconds"
                 },
                 "end_time": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "End time of the visual content in seconds"
                 }
               }
             }
@@ -6527,13 +6559,16 @@
               "type": "object",
               "properties": {
                 "text": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Text detected on screen"
                 },
                 "start_time": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Start time of the text in seconds"
                 },
                 "end_time": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "End time of the text in seconds"
                 }
               }
             }
@@ -6544,14 +6579,21 @@
             "items": {
               "type": "object",
               "properties": {
+                "speaker": {
+                  "type": "string",
+                  "description": "Identified speaker"
+                },
                 "text": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Transcribed speech text"
                 },
                 "start_time": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Start time of speech in seconds"
                 },
                 "end_time": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "End time of speech in seconds"
                 }
               }
             }
