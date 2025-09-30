@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.3.0"
+    "version": "0.3.1"
   },
   "servers": [
     {
@@ -3786,7 +3786,15 @@
           },
           "source": {
             "type": "string",
-            "enum": ["video", "youtube", "s3", "dropbox", "http", "upload"],
+            "enum": [
+              "video",
+              "youtube",
+              "s3",
+              "dropbox",
+              "http",
+              "upload",
+              "google-drive"
+            ],
             "description": "Source of the file"
           }
         },
