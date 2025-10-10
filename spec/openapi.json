@@ -6595,7 +6595,6 @@
       "FrameExtractionThumbnailsConfig": {
         "type": "object",
         "description": "Configuration for frame thumbnails",
-        "required": ["enable_frame_thumbnails"],
         "properties": {
           "enable_frame_thumbnails": {
             "type": "boolean",
