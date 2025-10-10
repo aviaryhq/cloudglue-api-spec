@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.3.1"
+    "version": "0.3.2"
   },
   "servers": [
     {
@@ -3179,6 +3179,295 @@
         }
       }
     },
+    "/files/{file_id}/frames": {
+      "post": {
+        "tags": ["Files"],
+        "summary": "Create a new frame extraction for a file",
+        "operationId": "createFileFrameExtraction",
+        "description": "Create a new frame extraction for a file using the specified frame extraction configuration. This is an async operation that returns immediately with a 'pending' status. Results are cached, so identical requests will return the same frame extraction.",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file to extract frames from",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Frame extraction configuration",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  { "$ref": "#/components/schemas/FrameExtractionConfig" }
+                ],
+                "type": "object",
+                "properties": {
+                  "thumbnails_config": {
+                    "$ref": "#/components/schemas/FrameExtractionThumbnailsConfig",
+                    "description": "Configuration for frame thumbnails. Optional."
+                  }
+                },
+                "description": "Frame extraction configuration (root level) with optional thumbnails configuration."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Frame extraction created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameExtraction"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or file duration is less than specified time range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Files"],
+        "summary": "List frame extractions for a file",
+        "operationId": "listFileFrameExtractions",
+        "description": "List all frame extractions for a specific file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of frame extractions to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of frame extractions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameExtractionList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/frames/{frame_extraction_id}": {
+      "get": {
+        "tags": ["Frames"],
+        "summary": "Get a specific frame extraction",
+        "operationId": "getFrameExtraction",
+        "description": "Retrieve details about a specific frame extraction including its frames",
+        "parameters": [
+          {
+            "name": "frame_extraction_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the frame extraction to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of frames to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the frames list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Frame extraction details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameExtraction"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Frame extraction not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Frames"],
+        "summary": "Delete a frame extraction",
+        "operationId": "deleteFrameExtraction",
+        "description": "Delete a specific frame extraction",
+        "parameters": [
+          {
+            "name": "frame_extraction_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the frame extraction to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Frame extraction deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the deleted frame extraction"
+                    }
+                  },
+                  "required": ["id"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Frame extraction not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/segments": {
       "post": {
         "tags": ["Segments"],
@@ -3793,7 +4082,8 @@
               "dropbox",
               "http",
               "upload",
-              "google-drive"
+              "google-drive",
+              "zoom"
             ],
             "description": "Source of the file"
           }
@@ -6241,6 +6531,222 @@
           "total": {
             "type": "integer",
             "description": "Total number of segmentations matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        }
+      },
+      "FrameExtractionConfig": {
+        "type": "object",
+        "description": "Configuration for frame extraction. Currently only supports uniform strategy.",
+        "required": ["strategy"],
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "enum": ["uniform"],
+            "description": "Frame extraction strategy - currently only 'uniform' is supported"
+          },
+          "uniform_config": {
+            "$ref": "#/components/schemas/FrameExtractionUniformConfig",
+            "description": "Configuration for uniform frame extraction"
+          },
+          "thumbnails_config": {
+            "$ref": "#/components/schemas/FrameExtractionThumbnailsConfig",
+            "description": "Configuration for frame thumbnails. Optional."
+          },
+          "start_time_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Optional: The start time of the video in seconds to start extracting frames from"
+          },
+          "end_time_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Optional: The end time of the video in seconds to stop extracting frames at"
+          }
+        }
+      },
+      "FrameExtractionUniformConfig": {
+        "type": "object",
+        "description": "Configuration for uniform frame extraction",
+        "properties": {
+          "frames_per_second": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 30,
+            "default": 1,
+            "description": "Number of frames to extract per second of video"
+          },
+          "max_width": {
+            "type": "number",
+            "minimum": 64,
+            "maximum": 4096,
+            "default": 1024,
+            "description": "Maximum width of extracted frames in pixels. Aspect ratio is preserved."
+          }
+        }
+      },
+      "FrameExtractionThumbnailsConfig": {
+        "type": "object",
+        "description": "Configuration for frame thumbnails",
+        "required": ["enable_frame_thumbnails"],
+        "properties": {
+          "enable_frame_thumbnails": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether to generate CDN-hosted thumbnails for extracted frames"
+          }
+        }
+      },
+      "FrameExtraction": {
+        "type": "object",
+        "required": [
+          "frame_extraction_id",
+          "status",
+          "created_at",
+          "file_id",
+          "frame_extraction_config"
+        ],
+        "properties": {
+          "frame_extraction_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the frame extraction job"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"],
+            "description": "Status of the frame extraction job"
+          },
+          "created_at": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Unix timestamp of when the frame extraction was created"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file this frame extraction belongs to"
+          },
+          "frame_extraction_config": {
+            "$ref": "#/components/schemas/FrameExtractionConfig"
+          },
+          "frame_count": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Total number of frames extracted (only present when status is completed)"
+          },
+          "data": {
+            "type": "object",
+            "description": "Frame data with pagination (only present when status is completed and frames exist)",
+            "required": ["object", "total", "limit", "offset"],
+            "properties": {
+              "object": {
+                "type": "string",
+                "enum": ["list"],
+                "description": "Object type, always 'list'"
+              },
+              "frames": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "timestamp"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique identifier for the frame"
+                    },
+                    "timestamp": {
+                      "type": "number",
+                      "description": "Timestamp of the frame in seconds"
+                    },
+                    "thumbnail_url": {
+                      "type": "string",
+                      "description": "URL of the CDN-hosted thumbnail for the frame if thumbnails are enabled"
+                    }
+                  }
+                },
+                "description": "Array of extracted frames"
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total number of frames in this extraction"
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Number of frames returned in this response"
+              },
+              "offset": {
+                "type": "integer",
+                "description": "Offset from the start of the frames list"
+              }
+            }
+          }
+        }
+      },
+      "FrameExtractionList": {
+        "type": "object",
+        "required": ["object", "data", "total", "limit", "offset"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "frame_extraction_id",
+                "status",
+                "created_at",
+                "file_id",
+                "frame_extraction_config"
+              ],
+              "properties": {
+                "frame_extraction_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Unique identifier for the frame extraction job"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["pending", "processing", "completed", "failed"],
+                  "description": "Status of the frame extraction job"
+                },
+                "created_at": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Unix timestamp of when the frame extraction was created"
+                },
+                "file_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ID of the file this frame extraction belongs to"
+                },
+                "frame_extraction_config": {
+                  "$ref": "#/components/schemas/FrameExtractionConfig"
+                },
+                "frame_count": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Total number of frames extracted (only present when status is completed)"
+                }
+              }
+            },
+            "description": "Array of frame extraction objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of frame extractions matching the query"
           },
           "limit": {
             "type": "integer",
