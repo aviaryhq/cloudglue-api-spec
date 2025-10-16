@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.3.2"
+    "version": "0.3.3"
   },
   "servers": [
     {
@@ -1433,9 +1433,9 @@
     "/collections/{collection_id}/videos/{file_id}/entities": {
       "get": {
         "tags": ["Collections"],
-        "summary": "Retrieve all extracted entities for a specific file in a collection",
+        "summary": "Retrieve extracted entities for a specific file in a collection",
         "operationId": "getEntities",
-        "description": "Retrieve all extracted entities for a specific file in a collection. This API is only available when the a collection is created with collection_type 'entities'",
+        "description": "Retrieve extracted entities for a specific file in a collection. Results are paginated with a default limit of 50 segment entities per request (maximum 100). Use limit and offset parameters to paginate through all results. This API is only available when the collection is created with collection_type 'entities'",
         "parameters": [
           {
             "name": "collection_id",
@@ -1453,6 +1453,29 @@
             "description": "The ID of the file",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of segment entities to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of segment entities to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
             }
           }
         ],
@@ -3473,7 +3496,7 @@
         "tags": ["Segments"],
         "summary": "Create a new video segmentation job",
         "operationId": "createSegments",
-        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**⚠️ Note: YouTube URLs are not supported for this API.** Use Cloudglue Files, HTTP URLs, or S3/Dropbox URIs instead.",
+        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**⚠️ Note: YouTube URLs are supported for narrative-based segmentation only.** Shot-based segmentation requires direct video file access. Use Cloudglue Files, HTTP URLs, or S3/Dropbox URIs for shot-based segmentation.",
         "requestBody": {
           "description": "Segmentation job parameters",
           "content": {
@@ -3497,7 +3520,7 @@
             }
           },
           "400": {
-            "description": "Invalid request, missing required parameters, or unsupported URL type (e.g., YouTube URLs are not supported)",
+            "description": "Invalid request, missing required parameters, or unsupported URL type (e.g., YouTube URLs with shot-based segmentation are not supported)",
             "content": {
               "application/json": {
                 "schema": {
@@ -3699,6 +3722,64 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": ["Segments"],
+        "summary": "Delete a segments job",
+        "operationId": "deleteSegments",
+        "description": "Delete a specific segments job",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segments job to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Segments job deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the deleted segments job"
+                    }
+                  },
+                  "required": ["id"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Segments job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/segmentations/{segmentation_id}/thumbnails": {
@@ -3764,6 +3845,419 @@
           },
           "404": {
             "description": "Segmentation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/face-match": {
+      "post": {
+        "tags": ["Face Match"],
+        "summary": "Find matching face in video",
+        "operationId": "createFaceMatch",
+        "description": "Search for a source face in a target video using facial recognition",
+        "requestBody": {
+          "description": "Face match request parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FaceMatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Face match job created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaceMatch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters or source image",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Target video file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Monthly face match jobs limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/face-match/{face_match_id}": {
+      "get": {
+        "tags": ["Face Match"],
+        "summary": "Get face match results",
+        "operationId": "getFaceMatch",
+        "description": "Retrieve face match results including detected faces and similarity scores",
+        "parameters": [
+          {
+            "name": "face_match_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the face match to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of face matches to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the face matches list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Face match results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaceMatch"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Face match job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Face Match"],
+        "summary": "Delete face match analysis",
+        "operationId": "deleteFaceMatch",
+        "description": "Delete a specific face match analysis",
+        "parameters": [
+          {
+            "name": "face_match_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the face match to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Face match deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "face_match_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the deleted face match"
+                    },
+                    "object": {
+                      "type": "string",
+                      "enum": ["face_match"],
+                      "description": "Object type, always 'face_match'"
+                    }
+                  },
+                  "required": ["face_match_id", "object"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Face match job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/face-detect": {
+      "post": {
+        "tags": ["Face Detection"],
+        "summary": "Detect faces in video",
+        "operationId": "createFaceDetection",
+        "description": "Analyze video to detect all faces",
+        "requestBody": {
+          "description": "Face detection request parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FaceDetectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Face detection job created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaceDetection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters or configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Target video file not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Monthly face detection jobs limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/face-detect/{face_detection_id}": {
+      "get": {
+        "tags": ["Face Detection"],
+        "summary": "Get face detection results",
+        "operationId": "getFaceDetection",
+        "description": "Retrieve face detection results including all detected faces",
+        "parameters": [
+          {
+            "name": "face_detection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the face detection to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of detected faces to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the detected faces list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Face detection results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaceDetection"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Face detection job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Face Detection"],
+        "summary": "Delete face detection analysis",
+        "operationId": "deleteFaceDetection",
+        "description": "Delete a specific face detection analysis",
+        "parameters": [
+          {
+            "name": "face_detection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the face detection to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Face detection deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the deleted face detection"
+                    }
+                  },
+                  "required": ["id"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Face detection job not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -4676,12 +5170,25 @@
                 }
               }
             }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of segment entities available"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of entities returned per request"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of entities skipped"
           }
         },
         "required": [
           "collection_id",
           "file_id",
           "entities",
+          "segment_entities",
           "total",
           "limit",
           "offset"
@@ -7182,12 +7689,12 @@
         "properties": {
           "url": {
             "type": "string",
-            "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public HTTP URLs, and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.\n\n**⚠️ Important: YouTube URLs are NOT supported for the segments API.** This includes both shot-based and narrative-based segmentation. For S3 and Dropbox URI support see our documentation on data connectors for setup information."
+            "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public HTTP URLs, YouTube URLs (narrative criteria only), and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.\n\n**⚠️ Important: YouTube URLs are ONLY supported for narrative-based segmentation.** Shot-based segmentation requires direct video file access and does not support YouTube URLs. For S3 and Dropbox URI support see our documentation on data connectors for setup information."
           },
           "criteria": {
             "type": "string",
             "enum": ["shot", "narrative"],
-            "description": "Segmentation criteria:\n• **shot**: Detect scene changes and shot boundaries using computer vision\n• **narrative**: Identify logical narrative segments and chapters using AI analysis"
+            "description": "Segmentation criteria:\n• **shot**: Detect scene changes and shot boundaries using computer vision (not supported for YouTube URLs)\n• **narrative**: Identify logical narrative segments and chapters using AI analysis (supports YouTube URLs)"
           },
           "shot_config": {
             "$ref": "#/components/schemas/ShotConfig",
@@ -7349,6 +7856,314 @@
           }
         },
         "required": ["object", "data", "total", "limit", "offset"]
+      },
+      "FaceMatchRequest": {
+        "type": "object",
+        "required": ["source_image", "target_video_url"],
+        "properties": {
+          "source_image": {
+            "$ref": "#/components/schemas/SourceImage",
+            "description": "Source image containing the face to search for"
+          },
+          "target_video_url": {
+            "type": "string",
+            "description": "URL of the target video to search in"
+          },
+          "max_faces": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4000,
+            "default": 50,
+            "description": "Maximum number of faces to return"
+          },
+          "face_detection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Optional: Use previously analyzed face detections in video"
+          },
+          "frame_extraction_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Optional: Use previously extracted frames"
+          },
+          "frame_extraction_config": {
+            "$ref": "#/components/schemas/FrameExtractionConfig",
+            "description": "Optional: Frame extraction configuration"
+          }
+        }
+      },
+      "FaceMatch": {
+        "type": "object",
+        "required": ["face_match_id", "status", "created_at"],
+        "properties": {
+          "face_match_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the face match job"
+          },
+          "face_detection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the face detection analysis used"
+          },
+          "frame_extraction_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the frame extraction used"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the target file"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"],
+            "description": "Status of the face match job"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp of when the job was created"
+          },
+          "source_face_bounding_box": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FaceBoundingBox"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Bounding box of the source face in the source image (null when job is pending/processing)"
+          },
+          "data": {
+            "type": "object",
+            "description": "Face match results (only present when status is completed)",
+            "properties": {
+              "object": {
+                "type": "string",
+                "enum": ["list"],
+                "description": "Object type, always 'list'"
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total number of face matches found"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Number of face matches returned per page"
+              },
+              "offset": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Offset from the start of the face matches list"
+              },
+              "faces_matches": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FaceMatchResult"
+                },
+                "description": "Array of face matches found"
+              }
+            }
+          }
+        }
+      },
+      "FaceDetectionRequest": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL of the target video to analyze"
+          },
+          "frame_extraction_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Optional: Use previously extracted frames"
+          },
+          "frame_extraction_config": {
+            "$ref": "#/components/schemas/FrameExtractionConfig",
+            "description": "Optional: Frame extraction configuration"
+          }
+        }
+      },
+      "FaceDetection": {
+        "type": "object",
+        "required": ["face_detection_id", "status", "created_at"],
+        "properties": {
+          "face_detection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the face detection job"
+          },
+          "frame_extraction_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the frame extraction used"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the target file"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"],
+            "description": "Status of the face detection job"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp of when the job was created"
+          },
+          "data": {
+            "type": "object",
+            "description": "Face detection results (only present when status is completed)",
+            "properties": {
+              "object": {
+                "type": "string",
+                "enum": ["list"],
+                "description": "Object type, always 'list'"
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total number of faces detected"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Number of faces returned per page"
+              },
+              "offset": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Offset from the start of the faces list"
+              },
+              "faces": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DetectedFace"
+                },
+                "description": "Array of detected faces"
+              }
+            }
+          }
+        }
+      },
+      "SourceImage": {
+        "type": "object",
+        "description": "Source image configuration - either url or base64_image must be provided",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public URL of the source image"
+          },
+          "base64_image": {
+            "type": "string",
+            "description": "Base64 encoded JPEG image data"
+          }
+        }
+      },
+      "FaceBoundingBox": {
+        "type": "object",
+        "required": ["height", "width", "top", "left"],
+        "properties": {
+          "height": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Height of the bounding box (normalized 0-1)"
+          },
+          "width": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Width of the bounding box (normalized 0-1)"
+          },
+          "top": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Top position of the bounding box (normalized 0-1)"
+          },
+          "left": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Left position of the bounding box (normalized 0-1)"
+          }
+        }
+      },
+      "FaceMatchResult": {
+        "type": "object",
+        "required": [
+          "id",
+          "face_bounding_box",
+          "similarity",
+          "frame_id",
+          "timestamp"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the face match result"
+          },
+          "face_bounding_box": {
+            "$ref": "#/components/schemas/FaceBoundingBox",
+            "description": "Bounding box of the matched face in the frame"
+          },
+          "similarity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Similarity score between source face and detected face (0-100)"
+          },
+          "frame_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the frame where the match was found"
+          },
+          "timestamp": {
+            "type": "number",
+            "description": "Timestamp of the frame in seconds"
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "description": "URL of the frame thumbnail (if frame extraction enabled thumbnails)"
+          }
+        }
+      },
+      "DetectedFace": {
+        "type": "object",
+        "required": ["id", "face_bounding_box", "frame_id", "timestamp"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the detected face"
+          },
+          "face_bounding_box": {
+            "$ref": "#/components/schemas/FaceBoundingBox",
+            "description": "Bounding box of the detected face in the frame"
+          },
+          "frame_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the frame where the face was detected"
+          },
+          "timestamp": {
+            "type": "number",
+            "description": "Timestamp of the frame in seconds"
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "description": "URL of the frame thumbnail (if frame extraction enabled thumbnails)"
+          }
+        }
       }
     },
     "securitySchemes": {
