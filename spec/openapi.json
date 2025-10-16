@@ -3496,7 +3496,7 @@
         "tags": ["Segments"],
         "summary": "Create a new video segmentation job",
         "operationId": "createSegments",
-        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**⚠️ Note: YouTube URLs are supported for narrative-based segmentation only.** Shot-based segmentation requires direct video file access. Use Cloudglue Files, HTTP URLs, or S3/Dropbox URIs for shot-based segmentation.",
+        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**⚠️ Note: YouTube URLs are supported for narrative-based segmentation only.** Shot-based segmentation requires direct video file access. Use Cloudglue Files, HTTP URLs, or files from data connectors for shot-based segmentation.",
         "requestBody": {
           "description": "Segmentation job parameters",
           "content": {
@@ -4405,7 +4405,7 @@
             "type": "object",
             "properties": {
               "url": {
-                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. For S3 and Dropbox URI support see our documentation on data connectors for setup information.",
+                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. For files via our Data connectors, see our documentation on data connectors for setup information.",
                 "type": "string"
               },
               "prompt": {
@@ -4975,7 +4975,7 @@
                 "properties": {
                   "url": {
                     "type": "string",
-                    "description": "The URL of the video to add to the collection. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. For S3 and Dropbox URI support see our documentation on data connectors for setup information."
+                    "description": "The URL of the video to add to the collection. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. For files via our Data connectors, see our documentation on data connectors for setup information."
                   }
                 },
                 "required": ["url"]
@@ -5736,7 +5736,7 @@
             "required": ["url"],
             "properties": {
               "url": {
-                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. For S3 and Dropbox URI support see our documentation on data connectors for setup information.",
+                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. For files via our Data connectors, see our documentation on data connectors for setup information.",
                 "type": "string"
               },
               "enable_summary": {
@@ -5828,7 +5828,7 @@
             "required": ["url"],
             "properties": {
               "url": {
-                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. For S3 and Dropbox URI support see our documentation on data connectors for setup information.",
+                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. For files via our Data connectors, see our documentation on data connectors for setup information.",
                 "type": "string"
               },
               "enable_summary": {
@@ -7689,7 +7689,7 @@
         "properties": {
           "url": {
             "type": "string",
-            "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public HTTP URLs, YouTube URLs (narrative criteria only), and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.\n\n**⚠️ Important: YouTube URLs are ONLY supported for narrative-based segmentation.** Shot-based segmentation requires direct video file access and does not support YouTube URLs. For S3 and Dropbox URI support see our documentation on data connectors for setup information."
+            "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public HTTP URLs, YouTube URLs (narrative criteria only), and files which have been granted access to Cloudglue via data connectors.\n\n**⚠️ Important: YouTube URLs are ONLY supported for narrative-based segmentation.** Shot-based segmentation requires direct video file access and does not support YouTube URLs. For files via our Data connectors, see our documentation on data connectors for setup information."
           },
           "criteria": {
             "type": "string",
