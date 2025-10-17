@@ -6905,15 +6905,15 @@
         "properties": {
           "window_seconds": {
             "type": "number",
-            "minimum": 2,
-            "maximum": 60,
-            "description": "The duration of each segment in seconds"
+            "minimum": 1,
+            "maximum": 120,
+            "description": "The duration of each segment in seconds. Must be between 1 and 120 seconds."
           },
           "hop_seconds": {
             "type": "number",
             "minimum": 1,
-            "maximum": 60,
-            "description": "The offset between the start of new windows. This means there can be overlap between segments. If not provided, defaults to window_seconds."
+            "maximum": 120,
+            "description": "The offset between the start of new windows. This means there can be overlap between segments. If not provided, defaults to window_seconds. Must be between 1 and 120 seconds."
           }
         }
       },
@@ -6928,17 +6928,17 @@
           },
           "min_seconds": {
             "type": "number",
-            "minimum": 2,
-            "maximum": 60,
+            "minimum": 1,
+            "maximum": 120,
             "nullable": true,
-            "description": "The minimum length of a shot in seconds"
+            "description": "The minimum length of a shot in seconds. Must be between 1 and 120 seconds."
           },
           "max_seconds": {
             "type": "number",
-            "minimum": 2,
-            "maximum": 60,
+            "minimum": 1,
+            "maximum": 120,
             "nullable": true,
-            "description": "The maximum length of a shot in seconds"
+            "description": "The maximum length of a shot in seconds. Must be between 1 and 120 seconds."
           },
           "detector": {
             "type": "string",
