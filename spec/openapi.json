@@ -1628,6 +1628,24 @@
               "enum": ["json", "markdown"],
               "default": "json"
             }
+          },
+          {
+            "name": "start_time_seconds",
+            "in": "query",
+            "description": "Start time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "end_time_seconds",
+            "in": "query",
+            "description": "End time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -2175,6 +2193,24 @@
               "type": "string",
               "enum": ["json", "markdown"],
               "default": "json"
+            }
+          },
+          {
+            "name": "start_time_seconds",
+            "in": "query",
+            "description": "Start time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "end_time_seconds",
+            "in": "query",
+            "description": "End time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
             }
           }
         ],
@@ -2756,6 +2792,24 @@
               "type": "string",
               "enum": ["json", "markdown"],
               "default": "json"
+            }
+          },
+          {
+            "name": "start_time_seconds",
+            "in": "query",
+            "description": "Start time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "end_time_seconds",
+            "in": "query",
+            "description": "End time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
             }
           }
         ],
@@ -5965,6 +6019,10 @@
             "type": "string",
             "description": "The URL of the processed video"
           },
+          "duration_seconds": {
+            "type": "number",
+            "description": "Duration of the video in seconds"
+          },
           "created_at": {
             "type": "integer",
             "description": "Unix timestamp of when the job was created"
@@ -6156,6 +6214,10 @@
             "type": "string",
             "description": "Generated video level summary"
           },
+          "duration_seconds": {
+            "type": "number",
+            "description": "Duration of the video in seconds"
+          },
           "speech": {
             "type": "array",
             "description": "Array of speech transcriptions",
@@ -6273,6 +6335,10 @@
           "summary": {
             "type": "string",
             "description": "Generated video level summary"
+          },
+          "duration_seconds": {
+            "type": "number",
+            "description": "Duration of the video in seconds"
           },
           "speech": {
             "type": "array",
@@ -6615,6 +6681,10 @@
                   "type": "string",
                   "description": "ID of the file"
                 },
+                "duration_seconds": {
+                  "type": "number",
+                  "description": "Duration of the video in seconds"
+                },
                 "data": {
                   "type": "object",
                   "properties": {
@@ -6770,6 +6840,10 @@
                   "enum": ["collection_file"],
                   "description": "Object type, always 'collection_file'"
                 },
+                "duration_seconds": {
+                  "type": "number",
+                  "description": "Duration of the video in seconds"
+                },
                 "data": {
                   "type": "object",
                   "properties": {
@@ -6905,15 +6979,15 @@
         "properties": {
           "window_seconds": {
             "type": "number",
-            "minimum": 2,
-            "maximum": 60,
-            "description": "The duration of each segment in seconds"
+            "minimum": 1,
+            "maximum": 120,
+            "description": "The duration of each segment in seconds. Must be between 1 and 120 seconds."
           },
           "hop_seconds": {
             "type": "number",
             "minimum": 1,
-            "maximum": 60,
-            "description": "The offset between the start of new windows. This means there can be overlap between segments. If not provided, defaults to window_seconds."
+            "maximum": 120,
+            "description": "The offset between the start of new windows. This means there can be overlap between segments. If not provided, defaults to window_seconds. Must be between 1 and 120 seconds."
           }
         }
       },
@@ -6928,17 +7002,17 @@
           },
           "min_seconds": {
             "type": "number",
-            "minimum": 2,
-            "maximum": 60,
+            "minimum": 1,
+            "maximum": 120,
             "nullable": true,
-            "description": "The minimum length of a shot in seconds"
+            "description": "The minimum length of a shot in seconds. Must be between 1 and 120 seconds."
           },
           "max_seconds": {
             "type": "number",
-            "minimum": 2,
-            "maximum": 60,
+            "minimum": 1,
+            "maximum": 120,
             "nullable": true,
-            "description": "The maximum length of a shot in seconds"
+            "description": "The maximum length of a shot in seconds. Must be between 1 and 120 seconds."
           },
           "detector": {
             "type": "string",
