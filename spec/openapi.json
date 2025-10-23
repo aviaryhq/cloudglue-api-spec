@@ -1628,6 +1628,24 @@
               "enum": ["json", "markdown"],
               "default": "json"
             }
+          },
+          {
+            "name": "start_time_seconds",
+            "in": "query",
+            "description": "Start time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "end_time_seconds",
+            "in": "query",
+            "description": "End time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -2175,6 +2193,24 @@
               "type": "string",
               "enum": ["json", "markdown"],
               "default": "json"
+            }
+          },
+          {
+            "name": "start_time_seconds",
+            "in": "query",
+            "description": "Start time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "end_time_seconds",
+            "in": "query",
+            "description": "End time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
             }
           }
         ],
@@ -2756,6 +2792,24 @@
               "type": "string",
               "enum": ["json", "markdown"],
               "default": "json"
+            }
+          },
+          {
+            "name": "start_time_seconds",
+            "in": "query",
+            "description": "Start time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "end_time_seconds",
+            "in": "query",
+            "description": "End time in seconds to filter out results by",
+            "required": false,
+            "schema": {
+              "type": "number"
             }
           }
         ],
@@ -5965,6 +6019,10 @@
             "type": "string",
             "description": "The URL of the processed video"
           },
+          "duration_seconds": {
+            "type": "number",
+            "description": "Duration of the video in seconds"
+          },
           "created_at": {
             "type": "integer",
             "description": "Unix timestamp of when the job was created"
@@ -6156,6 +6214,10 @@
             "type": "string",
             "description": "Generated video level summary"
           },
+          "duration_seconds": {
+            "type": "number",
+            "description": "Duration of the video in seconds"
+          },
           "speech": {
             "type": "array",
             "description": "Array of speech transcriptions",
@@ -6273,6 +6335,10 @@
           "summary": {
             "type": "string",
             "description": "Generated video level summary"
+          },
+          "duration_seconds": {
+            "type": "number",
+            "description": "Duration of the video in seconds"
           },
           "speech": {
             "type": "array",
@@ -6615,6 +6681,10 @@
                   "type": "string",
                   "description": "ID of the file"
                 },
+                "duration_seconds": {
+                  "type": "number",
+                  "description": "Duration of the video in seconds"
+                },
                 "data": {
                   "type": "object",
                   "properties": {
@@ -6769,6 +6839,10 @@
                   "type": "string",
                   "enum": ["collection_file"],
                   "description": "Object type, always 'collection_file'"
+                },
+                "duration_seconds": {
+                  "type": "number",
+                  "description": "Duration of the video in seconds"
                 },
                 "data": {
                   "type": "object",
