@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.3.3"
+    "version": "0.3.4"
   },
   "servers": [
     {
@@ -222,7 +222,7 @@
         "tags": ["Extract"],
         "summary": "Retrieve the current state of an extraction job",
         "operationId": "getExtract",
-        "description": "Retrieve the current state of an extraction job",
+        "description": "Retrieve the current state of an extraction job. Results are paginated with a default limit of 50 segment entities per request (maximum 100). Use limit and offset parameters to paginate through all segment entities.",
         "parameters": [
           {
             "name": "job_id",
@@ -231,6 +231,29 @@
             "description": "The unique identifier of the extraction job",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of segment entities to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of segment entities to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
             }
           }
         ],
@@ -4455,8 +4478,12 @@
               }
             }
           },
+          "segmentation_id": {
+            "type": "string",
+            "description": "The ID of the segmentation job used for this extraction"
+          },
           "data": {
-            "description": "The structured data extracted from the video based on prompt or schema",
+            "description": "The structured data extracted from the video based on prompt or schema. Only present when status is 'completed'.",
             "type": "object",
             "properties": {
               "entities": {
@@ -4485,6 +4512,18 @@
                 }
               }
             }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of segment entities available. Only present when status is 'completed'."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of segment entities returned per request. Only present when status is 'completed'."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of segment entities skipped. Only present when status is 'completed'."
           },
           "error": {
             "type": "string",
