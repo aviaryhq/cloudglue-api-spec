@@ -4957,7 +4957,7 @@
               "enable_audio_description": {
                 "type": "boolean",
                 "description": "Whether to generate audio description",
-                "default": false
+                "default": true
               }
             }
           },
@@ -5044,7 +5044,7 @@
               "enable_audio_description": {
                 "type": "boolean",
                 "description": "Whether to generate audio description",
-                "default": false
+                "default": true
               }
             }
           },
@@ -5911,7 +5911,7 @@
           "enable_audio_description": {
             "type": "boolean",
             "description": "Whether to generate audio description",
-            "default": false
+            "default": true
           }
         }
       },
@@ -5948,7 +5948,7 @@
               "enable_audio_description": {
                 "description": "Whether to generate audio description",
                 "type": "boolean",
-                "default": false
+                "default": true
               },
               "thumbnails_config": {
                 "$ref": "#/components/schemas/ThumbnailsConfig"
