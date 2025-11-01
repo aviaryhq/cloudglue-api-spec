@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "Cloudglue API",
     "description": "API for Cloudglue",
@@ -7,7 +7,7 @@
       "name": "Elastic License 2.0",
       "url": "https://www.elastic.co/licensing/elastic-license"
     },
-    "version": "0.3.4"
+    "version": "0.3.5"
   },
   "servers": [
     {
@@ -449,7 +449,7 @@
           {
             "name": "filter",
             "in": "query",
-            "description": "JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.\n\n**Supported Filter Types:**\n\n• **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory')\n• **video_info** - Filter by video information properties\n  - `duration_seconds` - Video duration in seconds\n  - `has_audio` - Whether the video has audio (true/false)\n\n• **file** - Filter by file properties\n  - `filename` - File name (string)\n  - `uri` - File URI (string)\n  - `id` - File ID (UUID string)\n  - `created_at` - Creation timestamp (ISO 8601 string)\n  - `bytes` - File size in bytes (number)\n\n**Supported Operators:**\n• **Equal** - Exact match (requires valueText)\n• **NotEqual** - Not equal to value (requires valueText)\n• **LessThan** - Less than value (requires valueText)\n• **GreaterThan** - Greater than value (requires valueText)\n• **Like** - Case-insensitive pattern matching with wildcards (requires valueText)\n• **In** - Value is in array (requires valueTextArray)\n• **ContainsAny** - Array contains any of the values (requires valueTextArray)\n• **ContainsAll** - Array contains all of the values (requires valueTextArray)\n\n**Examples:**\n\n**Metadata filtering:**\n```json\n{\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]}\n```\n\n**Video info filtering:**\n```json\n{\"video_info\":[{\"path\":\"video_info.duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]}\n```\n\n**File property filtering:**\n```json\n{\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]}\n```\n```json\n{\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]}\n```\n```json\n{\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]}\n```\n\n**Combined filtering:**\n```json\n{\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"video_info.has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]}\n```",
+            "description": "JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.\n\n**Supported Filter Types:**\n\n• **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory')\n• **video_info** - Filter by video information properties\n  - `duration_seconds` - Video duration in seconds\n  - `has_audio` - Whether the video has audio (true/false)\n\n• **file** - Filter by file properties\n  - `filename` - File name (string)\n  - `uri` - File URI (string)\n  - `id` - File ID (UUID string)\n  - `created_at` - Creation timestamp (ISO 8601 string)\n  - `bytes` - File size in bytes (number)\n\n**Supported Operators:**\n• **Equal** - Exact match (requires valueText)\n• **NotEqual** - Not equal to value (requires valueText)\n• **LessThan** - Less than value (requires valueText)\n• **GreaterThan** - Greater than value (requires valueText)\n• **Like** - Case-insensitive pattern matching with wildcards (requires valueText)\n• **In** - Value is in array (requires valueTextArray)\n• **ContainsAny** - Array contains any of the values (requires valueTextArray)\n• **ContainsAll** - Array contains all of the values (requires valueTextArray)\n\n**Examples:**\n\n**Metadata filtering:**\n```json\n{\"metadata\":[{\"path\":\"speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]}\n```\n\n**Video info filtering:**\n```json\n{\"video_info\":[{\"path\":\"duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]}\n```\n\n**File property filtering:**\n```json\n{\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]}\n```\n```json\n{\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]}\n```\n```json\n{\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]}\n```\n\n**Combined filtering:**\n```json\n{\"metadata\":[{\"path\":\"speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]}\n```",
             "required": false,
             "schema": {
               "type": "string"
@@ -1368,6 +1368,15 @@
               "type": "string",
               "enum": ["asc", "desc"],
               "default": "desc"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.\n\n**Supported Filter Types:**\n\n• **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory')\n• **video_info** - Filter by video information properties\n  - `duration_seconds` - Video duration in seconds\n  - `has_audio` - Whether the video has audio (true/false)\n\n• **file** - Filter by file properties\n  - `filename` - File name (string)\n  - `uri` - File URI (string)\n  - `id` - File ID (UUID string)\n  - `created_at` - Creation timestamp (ISO 8601 string)\n  - `bytes` - File size in bytes (number)\n\n**Supported Operators:**\n• **Equal** - Exact match (requires valueText)\n• **NotEqual** - Not equal to value (requires valueText)\n• **LessThan** - Less than value (requires valueText)\n• **GreaterThan** - Greater than value (requires valueText)\n• **Like** - Case-insensitive pattern matching with wildcards (requires valueText)\n• **In** - Value is in array (requires valueTextArray)\n• **ContainsAny** - Array contains any of the values (requires valueTextArray)\n• **ContainsAll** - Array contains all of the values (requires valueTextArray)\n\n**Examples:**\n\n**Metadata filtering:**\n```json\n{\"metadata\":[{\"path\":\"speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]}\n```\n\n**Video info filtering:**\n```json\n{\"video_info\":[{\"path\":\"duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]}\n```\n\n**File property filtering:**\n```json\n{\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]}\n```\n```json\n{\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]}\n```\n```json\n{\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]}\n```\n\n**Combined filtering:**\n```json\n{\"metadata\":[{\"path\":\"speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]}\n```",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -4618,16 +4627,8 @@
             "description": "Processing status of the file"
           },
           "bytes": {
-            "oneOf": [
-              {
-                "type": "integer",
-                "description": "Size of the file in bytes"
-              },
-              {
-                "type": "null",
-                "description": "No size information available"
-              }
-            ],
+            "type": "integer",
+            "nullable": true,
             "description": "Size of the file in bytes, null if not available"
           },
           "created_at": {
@@ -4643,84 +4644,36 @@
             "description": "Cloudglue URI for the file, to be used in other API calls"
           },
           "metadata": {
-            "oneOf": [
-              {
-                "type": "object",
-                "description": "User-provided metadata about the file"
-              },
-              {
-                "type": "null",
-                "description": "No metadata provided"
-              }
-            ],
+            "type": "object",
+            "nullable": true,
             "description": "User-provided metadata about the file, null if none provided"
           },
           "video_info": {
             "type": "object",
             "properties": {
               "duration_seconds": {
-                "oneOf": [
-                  {
-                    "type": "number",
-                    "description": "Duration of the video in seconds"
-                  },
-                  {
-                    "type": "null",
-                    "description": "Duration information not available"
-                  }
-                ],
+                "type": "number",
+                "nullable": true,
                 "description": "Duration of the video in seconds, null if not available"
               },
               "height": {
-                "oneOf": [
-                  {
-                    "type": "integer",
-                    "description": "Height of the video in pixels"
-                  },
-                  {
-                    "type": "null",
-                    "description": "Height information not available"
-                  }
-                ],
+                "type": "integer",
+                "nullable": true,
                 "description": "Height of the video in pixels, null if not available"
               },
               "width": {
-                "oneOf": [
-                  {
-                    "type": "integer",
-                    "description": "Width of the video in pixels"
-                  },
-                  {
-                    "type": "null",
-                    "description": "Width information not available"
-                  }
-                ],
+                "type": "integer",
+                "nullable": true,
                 "description": "Width of the video in pixels, null if not available"
               },
               "format": {
-                "oneOf": [
-                  {
-                    "type": "string",
-                    "description": "Format of the video file"
-                  },
-                  {
-                    "type": "null",
-                    "description": "Format information not available"
-                  }
-                ],
+                "type": "string",
+                "nullable": true,
                 "description": "Format of the video file, null if not available"
               },
               "has_audio": {
-                "oneOf": [
-                  {
-                    "type": "boolean",
-                    "description": "Whether the video has audio"
-                  },
-                  {
-                    "type": "null",
-                    "description": "Audio information not available"
-                  }
-                ],
+                "type": "boolean",
+                "nullable": true,
                 "description": "Whether the video has audio, null if not available"
               }
             },
@@ -4842,16 +4795,8 @@
             "description": "Name of the collection"
           },
           "description": {
-            "oneOf": [
-              {
-                "type": "string",
-                "description": "Description of the collection's purpose or contents"
-              },
-              {
-                "type": "null",
-                "description": "No description provided"
-              }
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Description of the collection's purpose or contents, null if none provided"
           },
           "collection_type": {
@@ -4987,16 +4932,8 @@
             "description": "Name of the collection (must be unique within an organization)"
           },
           "description": {
-            "oneOf": [
-              {
-                "type": "string",
-                "description": "Description of the collection's purpose or contents"
-              },
-              {
-                "type": "null",
-                "description": "No description provided"
-              }
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Description of the collection's purpose or contents, null if none provided"
           },
           "describe_config": {
@@ -8122,14 +8059,12 @@
             "description": "Unix timestamp of when the job was created"
           },
           "source_face_bounding_box": {
-            "oneOf": [
+            "allOf": [
               {
                 "$ref": "#/components/schemas/FaceBoundingBox"
-              },
-              {
-                "type": "null"
               }
             ],
+            "nullable": true,
             "description": "Bounding box of the source face in the source image (null when job is pending/processing)"
           },
           "data": {
