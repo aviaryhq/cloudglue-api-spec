@@ -4,10 +4,10 @@
     "title": "Cloudglue API",
     "description": "API for Cloudglue",
     "license": {
-      "name": "Elastic License 2.0",
-      "url": "https://www.elastic.co/licensing/elastic-license"
+      "name": "Apache License 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.3.6"
+    "version": "0.4.0"
   },
   "servers": [
     {
