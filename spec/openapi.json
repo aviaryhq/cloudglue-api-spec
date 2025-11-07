@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.0"
+    "version": "0.4.1"
   },
   "servers": [
     {
@@ -1007,7 +1007,32 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["media-descriptions", "entities", "rich-transcripts"]
+              "enum": [
+                "media-descriptions",
+                "entities",
+                "rich-transcripts",
+                "face-analysis"
+              ]
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter collections created after this date (ISO 8601 format)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter collections created before this date (ISO 8601 format)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -3225,6 +3250,99 @@
         }
       }
     },
+    "/collections/{collection_id}/videos/{file_id}/face-detections": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "Retrieve face detections for a specific file in a collection",
+        "operationId": "getFaceDetections",
+        "description": "Retrieve face detections for a specific file in a collection. Results are paginated with a default limit of 50 faces per request (maximum 100). Use limit and offset parameters to paginate through all results. This API is only available when the collection is created with collection_type 'face-analysis'",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the collection",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of faces to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of faces to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File face detections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileFaceDetections"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Collection type is not 'face-analysis'",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection, file, or face detection job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/segmentations/{segmentation_id}": {
       "get": {
         "tags": ["Segmentations"],
@@ -4872,7 +4990,12 @@
           },
           "collection_type": {
             "type": "string",
-            "enum": ["media-descriptions", "entities", "rich-transcripts"],
+            "enum": [
+              "media-descriptions",
+              "entities",
+              "rich-transcripts",
+              "face-analysis"
+            ],
             "description": "Type of collection, determines how videos are processed and what data is extracted"
           },
           "extract_config": {
@@ -4969,6 +5092,53 @@
             "$ref": "#/components/schemas/ThumbnailsConfig",
             "description": "Default thumbnails configuration used for files in this collection"
           },
+          "face_detection_config": {
+            "type": "object",
+            "nullable": true,
+            "description": "Configuration for face detection in videos. Only present when collection_type is 'face-analysis'.",
+            "properties": {
+              "frame_extraction_config": {
+                "type": "object",
+                "properties": {
+                  "strategy": {
+                    "type": "string",
+                    "enum": ["uniform"],
+                    "description": "Frame extraction strategy"
+                  },
+                  "uniform_config": {
+                    "type": "object",
+                    "properties": {
+                      "frames_per_second": {
+                        "type": "number",
+                        "minimum": 0.1,
+                        "maximum": 30,
+                        "default": 1,
+                        "description": "Number of frames to extract per second"
+                      },
+                      "max_width": {
+                        "type": "number",
+                        "minimum": 64,
+                        "maximum": 4096,
+                        "default": 1024,
+                        "description": "Maximum width of frames in pixels (aspect ratio preserved)"
+                      }
+                    }
+                  }
+                },
+                "required": ["strategy"]
+              },
+              "thumbnails_config": {
+                "type": "object",
+                "properties": {
+                  "enable_frame_thumbnails": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether to generate thumbnails for extracted frames"
+                  }
+                }
+              }
+            }
+          },
           "created_at": {
             "type": "integer",
             "description": "Unix timestamp of when the collection was created"
@@ -5005,8 +5175,13 @@
         "properties": {
           "collection_type": {
             "type": "string",
-            "enum": ["media-descriptions", "entities", "rich-transcripts"],
-            "description": "Type of collection, determines how videos are processed and what data is extracted.\n\n**Collection Types:**\n- **media-descriptions**: Generate comprehensive media descriptions with speech, visual, and text analysis (use `describe_config`)\n- **entities**: Extract structured data/entities from videos (requires `extract_config`)\n- **rich-transcripts**: Generate rich transcriptions with speech and visual descriptions (use `transcribe_config`). For backward compatibility only, new collections should use `media-descriptions` instead.\n\n⚠️ **Important**: Only provide the config that matches your collection_type. Other configs will be ignored."
+            "enum": [
+              "media-descriptions",
+              "entities",
+              "rich-transcripts",
+              "face-analysis"
+            ],
+            "description": "Type of collection, determines how videos are processed and what data is extracted.\n\n**Collection Types:**\n- **media-descriptions**: Generate comprehensive media descriptions with speech, visual, and text analysis (use `describe_config`)\n- **entities**: Extract structured data/entities from videos (requires `extract_config`)\n- **rich-transcripts**: Generate rich transcriptions with speech and visual descriptions (use `transcribe_config`). For backward compatibility only, new collections should use `media-descriptions` instead.\n- **face-analysis**: Detect and index faces in videos for face matching and search (use `face_detection_config`)\n\n⚠️ **Important**: Only provide the config that matches your collection_type. Other configs will be ignored."
           },
           "name": {
             "type": "string",
@@ -5110,6 +5285,52 @@
           "default_thumbnails_config": {
             "$ref": "#/components/schemas/ThumbnailsConfig",
             "description": "Default thumbnails configuration to use for files added to this collection. If not provided, a default thumbnails configuration will be used."
+          },
+          "face_detection_config": {
+            "type": "object",
+            "description": "🎯 **Use ONLY when collection_type = 'face-analysis'**\n\nConfiguration for face detection in videos. Optional - if not provided, default values will be used. This config will be ignored for other collection types.",
+            "properties": {
+              "frame_extraction_config": {
+                "type": "object",
+                "properties": {
+                  "strategy": {
+                    "type": "string",
+                    "enum": ["uniform"],
+                    "description": "Frame extraction strategy"
+                  },
+                  "uniform_config": {
+                    "type": "object",
+                    "properties": {
+                      "frames_per_second": {
+                        "type": "number",
+                        "minimum": 0.1,
+                        "maximum": 30,
+                        "default": 1,
+                        "description": "Number of frames to extract per second"
+                      },
+                      "max_width": {
+                        "type": "number",
+                        "minimum": 64,
+                        "maximum": 4096,
+                        "default": 1024,
+                        "description": "Maximum width of frames in pixels (aspect ratio preserved)"
+                      }
+                    }
+                  }
+                },
+                "required": ["strategy"]
+              },
+              "thumbnails_config": {
+                "type": "object",
+                "properties": {
+                  "enable_frame_thumbnails": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether to generate thumbnails for extracted frames"
+                  }
+                }
+              }
+            }
           }
         },
         "required": ["collection_type", "name"]
@@ -5393,6 +5614,98 @@
           "file_id",
           "entities",
           "segment_entities",
+          "total",
+          "limit",
+          "offset"
+        ]
+      },
+      "FileFaceDetections": {
+        "type": "object",
+        "properties": {
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the collection"
+          },
+          "file_id": {
+            "type": "string",
+            "description": "ID of the file"
+          },
+          "faces": {
+            "type": "array",
+            "description": "Array of detected faces",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Unique identifier for the detected face"
+                },
+                "face_bounding_box": {
+                  "type": "object",
+                  "properties": {
+                    "height": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "Height of the bounding box (normalized 0-1)"
+                    },
+                    "width": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "Width of the bounding box (normalized 0-1)"
+                    },
+                    "top": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "Top position of the bounding box (normalized 0-1)"
+                    },
+                    "left": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "Left position of the bounding box (normalized 0-1)"
+                    }
+                  },
+                  "required": ["height", "width", "top", "left"]
+                },
+                "frame_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ID of the frame where the face was detected"
+                },
+                "timestamp": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Timestamp of the frame in seconds"
+                },
+                "thumbnail_url": {
+                  "type": "string",
+                  "description": "URL of the frame thumbnail (if frame extraction enabled thumbnails)"
+                }
+              },
+              "required": ["id", "face_bounding_box", "frame_id", "timestamp"]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of faces detected"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of faces returned per request"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of faces skipped"
+          }
+        },
+        "required": [
+          "collection_id",
+          "file_id",
+          "faces",
           "total",
           "limit",
           "offset"
@@ -7089,12 +7402,11 @@
       },
       "SearchRequest": {
         "type": "object",
-        "required": ["scope", "collections", "query"],
         "properties": {
           "scope": {
             "type": "string",
-            "enum": ["file", "segment"],
-            "description": "Search scope - 'file' searches at file level (requires collections with enable_summary=true), 'segment' searches at segment level"
+            "enum": ["file", "segment", "face"],
+            "description": "Search scope - 'file' searches at file level (requires collections with enable_summary=true), 'segment' searches at segment level, 'face' searches for faces in videos using image matching"
           },
           "collections": {
             "type": "array",
@@ -7103,12 +7415,26 @@
               "format": "uuid"
             },
             "minItems": 1,
-            "description": "List of collection IDs to search within. All collections must be of collection_type 'media-descriptions' or 'rich-transcripts'. \n\nFor file-level search, collections must have 'enable_summary: true' in transcribe_config."
+            "description": "List of collection IDs to search within. \n\nFor text search (scope='file' or 'segment'): All collections must be of collection_type 'media-descriptions' or 'rich-transcripts'. For file-level search, collections must have 'enable_summary: true' in transcribe_config.\n\nFor face search (scope='face'): All collections must be of collection_type 'face-analysis'."
           },
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "Text search query to find relevant content"
+            "description": "Text search query to find relevant content (required for scope='file' or 'segment')"
+          },
+          "source_image": {
+            "type": "object",
+            "description": "Source image for face search (required for scope='face')",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "URL of the source image to search for"
+              },
+              "base64": {
+                "type": "string",
+                "description": "Base64-encoded image bytes"
+              }
+            }
           },
           "limit": {
             "type": "integer",
@@ -7211,15 +7537,7 @@
       },
       "SearchResponse": {
         "type": "object",
-        "required": [
-          "id",
-          "object",
-          "query",
-          "scope",
-          "results",
-          "total",
-          "limit"
-        ],
+        "required": ["id", "object", "scope", "results", "total", "limit"],
         "properties": {
           "id": {
             "type": "string",
@@ -7233,12 +7551,17 @@
           },
           "query": {
             "type": "string",
-            "description": "The search query that was executed"
+            "description": "The search query that was executed (for text search) or the source image URL/base64 indicator (for face search)"
           },
           "scope": {
             "type": "string",
-            "enum": ["file", "segment"],
+            "enum": ["file", "segment", "face"],
             "description": "The search scope that was used"
+          },
+          "search_target": {
+            "type": "string",
+            "enum": ["file", "segment"],
+            "description": "The search target (only present for text search, not face search)"
           },
           "results": {
             "type": "array",
@@ -7250,6 +7573,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/SegmentSearchResult"
+                },
+                {
+                  "$ref": "#/components/schemas/FaceSearchResult"
                 }
               ]
             }
@@ -7448,6 +7774,90 @@
           }
         }
       },
+      "FaceSearchResult": {
+        "type": "object",
+        "required": [
+          "type",
+          "file_id",
+          "collection_id",
+          "face_id",
+          "frame_id",
+          "score",
+          "timestamp"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["face"],
+            "description": "Result type, always 'face'"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file containing the matched face"
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the collection containing this file"
+          },
+          "face_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the detected face"
+          },
+          "frame_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the frame where the face was detected"
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Similarity score (0-100, higher is more similar)"
+          },
+          "timestamp": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Timestamp of the frame in seconds"
+          },
+          "face_bounding_box": {
+            "type": "object",
+            "properties": {
+              "height": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Height of the bounding box (normalized 0-1)"
+              },
+              "width": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Width of the bounding box (normalized 0-1)"
+              },
+              "top": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Top position of the bounding box (normalized 0-1)"
+              },
+              "left": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Left position of the bounding box (normalized 0-1)"
+              }
+            },
+            "required": ["height", "width", "top", "left"]
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "description": "URL of the frame thumbnail"
+          }
+        }
+      },
       "ThumbnailList": {
         "type": "object",
         "required": ["object", "total", "limit", "offset", "data"],
@@ -7625,6 +8035,57 @@
           }
         }
       },
+      "SegmentsListItem": {
+        "type": "object",
+        "required": [
+          "file_id",
+          "job_id",
+          "object",
+          "status",
+          "criteria",
+          "created_at"
+        ],
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the segment job"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file this segment belongs to"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["segments"],
+            "description": "Object type, always 'segments'"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"],
+            "description": "Current status of the segment job"
+          },
+          "criteria": {
+            "type": "string",
+            "enum": ["shot", "narrative"],
+            "description": "Segment criteria used for this job"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the job was created"
+          },
+          "shot_config": {
+            "$ref": "#/components/schemas/ShotConfig",
+            "description": "Configuration used for shot-based segmentation (only present when criteria is 'shot')"
+          },
+          "narrative_config": {
+            "$ref": "#/components/schemas/NarrativeConfig",
+            "description": "Configuration used for narrative-based segmentation (only present when criteria is 'narrative')"
+          }
+        },
+        "description": "Segmentation job object as returned in list responses (does not include segments array or total_segments)"
+      },
       "Segment": {
         "type": "object",
         "required": ["start_time", "end_time"],
@@ -7661,9 +8122,9 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Segments"
+              "$ref": "#/components/schemas/SegmentsListItem"
             },
-            "description": "Array of segmentation job objects"
+            "description": "Array of segmentation job objects (without segments array or total_segments)"
           },
           "total": {
             "type": "integer",
