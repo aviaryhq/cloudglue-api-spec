@@ -4882,7 +4882,8 @@
               "http",
               "upload",
               "google-drive",
-              "zoom"
+              "zoom",
+              "gong"
             ],
             "description": "Source of the file"
           }
