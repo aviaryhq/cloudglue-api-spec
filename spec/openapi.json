@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.2"
+    "version": "0.4.3"
   },
   "servers": [
     {
@@ -4882,7 +4882,8 @@
               "http",
               "upload",
               "google-drive",
-              "zoom"
+              "zoom",
+              "gong"
             ],
             "description": "Source of the file"
           }
