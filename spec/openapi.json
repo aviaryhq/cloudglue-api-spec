@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.3"
+    "version": "0.4.4"
   },
   "servers": [
     {
@@ -7001,14 +7001,37 @@
           }
         }
       },
+      "SegmentationManualConfig": {
+        "type": "object",
+        "required": ["segments"],
+        "properties": {
+          "segments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "start_time": {
+                  "type": "number",
+                  "description": "The start time of the segment in seconds"
+                },
+                "end_time": {
+                  "type": "number",
+                  "description": "The end time of the segment in seconds"
+                }
+              }
+            },
+            "description": "Array of segments"
+          }
+        }
+      },
       "SegmentationConfig": {
         "type": "object",
-        "description": "Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**\n\n• **uniform**: Provide `uniform_config`, do NOT provide `shot_detector_config`\n• **shot-detector**: Provide `shot_detector_config`, do NOT provide `uniform_config`\n\nOptionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.",
+        "description": "Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**\n\n• **uniform**: Provide `uniform_config`, do NOT provide `shot_detector_config` or `manual_config`\n• **shot-detector**: Provide `shot_detector_config`, do NOT provide `uniform_config` or `manual_config`\n• **manual**: Provide `manual_config`, do NOT provide `uniform_config` or `shot_detector_config`\n\nOptionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.",
         "required": ["strategy"],
         "properties": {
           "strategy": {
             "type": "string",
-            "enum": ["uniform", "shot-detector"],
+            "enum": ["uniform", "shot-detector", "manual"],
             "description": "Segmentation strategy - determines which config you must provide"
           },
           "uniform_config": {
@@ -7018,6 +7041,10 @@
           "shot_detector_config": {
             "$ref": "#/components/schemas/SegmentationShotDetectorConfig",
             "description": "🎯 **REQUIRED when strategy = 'shot-detector'** - Configuration for shot detection segmentation. Do NOT provide when using uniform strategy."
+          },
+          "manual_config": {
+            "$ref": "#/components/schemas/SegmentationManualConfig",
+            "description": "🎯 **REQUIRED when strategy = 'manual'** - Configuration for manual segmentation. Do NOT provide when using uniform or shot-detector strategy."
           },
           "start_time_seconds": {
             "type": "number",
