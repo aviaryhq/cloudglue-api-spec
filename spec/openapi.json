@@ -7467,7 +7467,6 @@
           "limit": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 2048,
             "default": 10,
             "description": "Maximum number of search results to return (applies to total items across groups when grouping)"
           },
