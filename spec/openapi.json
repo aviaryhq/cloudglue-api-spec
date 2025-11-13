@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.6"
+    "version": "0.4.7"
   },
   "servers": [
     {
@@ -7487,6 +7487,9 @@
             "enum": ["score", "item_count"],
             "default": "score",
             "description": "Sort order for results. Default: \"score\". When group_by_key is specified, can also use \"item_count\" to sort by number of items per group."
+          },
+          "search_scopes": {
+            "$ref": "#/components/schemas/SearchScopes"
           }
         }
       },
@@ -7608,6 +7611,9 @@
           "group_count": {
             "type": "integer",
             "description": "Number of groups in the results. Only present when group_by_key is specified."
+          },
+          "search_scopes": {
+            "$ref": "#/components/schemas/SearchScopes"
           },
           "results": {
             "type": "array",
@@ -8581,6 +8587,14 @@
             "description": "URL of the frame thumbnail (if frame extraction enabled thumbnails)"
           }
         }
+      },
+      "SearchScopes": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["general_content", "speech_lexical", "ocr_lexical"]
+        },
+        "description": "The search scopes that were used"
       }
     },
     "securitySchemes": {
