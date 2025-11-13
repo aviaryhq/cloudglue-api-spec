@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.4"
+    "version": "0.4.5"
   },
   "servers": [
     {
@@ -3770,7 +3770,7 @@
         "tags": ["Segments"],
         "summary": "Create a new video segmentation job",
         "operationId": "createSegments",
-        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**⚠️ Note: YouTube URLs are supported for narrative-based segmentation only.** Shot-based segmentation requires direct video file access. Use Cloudglue Files, HTTP URLs, or files from data connectors for shot-based segmentation.\n\n**Narrative Segmentation Strategies:**\n\n• **balanced** (default): Uses multimodal describe job for comprehensive analysis.\n  Recommended for most videos. Supports YouTube URLs.\n\n• **direct**: Directly analyzes the full video URL with AI.\n  Ideal for videos less than 10 minutes long. Provides finer grain control and expressibility with direct integration of your prompt with the Video AI model.\n\n• **long**: Optimized for longer videos beyond 10 minutes.\n  Provides finer grain control and expressibility with direct integration of your prompt with the Video AI model.\n\n**YouTube URLs**: Automatically use the 'balanced' strategy. The strategy field is ignored for YouTube URLs, and other strategies will be rejected with an error.",
+        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**⚠️ Note: YouTube URLs are supported for narrative-based segmentation only.** Shot-based segmentation requires direct video file access. Use Cloudglue Files, HTTP URLs, or files from data connectors for shot-based segmentation.\n\n**Narrative Segmentation Strategies:**\n\n• **balanced** (default): Balanced analysis approach using multiple modalities.\n  Recommended for most videos. Supports YouTube URLs.\n\n• **comprehensive**: Uses a VLM to deeply analyze logical segments of video.\n  Only available for non-YouTube videos.\n\n**YouTube URLs**: Automatically use the 'balanced' strategy. The strategy field is ignored for YouTube URLs, and other strategies will be rejected with an error.",
         "requestBody": {
           "description": "Segmentation job parameters",
           "content": {
@@ -7469,10 +7469,25 @@
             "minimum": 1,
             "maximum": 100,
             "default": 10,
-            "description": "Maximum number of search results to return"
+            "description": "Maximum number of search results to return (applies to total items across groups when grouping)"
           },
           "filter": {
             "$ref": "#/components/schemas/SearchFilter"
+          },
+          "threshold": {
+            "type": "number",
+            "description": "Minimum score threshold to filter results. Can be any real number."
+          },
+          "group_by_key": {
+            "type": "string",
+            "enum": ["file"],
+            "description": "Group results by file. Cannot be used with scope=\"file\". When specified, results are grouped by file_id."
+          },
+          "sort_by": {
+            "type": "string",
+            "enum": ["score", "item_count"],
+            "default": "score",
+            "description": "Sort order for results. Default: \"score\". When group_by_key is specified, can also use \"item_count\" to sort by number of items per group."
           }
         }
       },
@@ -7586,10 +7601,14 @@
             "enum": ["file", "segment", "face"],
             "description": "The search scope that was used"
           },
-          "search_target": {
+          "group_by_key": {
             "type": "string",
-            "enum": ["file", "segment"],
-            "description": "The search target (only present for text search, not face search)"
+            "enum": ["file"],
+            "description": "The key used for grouping results. Only present when group_by_key was specified in the request and results are grouped."
+          },
+          "group_count": {
+            "type": "integer",
+            "description": "Number of groups in the results. Only present when group_by_key is specified."
           },
           "results": {
             "type": "array",
@@ -7604,13 +7623,19 @@
                 },
                 {
                   "$ref": "#/components/schemas/FaceSearchResult"
+                },
+                {
+                  "$ref": "#/components/schemas/SegmentGroupResult"
+                },
+                {
+                  "$ref": "#/components/schemas/FaceGroupResult"
                 }
               ]
             }
           },
           "total": {
             "type": "integer",
-            "description": "Total number of results returned"
+            "description": "Total number of results returned. When group_by_key is specified, this represents the total number of items across all groups (not the number of groups)."
           },
           "limit": {
             "type": "integer",
@@ -7841,9 +7866,7 @@
           },
           "score": {
             "type": "number",
-            "minimum": 0,
-            "maximum": 100,
-            "description": "Similarity score (0-100, higher is more similar)"
+            "description": "Similarity score (higher is more similar)"
           },
           "timestamp": {
             "type": "number",
@@ -7883,6 +7906,80 @@
           "thumbnail_url": {
             "type": "string",
             "description": "URL of the frame thumbnail"
+          }
+        }
+      },
+      "SegmentGroupResult": {
+        "type": "object",
+        "required": [
+          "type",
+          "matched_items",
+          "file_id",
+          "item_count",
+          "best_score"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["segment_group"],
+            "description": "Result type, always 'segment_group'"
+          },
+          "matched_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SegmentSearchResult"
+            },
+            "description": "Array of segment search results that belong to this file"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file that this group represents"
+          },
+          "item_count": {
+            "type": "integer",
+            "description": "Number of matched items in this group"
+          },
+          "best_score": {
+            "type": "number",
+            "description": "The highest score among all items in this group"
+          }
+        }
+      },
+      "FaceGroupResult": {
+        "type": "object",
+        "required": [
+          "type",
+          "matched_items",
+          "file_id",
+          "item_count",
+          "best_score"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["face_group"],
+            "description": "Result type, always 'face_group'"
+          },
+          "matched_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FaceSearchResult"
+            },
+            "description": "Array of face search results that belong to this file"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file that this group represents"
+          },
+          "item_count": {
+            "type": "integer",
+            "description": "Number of matched items in this group"
+          },
+          "best_score": {
+            "type": "number",
+            "description": "The highest score among all items in this group"
           }
         }
       },
@@ -8001,9 +8098,9 @@
           },
           "strategy": {
             "type": "string",
-            "enum": ["direct", "long", "balanced"],
+            "enum": ["comprehensive", "balanced"],
             "default": "balanced",
-            "description": "Narrative segmentation strategy:\n\n• **balanced**: Uses multimodal describe job for comprehensive analysis.\n  Default strategy, recommended for most videos. Supports YouTube URLs.\n\n• **direct**: Directly analyzes the full video URL with AI.\n  Ideal for videos less than 10 minutes long. Provides finer grain control and expressibility with direct integration of your prompt with the Video AI model.\n\n• **long**: Optimized for longer videos beyond 10 minutes.\n  Provides finer grain control and expressibility with direct integration of your prompt with the Video AI model.\n\n**Note**: YouTube URLs automatically use the 'balanced' strategy regardless of the strategy field value. Other strategies are not supported for YouTube URLs."
+            "description": "Narrative segmentation strategy:\n\n• **balanced**: Balanced analysis approach using multiple modalities.\n  Default strategy, recommended for most videos. Supports YouTube URLs.\n\n• **comprehensive**: Uses a VLM to deeply analyze logical segments of video.\n  Only available for non-YouTube videos.\n\n**Note**: YouTube URLs automatically use the 'balanced' strategy regardless of the strategy field value. The 'comprehensive' strategy is not supported for YouTube URLs."
           },
           "number_of_chapters": {
             "type": "integer",
