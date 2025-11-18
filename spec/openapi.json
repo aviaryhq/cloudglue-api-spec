@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.7"
+    "version": "0.4.8"
   },
   "servers": [
     {
@@ -7552,6 +7552,9 @@
             "enum": ["score", "item_count"],
             "default": "score",
             "description": "Sort order for results. Default: \"score\". When group_by_key is specified, can also use \"item_count\" to sort by number of items per group."
+          },
+          "search_modalities": {
+            "$ref": "#/components/schemas/SearchModalities"
           }
         }
       },
@@ -7673,6 +7676,9 @@
           "group_count": {
             "type": "integer",
             "description": "Number of groups in the results. Only present when group_by_key is specified."
+          },
+          "search_modalities": {
+            "$ref": "#/components/schemas/SearchModalities"
           },
           "results": {
             "type": "array",
@@ -8682,6 +8688,14 @@
             "description": "URL of the frame thumbnail (if frame extraction enabled thumbnails)"
           }
         }
+      },
+      "SearchModalities": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["general_content", "speech_lexical", "ocr_lexical"]
+        },
+        "description": "The search modalities that were used"
       }
     },
     "securitySchemes": {
