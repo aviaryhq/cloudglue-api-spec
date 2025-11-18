@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.6"
+    "version": "0.4.7"
   },
   "servers": [
     {
@@ -7130,6 +7130,11 @@
             "minimum": 0,
             "description": "Total number of segments in this segmentation (only present when status is completed)"
           },
+          "total_shots": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Total number of shots in this segmentation (only present when status is completed and segmentation_config.strategy is 'shot-detector')"
+          },
           "data": {
             "type": "object",
             "description": "Segment data with pagination (only present when status is completed and segments exist)",
@@ -7166,6 +7171,14 @@
                   }
                 }
               },
+              "shots": {
+                "type": "array",
+                "description": "Array of shots in the original video (only present when status is completed and segmentation_config.strategy is 'shot-detector')",
+                "items": {
+                  "$ref": "#/components/schemas/Shot"
+                }
+              },
+
               "total": {
                 "type": "integer",
                 "description": "Total number of segments"
@@ -7183,6 +7196,58 @@
         }
       },
 
+      "SegmentationListItem": {
+        "type": "object",
+        "required": [
+          "segmentation_id",
+          "status",
+          "created_at",
+          "file_id",
+          "segmentation_config",
+          "thumbnails_config"
+        ],
+        "properties": {
+          "segmentation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the segmentation job"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "not_applicable"
+            ],
+            "description": "Status of the segmentation job. If a job has the status 'not_applicable' it means that we were unable to find any appropriate scenes for this video. This can be possible if you use the shot-detector strategy."
+          },
+          "created_at": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Unix timestamp of when the segmentation was created"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the file this segmentation belongs to"
+          },
+          "segmentation_config": {
+            "$ref": "#/components/schemas/SegmentationConfig"
+          },
+          "thumbnails_config": {
+            "$ref": "#/components/schemas/ThumbnailsConfig"
+          },
+          "total_segments": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Total number of segments in this segmentation (only present when status is completed)"
+          }
+        },
+        "description": "Segmentation object as returned in list responses (does not include segments array or data property)"
+      },
+
       "SegmentationList": {
         "type": "object",
         "required": ["object", "data", "total", "limit", "offset"],
@@ -7195,7 +7260,7 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Segmentation"
+              "$ref": "#/components/schemas/SegmentationListItem"
             },
             "description": "Array of segmentation objects"
           },
@@ -8161,11 +8226,23 @@
             "minimum": 0,
             "description": "Total number of segments generated (only present when status is 'completed')"
           },
+          "total_shots": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of shots in the original video (only present when criteria is 'shot')"
+          },
           "segments": {
             "type": "array",
             "description": "Array of generated segments (only present when status is 'completed')",
             "items": {
               "$ref": "#/components/schemas/Segment"
+            }
+          },
+          "shots": {
+            "type": "array",
+            "description": "Array of shots in the original video (only present when criteria is 'shot')",
+            "items": {
+              "$ref": "#/components/schemas/Shot"
             }
           }
         }
@@ -8243,6 +8320,30 @@
             "type": "string",
             "format": "uri",
             "description": "Optional URL of the thumbnail for this segment"
+          },
+          "shot_index": {
+            "type": "integer",
+            "description": "Index of the shot in the original video segmentation. Only present when criteria is set to 'shot'"
+          }
+        }
+      },
+      "Shot": {
+        "type": "object",
+        "required": ["index", "start_time", "end_time"],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Index of the shot in the original video"
+          },
+          "start_time": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Start time of the shot in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "minimum": 0,
+            "description": "End time of the shot in seconds"
           }
         }
       },
