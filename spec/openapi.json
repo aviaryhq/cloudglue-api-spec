@@ -3770,7 +3770,7 @@
         "tags": ["Segments"],
         "summary": "Create a new video segmentation job",
         "operationId": "createSegments",
-        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**⚠️ Note: YouTube URLs are supported for narrative-based segmentation only.** Shot-based segmentation requires direct video file access. Use Cloudglue Files, HTTP URLs, or files from data connectors for shot-based segmentation.\n\n**Narrative Segmentation Strategies:**\n\n• **balanced** (default): Balanced analysis approach using multiple modalities.\n  Recommended for most videos. Supports YouTube URLs.\n\n• **comprehensive**: Uses a VLM to deeply analyze logical segments of video.\n  Only available for non-YouTube videos.\n\n**YouTube URLs**: Automatically use the 'balanced' strategy. The strategy field is ignored for YouTube URLs, and other strategies will be rejected with an error.",
+        "description": "Create intelligent video segments based on shot detection or narrative analysis.\n\n**Note: YouTube URLs are supported for narrative-based segmentation only.** Shot-based segmentation requires direct video file access. Use Cloudglue Files, HTTP URLs, or files from data connectors for shot-based segmentation.\n\n**Narrative Segmentation Strategies:**\n\n- **comprehensive** (default for non-YouTube videos): Uses a VLM to deeply analyze logical segments of video. Only available for non-YouTube videos.\n- **balanced** (default for YouTube videos): Balanced analysis approach using multiple modalities. Supports YouTube URLs.\n\n**YouTube URLs**: Automatically use the 'balanced' strategy. The strategy field is ignored for YouTube URLs, and other strategies will be rejected with an error.\n\n**Chapter Count Parameters:**\n\n- **number_of_chapters**: Target number of chapters. If only this is provided, min_chapters and max_chapters are calculated automatically.\n- **min_chapters**: Minimum number of chapters. If provided with number_of_chapters and max, validates min is less than or equal to number_of_chapters which is less than or equal to max.\n- **max_chapters**: Maximum number of chapters. If provided with number_of_chapters and min, validates min is less than or equal to number_of_chapters which is less than or equal to max.\n- If none are provided, chapter counts are calculated automatically based on video duration.",
         "requestBody": {
           "description": "Segmentation job parameters",
           "content": {
@@ -8170,12 +8170,22 @@
             "type": "string",
             "enum": ["comprehensive", "balanced"],
             "default": "balanced",
-            "description": "Narrative segmentation strategy:\n\n• **balanced**: Balanced analysis approach using multiple modalities.\n  Default strategy, recommended for most videos. Supports YouTube URLs.\n\n• **comprehensive**: Uses a VLM to deeply analyze logical segments of video.\n  Only available for non-YouTube videos.\n\n**Note**: YouTube URLs automatically use the 'balanced' strategy regardless of the strategy field value. The 'comprehensive' strategy is not supported for YouTube URLs."
+            "description": "Narrative segmentation strategy:\n\n• **comprehensive** (default for non-YouTube videos): Uses a VLM to deeply analyze logical segments of video. Only available for non-YouTube videos.\n\n• **balanced** (default for YouTube videos): Balanced analysis approach using multiple modalities. Supports YouTube URLs.\n\n**Note**: YouTube URLs automatically use the 'balanced' strategy regardless of the strategy field value. The 'comprehensive' strategy is not supported for YouTube URLs."
           },
           "number_of_chapters": {
             "type": "integer",
             "minimum": 1,
-            "description": "Optional target number of chapters to generate. If provided, the AI will attempt to generate exactly this number of chapters."
+            "description": "Optional target number of chapters to generate. If provided, min_chapters and max_chapters will be calculated automatically if not specified. If only target is provided, the AI will attempt to generate exactly this number of chapters."
+          },
+          "min_chapters": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Optional minimum number of chapters to generate. If provided along with number_of_chapters and max_chapters, validates that min <= number_of_chapters <= max. If only number_of_chapters is provided, min and max are calculated automatically."
+          },
+          "max_chapters": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Optional maximum number of chapters to generate. If provided along with number_of_chapters and min_chapters, validates that min <= number_of_chapters <= max. If only number_of_chapters is provided, min and max are calculated automatically."
           }
         }
       },
