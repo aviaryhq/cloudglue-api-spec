@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.8"
+    "version": "0.4.9"
   },
   "servers": [
     {
@@ -4883,7 +4883,8 @@
               "upload",
               "google-drive",
               "zoom",
-              "gong"
+              "gong",
+              "recall"
             ],
             "description": "Source of the file"
           }
@@ -5280,7 +5281,7 @@
             }
           },
           "default_segmentation_config": {
-            "$ref": "#/components/schemas/SegmentationConfig",
+            "$ref": "#/components/schemas/DefaultSegmentationConfig",
             "description": "Default segmentation configuration to use for files added to this collection. If not provided, a default uniform segmentation will be used."
           },
           "default_thumbnails_config": {
@@ -7045,6 +7046,36 @@
           "manual_config": {
             "$ref": "#/components/schemas/SegmentationManualConfig",
             "description": "🎯 **REQUIRED when strategy = 'manual'** - Configuration for manual segmentation. Do NOT provide when using uniform or shot-detector strategy."
+          },
+          "start_time_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Optional: The start time of the video in seconds to start segmenting from"
+          },
+          "end_time_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Optional: The end time of the video in seconds to stop segmenting at"
+          }
+        }
+      },
+      "DefaultSegmentationConfig": {
+        "type": "object",
+        "description": "Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**\n\n• **uniform**: Provide `uniform_config`, do NOT provide `shot_detector_config`\n• **shot-detector**: Provide `shot_detector_config`, do NOT provide `uniform_config`\n\nOptionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.",
+        "required": ["strategy"],
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "enum": ["uniform", "shot-detector"],
+            "description": "Segmentation strategy - determines which config you must provide. Manual strategies are not supported for default segmentation configs"
+          },
+          "uniform_config": {
+            "$ref": "#/components/schemas/SegmentationUniformConfig",
+            "description": "🎯 **REQUIRED when strategy = 'uniform'** - Configuration for uniform segmentation. Do NOT provide when using shot-detector strategy."
+          },
+          "shot_detector_config": {
+            "$ref": "#/components/schemas/SegmentationShotDetectorConfig",
+            "description": "🎯 **REQUIRED when strategy = 'shot-detector'** - Configuration for shot detection segmentation. Do NOT provide when using uniform strategy."
           },
           "start_time_seconds": {
             "type": "number",
