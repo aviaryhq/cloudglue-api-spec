@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.9"
+    "version": "0.4.10"
   },
   "servers": [
     {
@@ -161,6 +161,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "include_data",
+            "in": "query",
+            "description": "Include the data in the response. If false, the response will only include the job information and not the data to minimize the response size.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
           }
         ],
         "responses": {
@@ -264,6 +274,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Extract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Extract"],
+        "summary": "Delete an extraction job",
+        "operationId": "deleteExtract",
+        "description": "Delete an extraction job",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the extraction job",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique identifier for the extract job"
+                    }
+                  },
+                  "required": ["id"]
                 }
               }
             }
@@ -2788,6 +2854,16 @@
               "enum": ["json", "markdown"],
               "default": "json"
             }
+          },
+          {
+            "name": "include_data",
+            "in": "query",
+            "description": "Include the data in the response. If false, the response will only include the job information and not the data to minimize the response size.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
           }
         ],
         "responses": {
@@ -2877,6 +2953,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Describe"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Describe"],
+        "summary": "Delete a media description job",
+        "operationId": "deleteDescribe",
+        "description": "Delete a media description job",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the description job",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique identifier for the describe job"
+                    }
+                  },
+                  "required": ["id"]
                 }
               }
             }
