@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.10"
+    "version": "0.4.11"
   },
   "servers": [
     {
@@ -911,6 +911,15 @@
               "minimum": 0,
               "default": 0
             }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter thumbnails by type",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ThumbnailType"
+            }
           }
         ],
         "responses": {
@@ -926,6 +935,154 @@
           },
           "404": {
             "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{file_id}/segments/{segment_id}": {
+      "get": {
+        "tags": ["Files", "File Segments"],
+        "summary": "Get a file segment",
+        "operationId": "getFileSegment",
+        "description": "Get a file segment",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "segment_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segment",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File segment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileSegment"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File segment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Files", "File Segments"],
+        "summary": "Update a file segment",
+        "operationId": "updateFileSegment",
+        "description": "Update a file segment",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "segment_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segment",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "File segment update parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "type": "object",
+                    "description": "The user defined metadata for the segment. Nullable"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File segment updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileSegment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or malformed file segment update parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File segment not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -3380,6 +3537,121 @@
             }
           }
         }
+      },
+      "get": {
+        "tags": ["Search"],
+        "summary": "Get a list of search responses",
+        "operationId": "getSearch",
+        "description": "Get a list of search responses. Order by `created_at` in descending order by default.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of search responses to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of search responses to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponseList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Search not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search/{search_id}": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "Get a search response by ID",
+        "operationId": "getSearchById",
+        "description": "Get a search response by search_id. ",
+        "parameters": [
+          {
+            "name": "search_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the search response to get",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A search response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Search response not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/collections/{collection_id}/videos/{file_id}/face-detections": {
@@ -4235,6 +4507,15 @@
               "type": "integer",
               "minimum": 0,
               "default": 0
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter thumbnails by type",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ThumbnailType"
             }
           }
         ],
@@ -7134,6 +7415,26 @@
           }
         }
       },
+      "KeyframeConfig": {
+        "type": "object",
+        "required": ["frames_per_segment", "max_width"],
+        "description": "Configuration for keyframe extraction. When provided, will be used to extract keyframes for the segmentation. This is not supported for YouTube videos.",
+        "properties": {
+          "frames_per_segment": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 8,
+            "description": "The number of key frames to extract per segment"
+          },
+          "max_width": {
+            "type": "number",
+            "minimum": 144,
+            "maximum": 4320,
+            "default": 280,
+            "description": "The maximum width of the key frames in pixels"
+          }
+        }
+      },
       "SegmentationManualConfig": {
         "type": "object",
         "required": ["segments"],
@@ -7179,6 +7480,10 @@
             "$ref": "#/components/schemas/SegmentationManualConfig",
             "description": "🎯 **REQUIRED when strategy = 'manual'** - Configuration for manual segmentation. Do NOT provide when using uniform or shot-detector strategy."
           },
+          "keyframe_config": {
+            "$ref": "#/components/schemas/KeyframeConfig",
+            "description": "When provided, will be used to extract keyframes for the segmentation."
+          },
           "start_time_seconds": {
             "type": "number",
             "minimum": 0,
@@ -7208,6 +7513,10 @@
           "shot_detector_config": {
             "$ref": "#/components/schemas/SegmentationShotDetectorConfig",
             "description": "🎯 **REQUIRED when strategy = 'shot-detector'** - Configuration for shot detection segmentation. Do NOT provide when using uniform strategy."
+          },
+          "keyframe_config": {
+            "$ref": "#/components/schemas/KeyframeConfig",
+            "description": "When provided, will be used to extract keyframes for the segmentation."
           },
           "start_time_seconds": {
             "type": "number",
@@ -7808,6 +8117,84 @@
           }
         }
       },
+      "SearchResponseList": {
+        "type": "object",
+        "required": ["object", "data", "total", "limit", "offset"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "object",
+                "scope",
+                "results",
+                "total",
+                "limit"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ID of the search response"
+                },
+                "object": {
+                  "type": "string",
+                  "enum": ["search"],
+                  "description": "Object type, always 'search'"
+                },
+                "query": {
+                  "type": "string",
+                  "description": "The search query that was executed (for text search) or the source image URL/base64 indicator (for face search)"
+                },
+                "scope": {
+                  "type": "string",
+                  "enum": ["file", "segment", "face"],
+                  "description": "The search scope that was used"
+                },
+                "group_by_key": {
+                  "type": "string",
+                  "enum": ["file"],
+                  "description": "The key used for grouping results. Only present when group_by_key was specified in the request and results are grouped."
+                },
+                "group_count": {
+                  "type": "integer",
+                  "description": "Number of groups in the results. Only present when group_by_key is specified."
+                },
+                "search_modalities": {
+                  "$ref": "#/components/schemas/SearchModalities"
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total number of results returned. When group_by_key is specified, this represents the total number of items across all groups (not the number of groups)."
+                },
+                "limit": {
+                  "type": "integer",
+                  "description": "The limit that was applied to the search"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of search responses matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        }
+      },
       "SearchResponse": {
         "type": "object",
         "required": ["id", "object", "scope", "results", "total", "limit"],
@@ -8057,6 +8444,24 @@
             "type": "string",
             "format": "uri",
             "description": "URL of the thumbnail for the segment if available"
+          },
+          "keyframes": {
+            "type": "array",
+            "description": "Keyframes for the segment",
+            "items": {
+              "type": "object",
+              "properties": {
+                "time_in_seconds": {
+                  "type": "number",
+                  "description": "Time of the keyframe in seconds"
+                },
+                "thumbnail_url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "URL of the thumbnail for the keyframe"
+                }
+              }
+            }
           }
         }
       },
@@ -8266,6 +8671,9 @@
             "type": "string",
             "format": "uuid",
             "description": "The ID of the segmentation if part of a segmentation job"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ThumbnailType"
           },
           "segment_id": {
             "type": "string",
@@ -8869,6 +9277,53 @@
           "enum": ["general_content", "speech_lexical", "ocr_lexical"]
         },
         "description": "The search modalities that were used"
+      },
+      "ThumbnailType": {
+        "type": "string",
+        "description": "The type of the thumbnail: 'segment' for segment thumbnails, 'keyframe' for keyframes, 'file' for file thumbnails. Comma separated string of one or more types."
+      },
+      "FileSegment": {
+        "type": "object",
+        "required": [
+          "id",
+          "file_id",
+          "start_time",
+          "end_time",
+          "thumbnail_url"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segment"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the file"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "The start time of the segment in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "The end time of the segment in seconds"
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "description": "The URL of the thumbnail for the segment (if available)"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "The user defined metadata for the segment"
+          },
+          "segmentation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segmentation job it belongs to"
+          }
+        }
       }
     },
     "securitySchemes": {
