@@ -7417,7 +7417,7 @@
       },
       "KeyframeConfig": {
         "type": "object",
-        "required": ["frames_per_segment", "max_width"],
+        "required": ["frames_per_segment"],
         "description": "Configuration for keyframe extraction. When provided, will be used to extract keyframes for the segmentation. This is not supported for YouTube videos.",
         "properties": {
           "frames_per_segment": {
@@ -9280,7 +9280,7 @@
       },
       "ThumbnailType": {
         "type": "string",
-        "description": "The type of the thumbnail: 'segment' for segment thumbnails, 'keyframe' for keyframes, 'file' for file thumbnails. Comma separated string of one or more types."
+        "description": "The type of the thumbnail: 'segment' for segment thumbnails, 'keyframe' for keyframes, 'file' for file thumbnails, 'frame' for frame thumbnails. Comma separated string of one or more types."
       },
       "FileSegment": {
         "type": "object",
