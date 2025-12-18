@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.4.11"
+    "version": "0.4.12"
   },
   "servers": [
     {
@@ -20,6 +20,255 @@
     }
   ],
   "paths": {
+    "/tags": {
+      "post": {
+        "tags": ["Tags"],
+        "summary": "Create a new tag",
+        "operationId": "createTag",
+        "description": "Create a new tag",
+        "requestBody": {
+          "description": "Tag creation parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVideoTagRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Tag created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing required label/value",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Resource limits exceeded (total tags per file or segment)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Tags"],
+        "summary": "List all tags",
+        "operationId": "listTags",
+        "description": "List all tags",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter tags by type: 'file' or 'segment'",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["file", "segment"]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of tags to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of tags to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListVideoTagsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/{tag_id}": {
+      "get": {
+        "tags": ["Tags"],
+        "summary": "Get a tag",
+        "operationId": "getTag",
+        "description": "Get a tag",
+        "parameters": [
+          {
+            "name": "tag_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the tag",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTag"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tag not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tags"],
+        "summary": "Delete a tag",
+        "operationId": "deleteTag",
+        "description": "Delete a tag",
+        "parameters": [
+          {
+            "name": "tag_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the tag",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique identifier for the tag"
+                    }
+                  },
+                  "required": ["id"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tag not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Tags"],
+        "summary": "Update a tag",
+        "operationId": "updateTag",
+        "description": "Update a tag",
+        "parameters": [
+          {
+            "name": "tag_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the tag",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Tag update parameters. At least one of label or value is required.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVideoTagRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Tag updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTag"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/extract": {
       "post": {
         "tags": ["Extract"],
@@ -956,6 +1205,38 @@
         }
       }
     },
+    "/files/{file_id}/tags": {
+      "get": {
+        "tags": ["Files", "Tags"],
+        "summary": "List tags for a file",
+        "operationId": "listFileTags",
+        "description": "List all tags for a specific file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListVideoTagsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/files/{file_id}/segments/{segment_id}": {
       "get": {
         "tags": ["Files", "File Segments"],
@@ -1097,6 +1378,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{file_id}/segments/{segment_id}/tags": {
+      "get": {
+        "tags": ["Files", "File Segments", "Tags"],
+        "summary": "List tags for a file segment",
+        "operationId": "listFileSegmentTags",
+        "description": "List all tags for a specific file segment",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "segment_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segment",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListVideoTagsResponse"
                 }
               }
             }
@@ -8027,6 +8350,13 @@
           },
           "search_modalities": {
             "$ref": "#/components/schemas/SearchModalities"
+          },
+          "label_filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter eligible search items by presence of one or more labels in the provided list (otherwise all tags will be considered in search response). Only supported for `tag_semantic` and `tag_lexical` search modalities "
           }
         }
       },
@@ -8037,7 +8367,22 @@
             "type": "array",
             "description": "Filter by file metadata using JSON path expressions",
             "items": {
-              "$ref": "#/components/schemas/SearchFilterCriteria"
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SearchFilterCriteria"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "scope": {
+                      "type": "string",
+                      "enum": ["file", "segment"],
+                      "default": "file",
+                      "description": "Specifies scope of eligible search items (file/segment) to check metadata filtering conditions"
+                    }
+                  }
+                }
+              ]
             }
           },
           "video_info": {
@@ -8310,6 +8655,9 @@
             "type": "string",
             "format": "uri",
             "description": "URL of the thumbnail for the file if available."
+          },
+          "tag": {
+            "$ref": "#/components/schemas/SearchTagResponse"
           }
         }
       },
@@ -8444,6 +8792,13 @@
             "type": "string",
             "format": "uri",
             "description": "URL of the thumbnail for the segment if available"
+          },
+          "tag": {
+            "$ref": "#/components/schemas/SearchTagResponse"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "User-provided metadata about the segment, if provided."
           },
           "keyframes": {
             "type": "array",
@@ -9274,9 +9629,15 @@
         "type": "array",
         "items": {
           "type": "string",
-          "enum": ["general_content", "speech_lexical", "ocr_lexical"]
+          "enum": [
+            "general_content",
+            "speech_lexical",
+            "ocr_lexical",
+            "tag_semantic",
+            "tag_lexical"
+          ]
         },
-        "description": "The search modalities that were used"
+        "description": "Specifies the type of search to execute, one of:\n- `general_content`: baseline for matching the content of the search item (file/segment) based on visual or spoken content similarity to provided short natural language query string\n- `speech_lexical`: performs keyword based search (e.g. query of `president` matching ` president` or `presidential` strings) and exact match (e.g. specifically find mentions of `\"Barack Obama\"` or `\"Donald Trump\"`) against speech content present in search item\n- `ocr_lexical`: performs keyword based search and exact match against screen text content present in search item\n- `tag_semantic`: performs basic word semantic similarity search against tag values associated with search items (e.g. `query=animal` expected to match tags with value containing `dog` or `cat`)\n- `tag_lexical`: performs keyword based search and exact match against tag values associated with search items\n\nThis API currently only supports one search modality per request. \n\nOnly applicable for when search `scope=file` or `scope=segment`\n"
       },
       "ThumbnailType": {
         "type": "string",
@@ -9322,6 +9683,137 @@
             "type": "string",
             "format": "uuid",
             "description": "The ID of the segmentation job it belongs to"
+          }
+        }
+      },
+      "PaginationResponse": {
+        "type": "object",
+        "required": ["object", "total", "limit", "offset"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "total": {
+            "type": "integer",
+            "description": "The total number of items"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The number of items per page"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The offset of the items"
+          }
+        }
+      },
+      "ListVideoTagsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PaginationResponse"
+          },
+          {
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/VideoTag"
+                },
+                "description": "The list of tags"
+              }
+            }
+          }
+        ]
+      },
+      "VideoTag": {
+        "type": "object",
+        "required": ["id", "label", "value", "type", "file_id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the tag"
+          },
+          "label": {
+            "type": "string",
+            "description": "The label of the tag"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the tag"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["file", "segment"],
+            "description": "The type of the tag"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the file"
+          },
+          "segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segment"
+          }
+        }
+      },
+      "CreateVideoTagRequest": {
+        "type": "object",
+        "required": ["label", "value", "file_id"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "The label of the tag"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the tag"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the file"
+          },
+          "segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segment"
+          }
+        }
+      },
+      "UpdateVideoTagRequest": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "The label of the tag"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the tag"
+          }
+        }
+      },
+      "SearchTagResponse": {
+        "type": "object",
+        "description": "The associated tag for the search result if it exists. Only provided for search requests with tag_semantic or tag_lexical search modalities.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the tag"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the tag"
+          },
+          "label": {
+            "type": "string",
+            "description": "The label of the tag"
           }
         }
       }
