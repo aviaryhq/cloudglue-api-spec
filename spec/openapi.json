@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.5.0"
+    "version": "0.5.1"
   },
   "servers": [
     {
@@ -4945,6 +4945,49 @@
             }
           }
         }
+      },
+      "get": {
+        "tags": ["Face Match"],
+        "summary": "List face match jobs",
+        "operationId": "listFaceMatch",
+        "description": "List all face match jobs",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of face match jobs to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the face match jobs list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Face match jobs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaceMatchListResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/face-match/{face_match_id}": {
@@ -5149,6 +5192,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Face Detection"],
+        "summary": "List face detection jobs",
+        "operationId": "listFaceDetection",
+        "description": "List all face detection jobs",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of face detection jobs to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the face detection jobs list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Face detection jobs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaceDetectionListResponse"
                 }
               }
             }
@@ -9816,6 +9902,116 @@
             "description": "The label of the tag"
           }
         }
+      },
+      "FaceMatchListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PaginationResponse"
+          },
+          {
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["job_id", "status", "created_at"],
+                  "properties": {
+                    "job_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique identifier for the face match job"
+                    },
+                    "face_detection_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the face detection analysis used"
+                    },
+                    "frame_extraction_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the frame extraction used"
+                    },
+                    "file_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the target file"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "processing", "completed", "failed"],
+                      "description": "Status of the face match job"
+                    },
+                    "created_at": {
+                      "type": "number",
+                      "description": "Unix timestamp of when the job was created"
+                    },
+                    "source_face_bounding_box": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/FaceBoundingBox"
+                        }
+                      ],
+                      "nullable": true,
+                      "description": "Bounding box of the source face in the source image (null when job is pending/processing)"
+                    },
+                    "match_count": {
+                      "type": "integer",
+                      "description": "Number of matches found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "FaceDetectionListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PaginationResponse"
+          },
+          {
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["job_id", "status", "created_at"],
+                  "properties": {
+                    "job_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique identifier for the face detection job"
+                    },
+                    "frame_extraction_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the frame extraction used"
+                    },
+                    "file_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the target file"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "processing", "completed", "failed"],
+                      "description": "Status of the face detection job"
+                    },
+                    "created_at": {
+                      "type": "number",
+                      "description": "Unix timestamp of when the job was created"
+                    },
+                    "total_faces": {
+                      "type": "integer",
+                      "description": "Total number of faces detected"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "securitySchemes": {
