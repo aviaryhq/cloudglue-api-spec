@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.5.1"
+    "version": "0.5.2"
   },
   "servers": [
     {
@@ -3889,6 +3889,26 @@
               "default": 0,
               "minimum": 0
             }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter search responses created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter search responses created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
           }
         ],
         "responses": {
@@ -4974,6 +4994,36 @@
               "minimum": 0,
               "default": 0
             }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter face match jobs created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter face match jobs created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "processing", "completed", "failed"]
+            }
           }
         ],
         "responses": {
@@ -5225,6 +5275,36 @@
               "type": "integer",
               "minimum": 0,
               "default": 0
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter face detection jobs created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter face detection jobs created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "processing", "completed", "failed"]
             }
           }
         ],
