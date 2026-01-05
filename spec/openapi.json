@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.5.2"
+    "version": "0.5.3"
   },
   "servers": [
     {
@@ -2921,6 +2921,108 @@
           },
           "500": {
             "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Chat"],
+        "summary": "List all chat completions",
+        "operationId": "listChatCompletions",
+        "description": "List all chat completions with optional filtering",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of chat completions to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of chat completions to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter chat completions created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter chat completions created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of chat completions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/completions/{id}": {
+      "get": {
+        "tags": ["Chat"],
+        "summary": "Retrieve a chat completion",
+        "operationId": "getChatCompletion",
+        "description": "Retrieve a chat completion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the chat completion",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Chat completion not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -10092,6 +10194,99 @@
             }
           }
         ]
+      },
+      "ChatCompletionList": {
+        "type": "object",
+        "required": ["object", "data", "total", "limit", "offset"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "created",
+                "object",
+                "model",
+                "usage",
+                "choices"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "The ID of the chat completion"
+                },
+                "created": {
+                  "type": "number",
+                  "description": "The timestamp of the chat completion"
+                },
+                "object": {
+                  "type": "string",
+                  "enum": ["chat.completion"],
+                  "description": "Object type, always 'chat.completion'"
+                },
+                "model": {
+                  "type": "string",
+                  "description": "The model used for the chat completion"
+                },
+                "usage": {
+                  "type": "object",
+                  "properties": {
+                    "prompt_tokens": {
+                      "type": "integer",
+                      "description": "The number of tokens in the prompt"
+                    },
+                    "completion_tokens": {
+                      "type": "integer",
+                      "description": "The number of tokens in the completion"
+                    },
+                    "total_tokens": {
+                      "type": "integer",
+                      "description": "The total number of tokens in the request"
+                    }
+                  },
+                  "description": "The usage of the chat completion"
+                },
+                "choices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["index", "message"],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "description": "The index of the choice"
+                      },
+                      "message": {
+                        "$ref": "#/components/schemas/ChatMessage"
+                      }
+                    }
+                  },
+                  "description": "The choices of the chat completion"
+                }
+              }
+            },
+            "description": "The list of chat completions"
+          },
+          "total": {
+            "type": "integer",
+            "description": "The total number of items"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The number of items per page"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The offset of the items"
+          }
+        }
       }
     },
     "securitySchemes": {
