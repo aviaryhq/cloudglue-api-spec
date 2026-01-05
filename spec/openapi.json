@@ -6910,7 +6910,7 @@
             "type": "string",
             "description": "Object type, always \"chat.completion\""
           },
-          "created": {
+          "created_at": {
             "type": "integer",
             "description": "Unix timestamp of when the chat completion was created"
           },
@@ -10213,7 +10213,7 @@
               "type": "object",
               "required": [
                 "id",
-                "created",
+                "created_at",
                 "object",
                 "model",
                 "usage",
@@ -10226,7 +10226,7 @@
                   "format": "uuid",
                   "description": "The ID of the chat completion"
                 },
-                "created": {
+                "created_at": {
                   "type": "number",
                   "description": "The timestamp of the chat completion"
                 },
@@ -10310,6 +10310,13 @@
           },
           "filter": {
             "$ref": "#/components/schemas/SearchFilter"
+          },
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       }
