@@ -7010,6 +7010,9 @@
               }
             }
           },
+          "payload": {
+            "$ref": "#/components/schemas/ChatCompletionPayload"
+          },
           "usage": {
             "type": "object",
             "description": "Usage statistics for the completion request",
@@ -10214,7 +10217,8 @@
                 "object",
                 "model",
                 "usage",
-                "choices"
+                "choices",
+                "payload"
               ],
               "properties": {
                 "id": {
@@ -10269,6 +10273,9 @@
                     }
                   },
                   "description": "The choices of the chat completion"
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/ChatCompletionPayload"
                 }
               }
             },
@@ -10285,6 +10292,31 @@
           "offset": {
             "type": "integer",
             "description": "The offset of the items"
+          }
+        }
+      },
+      "ChatCompletionPayload": {
+        "type": "object",
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            }
+          },
+          "temperature": {
+            "type": "number",
+            "description": "The temperature of the chat completion"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/SearchFilter"
+          },
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       }
