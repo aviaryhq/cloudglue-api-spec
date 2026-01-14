@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.5.3"
+    "version": "0.5.4"
   },
   "servers": [
     {
@@ -1230,6 +1230,81 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListVideoTagsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{file_id}/segments": {
+      "get": {
+        "tags": ["Files", "File Segments"],
+        "summary": "List file segments",
+        "operationId": "listFileSegments",
+        "description": "List all segments for a specific file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "start_time_after",
+            "in": "query",
+            "description": "Filter segments by start time",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "end_time_before",
+            "in": "query",
+            "description": "Filter segments by end time",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of segments to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of segments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileSegmentListResponse"
                 }
               }
             }
@@ -5546,6 +5621,299 @@
           },
           "500": {
             "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/share": {
+      "post": {
+        "tags": ["Share"],
+        "summary": "Create a publicly available shareable asset",
+        "operationId": "createShareableAsset",
+        "description": "Create a publicly available shareable asset",
+        "requestBody": {
+          "description": "Shareable asset creation request parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShareableAssetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Shareable asset created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareableAsset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters or configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File or file segment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Shareable asset already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Share"],
+        "summary": "List shareable assets",
+        "operationId": "listShareableAssets",
+        "description": "List shareable assets",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "query",
+            "description": "The ID of the file to list shareable assets for",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "file_segment_id",
+            "in": "query",
+            "description": "The ID of the file segment to list shareable assets for",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of shareable assets to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the shareable assets list",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter shareable assets created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter shareable assets created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shareable assets listed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareableAssetListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/share/{id}": {
+      "get": {
+        "tags": ["Share"],
+        "summary": "Get a shareable asset",
+        "operationId": "getShareableAsset",
+        "description": "Get a shareable asset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the shareable asset to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shareable asset retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareableAsset"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shareable asset not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Share"],
+        "summary": "Delete a shareable asset",
+        "operationId": "deleteShareableAsset",
+        "description": "Delete a shareable asset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the shareable asset to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shareable asset deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the deleted shareable asset"
+                    },
+                    "object": {
+                      "type": "string",
+                      "enum": ["share"],
+                      "description": "Object type, always 'share'"
+                    }
+                  },
+                  "required": ["id", "object"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shareable asset not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Share"],
+        "summary": "Update a shareable asset",
+        "operationId": "updateShareableAsset",
+        "description": "Update a shareable asset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the shareable asset to update",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Shareable asset update request parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShareableAssetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shareable asset updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareableAsset"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shareable asset not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -10317,6 +10685,178 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        }
+      },
+      "FileSegmentListResponse": {
+        "type": "object",
+        "required": ["object", "data", "total", "limit", "offset"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileSegment"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "The total number of items"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The number of items per page"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The offset of the items"
+          }
+        }
+      },
+      "ShareableAssetListResponse": {
+        "type": "object",
+        "required": ["object", "data", "total", "limit", "offset"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShareableAsset"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "The total number of items"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The number of items per page"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The offset of the items"
+          }
+        }
+      },
+      "ShareableAsset": {
+        "type": "object",
+        "required": ["id", "file_id", "url", "created_at"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier of the shareable asset"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the file the shareable asset belongs to"
+          },
+          "file_segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the file segment the shareable asset belongs to (optional)"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the shareable asset"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the shareable asset"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "The metadata of the shareable asset"
+          },
+          "preview_url": {
+            "type": "string",
+            "description": "The thumbnail url of the shareable asset"
+          },
+          "media_download_url": {
+            "type": "string",
+            "description": "The signed media download url of the shareable asset"
+          },
+          "media_download_expires_at": {
+            "type": "number",
+            "nullable": true,
+            "description": "The timestamp of when the media download url will expire"
+          },
+          "share_url": {
+            "type": "string",
+            "description": "This is the url that can be used to share the shareable asset"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"],
+            "description": "The status of the shareable asset"
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": ["file", "file_segment"],
+            "description": "The type of asset the shareable asset belongs to"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "The timestamp of when the shareable asset was created"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["share"],
+            "description": "Object type, always 'share'"
+          }
+        }
+      },
+      "CreateShareableAssetRequest": {
+        "type": "object",
+        "required": ["file_id"],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the file the shareable asset will be created for"
+          },
+          "file_segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the file segment the shareable asset will be created for. When provided, the shareable asset will be created for the file segment."
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the shareable asset"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the shareable asset"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "The metadata of the shareable asset"
+          }
+        }
+      },
+      "UpdateShareableAssetRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title of the shareable asset"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the shareable asset"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "The metadata of the shareable asset"
           }
         }
       }
