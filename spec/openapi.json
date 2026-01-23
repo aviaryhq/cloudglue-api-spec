@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.5.4"
+    "version": "0.5.5"
   },
   "servers": [
     {
@@ -969,7 +969,9 @@
             "application/json": {
               "schema": {
                 "allOf": [
-                  { "$ref": "#/components/schemas/SegmentationConfig" }
+                  {
+                    "$ref": "#/components/schemas/SegmentationConfig"
+                  }
                 ],
                 "type": "object",
                 "properties": {
@@ -2324,6 +2326,14 @@
             "schema": {
               "type": "number"
             }
+          },
+          {
+            "name": "modalities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ModalitiesSchema"
+            }
           }
         ],
         "responses": {
@@ -2656,6 +2666,14 @@
               "enum": ["json", "markdown"],
               "default": "json"
             }
+          },
+          {
+            "name": "modalities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ModalitiesSchema"
+            }
           }
         ],
         "responses": {
@@ -2791,6 +2809,14 @@
               "enum": ["json", "markdown"],
               "default": "json"
             }
+          },
+          {
+            "name": "modalities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ModalitiesSchema"
+            }
           }
         ],
         "responses": {
@@ -2889,6 +2915,14 @@
             "required": false,
             "schema": {
               "type": "number"
+            }
+          },
+          {
+            "name": "modalities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ModalitiesSchema"
             }
           }
         ],
@@ -3521,6 +3555,14 @@
               "type": "boolean",
               "default": true
             }
+          },
+          {
+            "name": "modalities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ModalitiesSchema"
+            }
           }
         ],
         "responses": {
@@ -3600,6 +3642,14 @@
             "required": false,
             "schema": {
               "type": "number"
+            }
+          },
+          {
+            "name": "modalities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ModalitiesSchema"
             }
           }
         ],
@@ -3693,7 +3743,6 @@
         }
       }
     },
-
     "/webhooks": {
       "get": {
         "tags": ["Webhooks"],
@@ -4424,7 +4473,9 @@
             "application/json": {
               "schema": {
                 "allOf": [
-                  { "$ref": "#/components/schemas/FrameExtractionConfig" }
+                  {
+                    "$ref": "#/components/schemas/FrameExtractionConfig"
+                  }
                 ],
                 "type": "object",
                 "properties": {
@@ -6256,7 +6307,8 @@
               "google-drive",
               "zoom",
               "gong",
-              "recall"
+              "recall",
+              "gcs"
             ],
             "description": "Source of the file"
           }
@@ -8612,7 +8664,6 @@
                   "$ref": "#/components/schemas/Shot"
                 }
               },
-
               "total": {
                 "type": "integer",
                 "description": "Total number of segments"
@@ -8629,7 +8680,6 @@
           }
         }
       },
-
       "SegmentationListItem": {
         "type": "object",
         "required": [
@@ -8681,7 +8731,6 @@
         },
         "description": "Segmentation object as returned in list responses (does not include segments array or data property)"
       },
-
       "SegmentationList": {
         "type": "object",
         "required": ["object", "data", "total", "limit", "offset"],
@@ -10859,6 +10908,22 @@
             "description": "The metadata of the shareable asset"
           }
         }
+      },
+      "ModalitiesSchema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "speech",
+            "visual_scene_description",
+            "scene_text",
+            "audio_description",
+            "summary",
+            "segment_summary",
+            "title"
+          ]
+        },
+        "description": "The modalities to output in the response. Can be used to return smaller data sets. Comma separated list of strings. Defaults to all modalities available / previously extracted. Accepted values are speech,visual_scene_description,scene_text, audio_description, summary, segment_summary, title"
       }
     },
     "securitySchemes": {
