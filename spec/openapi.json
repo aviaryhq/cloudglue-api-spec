@@ -6990,42 +6990,6 @@
           }
         ]
       },
-      "AddCollectionAudio": {
-        "allOf": [
-          {
-            "type": "object",
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "file_id": {
-                    "type": "string",
-                    "description": "The ID of the audio file to add to the collection"
-                  }
-                },
-                "required": ["file_id"]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "description": "The URL of the audio file to add to the collection. Supports URIs of files uploaded to Cloudglue Files endpoint, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors."
-                  }
-                },
-                "required": ["url"]
-              }
-            ]
-          },
-          {
-            "$ref": "#/components/schemas/FileSegmentationConfig"
-          },
-          {
-            "type": "object",
-            "properties": {}
-          }
-        ]
-      },
       "AddYouTubeCollectionFile": {
         "allOf": [
           {
