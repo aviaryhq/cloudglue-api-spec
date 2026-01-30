@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.5.6"
+    "version": "0.5.7"
   },
   "servers": [
     {
@@ -1504,6 +1504,185 @@
         }
       }
     },
+    "/files/{file_id}/segments/{segment_id}/describes": {
+      "get": {
+        "tags": ["Files", "File Segments", "Describe"],
+        "summary": "List describes for a file segment",
+        "operationId": "listFileSegmentDescribes",
+        "description": "List all describe outputs for a specific file segment",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "segment_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segment",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by job status. Supports comma-separated values (e.g., 'completed,processing'). Defaults to 'completed'.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "completed"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Output format for the describe data",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "include_data",
+            "in": "query",
+            "description": "Include the describe data in the response. If false, only job information is returned. Defaults to false.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of describes for the segment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SegmentDescribeListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File or segment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{file_id}/segments/{segment_id}/describes/{job_id}": {
+      "get": {
+        "tags": ["Files", "File Segments", "Describe"],
+        "summary": "Get describe for a file segment",
+        "operationId": "getFileSegmentDescribe",
+        "description": "Get a specific describe output for a file segment by job ID",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the file",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "segment_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segment",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the describe job",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Output format for the describe data",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Describe for the segment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SegmentDescribe"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File, segment, or describe job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/collections": {
       "post": {
         "tags": ["Collections"],
@@ -1858,7 +2037,7 @@
         "tags": ["Collections"],
         "summary": "[Deprecated] Add a video to a collection",
         "operationId": "addVideo",
-        "description": "**DEPRECATED: Use POST /collections/{collection_id}/media instead.**\n\nAdd a video to a collection. This endpoint is deprecated - use the /media endpoint which supports both video and audio files.",
+        "description": "**DEPRECATED: Use POST /collections/\\{collection_id\\}/media instead.**\n\nAdd a video to a collection. This endpoint is deprecated - use the /media endpoint which supports both video and audio files.",
         "parameters": [
           {
             "name": "collection_id",
@@ -4224,6 +4403,294 @@
         }
       }
     },
+    "/responses": {
+      "post": {
+        "tags": ["Response"],
+        "summary": "Create a response",
+        "operationId": "createResponse",
+        "description": "Create a new response using the Response API. This endpoint provides an OpenAI Responses-compatible interface for chat completions with video collections.\n\nThe response can be processed synchronously (default) or asynchronously using the `background` parameter.",
+        "requestBody": {
+          "description": "Response creation parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateResponseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Response created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Response"],
+        "summary": "List responses",
+        "operationId": "listResponses",
+        "description": "List all responses with pagination and filtering options.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of responses to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of responses to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by response status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["in_progress", "completed", "failed", "cancelled"]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter responses created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter responses created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseList"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/responses/{id}": {
+      "get": {
+        "tags": ["Response"],
+        "summary": "Get a response by ID",
+        "operationId": "getResponse",
+        "description": "Retrieve a specific response by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the response to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Response"],
+        "summary": "Delete a response",
+        "operationId": "deleteResponse",
+        "description": "Delete a response by ID. This operation is idempotent - deleting a non-existent response returns success.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the response to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponseResult"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/responses/{id}/cancel": {
+      "post": {
+        "tags": ["Response"],
+        "summary": "Cancel a response",
+        "operationId": "cancelResponse",
+        "description": "Cancel a background response that is in progress. If the response is already completed, failed, or cancelled, this returns the response as-is.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the response to cancel",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response cancelled or current status returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/collections/{collection_id}/videos/{file_id}/face-detections": {
       "get": {
         "tags": ["Collections"],
@@ -5098,6 +5565,102 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ThumbnailList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Segmentation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/segmentations/{segmentation_id}/describes": {
+      "get": {
+        "tags": ["Segmentations", "Describe"],
+        "summary": "List describe jobs for a segmentation",
+        "operationId": "listSegmentationDescribes",
+        "description": "List all describe jobs that referenced the specified segmentation. Returns describe job records associated with the segmentation.",
+        "parameters": [
+          {
+            "name": "segmentation_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the segmentation job",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "include_data",
+            "in": "query",
+            "description": "Include the describe data in the response. If false, only job information is returned. Defaults to false.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "description": "Output format for the describe data",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset from the start of the list",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of describe outputs for the segmentation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DescribeList"
                 }
               }
             }
@@ -6052,6 +6615,415 @@
   },
   "components": {
     "schemas": {
+      "CreateResponseRequest": {
+        "type": "object",
+        "required": ["model", "input", "knowledge_base"],
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": ["nimbus-001"],
+            "description": "The model to use for generating the response"
+          },
+          "input": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "A simple string input (treated as a user message)"
+              },
+              {
+                "type": "array",
+                "description": "An array of message objects",
+                "items": {
+                  "$ref": "#/components/schemas/ResponseInputMessage"
+                }
+              }
+            ],
+            "description": "The input for the response. Can be a simple string or an array of messages."
+          },
+          "instructions": {
+            "type": "string",
+            "description": "System instructions to guide the model's behavior (maps to developer/system message)"
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "default": 0.7,
+            "description": "Sampling temperature for the model"
+          },
+          "knowledge_base": {
+            "$ref": "#/components/schemas/ResponseKnowledgeBase"
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["cloudglue_citations.media_descriptions"]
+            },
+            "description": "Additional data to include in the response annotations"
+          },
+          "background": {
+            "type": "boolean",
+            "default": false,
+            "description": "Set to true to process the response in the background. When true, the response is returned immediately with status 'in_progress'."
+          }
+        }
+      },
+      "ResponseInputMessage": {
+        "type": "object",
+        "required": ["type", "role", "content"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["message"],
+            "description": "The type of the message"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["developer", "user", "assistant"],
+            "description": "The role of the message sender. 'developer' maps to system instructions."
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResponseInputContent"
+            },
+            "description": "The content of the message"
+          }
+        }
+      },
+      "ResponseInputContent": {
+        "type": "object",
+        "required": ["type", "text"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["input_text"],
+            "description": "The type of content"
+          },
+          "text": {
+            "type": "string",
+            "description": "The text content"
+          }
+        }
+      },
+      "ResponseKnowledgeBase": {
+        "type": "object",
+        "description": "Configuration for the video collections to search against for response context",
+        "required": ["collections"],
+        "properties": {
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "description": "Collection IDs to search for relevant context"
+          },
+          "filter": {
+            "type": "object",
+            "description": "Optional filter to narrow down the search within collections",
+            "properties": {
+              "file_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "description": "Filter to specific file IDs"
+              }
+            }
+          }
+        }
+      },
+      "Response": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the response"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["response"],
+            "description": "Object type identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["in_progress", "completed", "failed", "cancelled"],
+            "description": "Current status of the response"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the response was created"
+          },
+          "model": {
+            "type": "string",
+            "description": "The model used for the response"
+          },
+          "instructions": {
+            "type": "string",
+            "nullable": true,
+            "description": "The system instructions used"
+          },
+          "output": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/ResponseOutputMessage"
+            },
+            "description": "The generated output messages"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/ResponseUsage",
+            "nullable": true
+          },
+          "error": {
+            "$ref": "#/components/schemas/ResponseError",
+            "nullable": true
+          }
+        }
+      },
+      "ResponseOutputMessage": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["message"],
+            "description": "The type of output"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["assistant"],
+            "description": "The role (always assistant for outputs)"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResponseOutputContent"
+            },
+            "description": "The content items in the output"
+          }
+        }
+      },
+      "ResponseOutputContent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["output_text"],
+            "description": "The type of content"
+          },
+          "text": {
+            "type": "string",
+            "description": "The generated text"
+          },
+          "annotations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResponseAnnotation"
+            },
+            "description": "Citations and references in the output"
+          }
+        }
+      },
+      "ResponseAnnotation": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["cloudglue_citation"],
+            "description": "The type of annotation"
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The collection containing the cited content"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The file containing the cited content"
+          },
+          "segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The specific segment cited"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Start time of the cited segment in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "End time of the cited segment in seconds"
+          },
+          "context": {
+            "type": "string",
+            "description": "The text context of the citation"
+          },
+          "relevant_sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Relevant source descriptions (included when 'cloudglue_citations.media_descriptions' is requested)"
+          },
+          "visual_scene_description": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Visual descriptions (included when 'cloudglue_citations.media_descriptions' is requested)"
+          },
+          "scene_text": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "On-screen text (included when 'cloudglue_citations.media_descriptions' is requested)"
+          },
+          "speech": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Speech transcripts (included when 'cloudglue_citations.media_descriptions' is requested)"
+          },
+          "audio_description": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Audio descriptions (included when 'cloudglue_citations.media_descriptions' is requested)"
+          }
+        }
+      },
+      "ResponseUsage": {
+        "type": "object",
+        "description": "Token usage statistics for the response",
+        "properties": {
+          "input_tokens": {
+            "type": "integer",
+            "description": "Number of input tokens used"
+          },
+          "output_tokens": {
+            "type": "integer",
+            "description": "Number of output tokens generated"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "description": "Total tokens used"
+          }
+        }
+      },
+      "ResponseError": {
+        "type": "object",
+        "description": "Error details when the response status is 'failed'",
+        "nullable": true,
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "type": {
+            "type": "string",
+            "description": "Error type"
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code"
+          }
+        }
+      },
+      "ResponseList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type identifier"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResponseListItem"
+            },
+            "description": "List of responses"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of responses matching the query"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of responses returned"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of responses skipped"
+          }
+        }
+      },
+      "ResponseListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the response"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["response"],
+            "description": "Object type identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["in_progress", "completed", "failed", "cancelled"],
+            "description": "Current status of the response"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp of when the response was created"
+          },
+          "model": {
+            "type": "string",
+            "description": "The model used for the response"
+          },
+          "instructions": {
+            "type": "string",
+            "nullable": true,
+            "description": "The system instructions used"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/ResponseUsage",
+            "nullable": true
+          }
+        }
+      },
+      "DeleteResponseResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the deleted response"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["response"],
+            "description": "Object type identifier"
+          },
+          "deleted": {
+            "type": "boolean",
+            "enum": [true],
+            "description": "Indicates successful deletion"
+          }
+        }
+      },
       "DescribeOutputPart": {
         "type": "object",
         "properties": {
@@ -6146,7 +7118,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the job was created"
+            "description": "Unix timestamp in milliseconds when the job was created"
           },
           "extract_config": {
             "type": "object",
@@ -6328,7 +7300,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the file was created"
+            "description": "Unix timestamp in milliseconds when the file was created"
           },
           "filename": {
             "type": "string",
@@ -6706,7 +7678,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the collection was created"
+            "description": "Unix timestamp in milliseconds when the collection was created"
           },
           "file_count": {
             "type": "integer",
@@ -7029,7 +8001,7 @@
           },
           "added_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the file was added to the collection"
+            "description": "Unix timestamp in milliseconds when the file was added to the collection"
           },
           "status": {
             "type": "string",
@@ -7476,7 +8448,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the chat completion was created"
+            "description": "Unix timestamp in milliseconds when the chat completion was created"
           },
           "model": {
             "type": "string",
@@ -7620,7 +8592,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the job was created"
+            "description": "Unix timestamp in milliseconds when the job was created"
           },
           "transcribe_config": {
             "type": "object",
@@ -7801,6 +8773,228 @@
           }
         }
       },
+      "SegmentDescribeOutputEntry": {
+        "type": "object",
+        "description": "A single describe output entry with timestamp",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The text content"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Start time in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "End time in seconds"
+          }
+        },
+        "required": ["text", "start_time", "end_time"]
+      },
+      "SegmentDescribeSpeechEntry": {
+        "type": "object",
+        "description": "A speech entry with optional speaker information",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The speech text"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Start time in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "End time in seconds"
+          },
+          "speaker": {
+            "type": "string",
+            "description": "Speaker identifier"
+          }
+        },
+        "required": ["text", "start_time", "end_time"]
+      },
+      "SegmentDescribeJsonData": {
+        "type": "object",
+        "description": "JSON format describe output data",
+        "properties": {
+          "visual_scene_description": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SegmentDescribeOutputEntry"
+            },
+            "description": "Visual scene descriptions with timestamps"
+          },
+          "speech": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SegmentDescribeSpeechEntry"
+            },
+            "description": "Speech transcript with timestamps and speaker info"
+          },
+          "scene_text": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SegmentDescribeOutputEntry"
+            },
+            "description": "On-screen text detected with timestamps"
+          },
+          "audio_description": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SegmentDescribeOutputEntry"
+            },
+            "description": "Audio descriptions with timestamps"
+          },
+          "title": {
+            "type": "string",
+            "description": "Generated title for the segment"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Generated summary for the segment"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Start time of the segment in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "End time of the segment in seconds"
+          },
+          "segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segment"
+          }
+        }
+      },
+      "SegmentDescribeMarkdownData": {
+        "type": "object",
+        "description": "Markdown format describe output data",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Markdown formatted content containing the describe output"
+          }
+        },
+        "required": ["content"]
+      },
+      "SegmentDescribe": {
+        "type": "object",
+        "description": "Describe output for a specific video segment",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the describe job"
+          },
+          "segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the video segment"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "not_applicable"
+            ],
+            "description": "Status of the describe job"
+          },
+          "describe_config": {
+            "$ref": "#/components/schemas/DescribeConfig"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp in milliseconds when the job was created"
+          },
+          "completed_at": {
+            "type": "integer",
+            "description": "Unix timestamp in milliseconds when the job completed"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Start time of the segment in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "End time of the segment in seconds"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the file"
+          },
+          "segmentation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segmentation job"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SegmentDescribeJsonData"
+              },
+              {
+                "$ref": "#/components/schemas/SegmentDescribeMarkdownData"
+              }
+            ],
+            "description": "The describe output data. When response_format=json, contains visual_scene_description, speech, scene_text, and audio_description arrays. When response_format=markdown, contains a content string."
+          },
+          "object": {
+            "type": "string",
+            "enum": ["segment_describe"],
+            "description": "Object type"
+          }
+        },
+        "required": [
+          "job_id",
+          "segment_id",
+          "status",
+          "describe_config",
+          "created_at",
+          "start_time",
+          "end_time",
+          "file_id",
+          "object"
+        ]
+      },
+      "SegmentDescribeListResponse": {
+        "type": "object",
+        "description": "List of describe outputs for a video segment",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SegmentDescribe"
+            },
+            "description": "Array of segment describe objects"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of describe jobs for this segment"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
+          }
+        },
+        "required": ["object", "data", "total", "limit", "offset"]
+      },
       "NewDescribe": {
         "allOf": [
           {
@@ -7873,7 +9067,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the job was created"
+            "description": "Unix timestamp in milliseconds when the job was created"
           },
           "describe_config": {
             "type": "object",
@@ -7953,6 +9147,11 @@
           "error": {
             "type": "string",
             "description": "Error message if status is 'failed'"
+          },
+          "segmentation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the segmentation job if the describe was run with a segmentation"
           }
         }
       },
@@ -7978,9 +9177,13 @@
           "limit": {
             "type": "integer",
             "description": "Number of items returned in this response"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset from the start of the list"
           }
         },
-        "required": ["object", "data", "total", "limit"]
+        "required": ["object", "data", "total", "limit", "offset"]
       },
       "MediaDescription": {
         "allOf": [
@@ -8120,7 +9323,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the webhook was created"
+            "description": "Unix timestamp in milliseconds when the webhook was created"
           },
           "webhook_secret": {
             "type": "string",
@@ -8445,7 +9648,7 @@
                 },
                 "added_at": {
                   "type": "integer",
-                  "description": "Unix timestamp of when the file was added to the collection"
+                  "description": "Unix timestamp in milliseconds when the file was added to the collection"
                 },
                 "object": {
                   "type": "string",
@@ -8618,25 +9821,29 @@
       },
       "SegmentationConfig": {
         "type": "object",
-        "description": "Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**\n\n\u2022 **uniform**: Provide `uniform_config`, do NOT provide `shot_detector_config` or `manual_config`\n\u2022 **shot-detector**: Provide `shot_detector_config`, do NOT provide `uniform_config` or `manual_config`\n\u2022 **manual**: Provide `manual_config`, do NOT provide `uniform_config` or `shot_detector_config`\n\nOptionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.",
+        "description": "Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**\n\n\u2022 **uniform**: Provide `uniform_config`, do NOT provide other configs\n\u2022 **shot-detector**: Provide `shot_detector_config`, do NOT provide other configs\n\u2022 **manual**: Provide `manual_config`, do NOT provide other configs\n\u2022 **narrative**: Provide `narrative_config`, do NOT provide other configs\n\nOptionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.",
         "required": ["strategy"],
         "properties": {
           "strategy": {
             "type": "string",
-            "enum": ["uniform", "shot-detector", "manual"],
+            "enum": ["uniform", "shot-detector", "manual", "narrative"],
             "description": "Segmentation strategy - determines which config you must provide"
           },
           "uniform_config": {
             "$ref": "#/components/schemas/SegmentationUniformConfig",
-            "description": "\ud83c\udfaf **REQUIRED when strategy = 'uniform'** - Configuration for uniform segmentation. Do NOT provide when using shot-detector strategy."
+            "description": "\ud83c\udfaf **REQUIRED when strategy = 'uniform'** - Configuration for uniform segmentation."
           },
           "shot_detector_config": {
             "$ref": "#/components/schemas/SegmentationShotDetectorConfig",
-            "description": "\ud83c\udfaf **REQUIRED when strategy = 'shot-detector'** - Configuration for shot detection segmentation. Do NOT provide when using uniform strategy."
+            "description": "\ud83c\udfaf **REQUIRED when strategy = 'shot-detector'** - Configuration for shot detection segmentation."
           },
           "manual_config": {
             "$ref": "#/components/schemas/SegmentationManualConfig",
-            "description": "\ud83c\udfaf **REQUIRED when strategy = 'manual'** - Configuration for manual segmentation. Do NOT provide when using uniform or shot-detector strategy."
+            "description": "\ud83c\udfaf **REQUIRED when strategy = 'manual'** - Configuration for manual segmentation."
+          },
+          "narrative_config": {
+            "$ref": "#/components/schemas/NarrativeConfig",
+            "description": "\ud83c\udfaf **REQUIRED when strategy = 'narrative'** - Configuration for narrative-based chapter segmentation using AI analysis."
           },
           "keyframe_config": {
             "$ref": "#/components/schemas/KeyframeConfig",
@@ -8656,21 +9863,25 @@
       },
       "DefaultSegmentationConfig": {
         "type": "object",
-        "description": "Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**\n\n\u2022 **uniform**: Provide `uniform_config`, do NOT provide `shot_detector_config`\n\u2022 **shot-detector**: Provide `shot_detector_config`, do NOT provide `uniform_config`\n\nOptionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.",
+        "description": "Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**\n\n\u2022 **uniform**: Provide `uniform_config`, do NOT provide other configs\n\u2022 **shot-detector**: Provide `shot_detector_config`, do NOT provide other configs\n\u2022 **narrative**: Provide `narrative_config`, do NOT provide other configs\n\nOptionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.",
         "required": ["strategy"],
         "properties": {
           "strategy": {
             "type": "string",
-            "enum": ["uniform", "shot-detector"],
-            "description": "Segmentation strategy - determines which config you must provide. Manual strategies are not supported for default segmentation configs"
+            "enum": ["uniform", "shot-detector", "narrative"],
+            "description": "Segmentation strategy - determines which config you must provide. Manual strategies are not supported for default segmentation configs."
           },
           "uniform_config": {
             "$ref": "#/components/schemas/SegmentationUniformConfig",
-            "description": "\ud83c\udfaf **REQUIRED when strategy = 'uniform'** - Configuration for uniform segmentation. Do NOT provide when using shot-detector strategy."
+            "description": "\ud83c\udfaf **REQUIRED when strategy = 'uniform'** - Configuration for uniform segmentation."
           },
           "shot_detector_config": {
             "$ref": "#/components/schemas/SegmentationShotDetectorConfig",
-            "description": "\ud83c\udfaf **REQUIRED when strategy = 'shot-detector'** - Configuration for shot detection segmentation. Do NOT provide when using uniform strategy."
+            "description": "\ud83c\udfaf **REQUIRED when strategy = 'shot-detector'** - Configuration for shot detection segmentation."
+          },
+          "narrative_config": {
+            "$ref": "#/components/schemas/NarrativeConfig",
+            "description": "\ud83c\udfaf **REQUIRED when strategy = 'narrative'** - Configuration for narrative-based chapter segmentation using AI analysis."
           },
           "keyframe_config": {
             "$ref": "#/components/schemas/KeyframeConfig",
@@ -8742,7 +9953,7 @@
           "created_at": {
             "type": "number",
             "minimum": 0,
-            "description": "Unix timestamp of when the segmentation was created"
+            "description": "Unix timestamp in milliseconds when the segmentation was created"
           },
           "file_id": {
             "type": "string",
@@ -8764,6 +9975,11 @@
             "type": "number",
             "minimum": 0,
             "description": "Total number of shots in this segmentation (only present when status is completed and segmentation_config.strategy is 'shot-detector')"
+          },
+          "total_chapters": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Total number of chapters in this segmentation (only present when status is completed and segmentation_config.strategy is 'narrative')"
           },
           "data": {
             "type": "object",
@@ -8806,6 +10022,13 @@
                 "description": "Array of shots in the original video (only present when status is completed and segmentation_config.strategy is 'shot-detector')",
                 "items": {
                   "$ref": "#/components/schemas/Shot"
+                }
+              },
+              "chapters": {
+                "type": "array",
+                "description": "Array of narrative chapters in the video (only present when status is completed and segmentation_config.strategy is 'narrative')",
+                "items": {
+                  "$ref": "#/components/schemas/Chapter"
                 }
               },
               "total": {
@@ -8854,7 +10077,7 @@
           "created_at": {
             "type": "number",
             "minimum": 0,
-            "description": "Unix timestamp of when the segmentation was created"
+            "description": "Unix timestamp in milliseconds when the segmentation was created"
           },
           "file_id": {
             "type": "string",
@@ -8989,7 +10212,7 @@
           "created_at": {
             "type": "number",
             "minimum": 0,
-            "description": "Unix timestamp of when the frame extraction was created"
+            "description": "Unix timestamp in milliseconds when the frame extraction was created"
           },
           "file_id": {
             "type": "string",
@@ -9087,7 +10310,7 @@
                 "created_at": {
                   "type": "number",
                   "minimum": 0,
-                  "description": "Unix timestamp of when the frame extraction was created"
+                  "description": "Unix timestamp in milliseconds when the frame extraction was created"
                 },
                 "file_id": {
                   "type": "string",
@@ -9985,7 +11208,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the job was created"
+            "description": "Unix timestamp in milliseconds when the job was created"
           },
           "shot_config": {
             "$ref": "#/components/schemas/ShotConfig",
@@ -10005,6 +11228,11 @@
             "minimum": 0,
             "description": "Total number of shots in the original video (only present when criteria is 'shot')"
           },
+          "total_chapters": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of chapters in the video (only present when criteria is 'narrative')"
+          },
           "segments": {
             "type": "array",
             "description": "Array of generated segments (only present when status is 'completed')",
@@ -10017,6 +11245,13 @@
             "description": "Array of shots in the original video (only present when criteria is 'shot')",
             "items": {
               "$ref": "#/components/schemas/Shot"
+            }
+          },
+          "chapters": {
+            "type": "array",
+            "description": "Array of narrative chapters in the video (only present when criteria is 'narrative')",
+            "items": {
+              "$ref": "#/components/schemas/Chapter"
             }
           }
         }
@@ -10059,7 +11294,7 @@
           },
           "created_at": {
             "type": "integer",
-            "description": "Unix timestamp of when the job was created"
+            "description": "Unix timestamp in milliseconds when the job was created"
           },
           "shot_config": {
             "$ref": "#/components/schemas/ShotConfig",
@@ -10118,6 +11353,30 @@
             "type": "number",
             "minimum": 0,
             "description": "End time of the shot in seconds"
+          }
+        }
+      },
+      "Chapter": {
+        "type": "object",
+        "required": ["index", "start_time", "end_time", "description"],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Index of the chapter in the video"
+          },
+          "start_time": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Start time of the chapter in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "minimum": 0,
+            "description": "End time of the chapter in seconds"
+          },
+          "description": {
+            "type": "string",
+            "description": "AI-generated description of the chapter content"
           }
         }
       },
@@ -10217,7 +11476,7 @@
           },
           "created_at": {
             "type": "number",
-            "description": "Unix timestamp of when the job was created"
+            "description": "Unix timestamp in milliseconds when the job was created"
           },
           "source_face_bounding_box": {
             "allOf": [
@@ -10308,7 +11567,7 @@
           },
           "created_at": {
             "type": "number",
-            "description": "Unix timestamp of when the job was created"
+            "description": "Unix timestamp in milliseconds when the job was created"
           },
           "data": {
             "type": "object",
@@ -10469,7 +11728,8 @@
             "tag_lexical"
           ]
         },
-        "description": "Specifies the type of search to execute, one of:\n- `general_content`: baseline for matching the content of the search item (file/segment) based on visual or spoken content similarity to provided short natural language query string\n- `speech_lexical`: performs keyword based search (e.g. query of `president` matching ` president` or `presidential` strings) and exact match (e.g. specifically find mentions of `\"Barack Obama\"` or `\"Donald Trump\"`) against speech content present in search item\n- `ocr_lexical`: performs keyword based search and exact match against screen text content present in search item\n- `tag_semantic`: performs basic word semantic similarity search against tag values associated with search items (e.g. `query=animal` expected to match tags with value containing `dog` or `cat`)\n- `tag_lexical`: performs keyword based search and exact match against tag values associated with search items\n\nThis API currently only supports one search modality per request. \n\nOnly applicable for when search `scope=file` or `scope=segment`\n"
+        "maxItems": 5,
+        "description": "Specifies the type(s) of search to execute. When multiple modalities are specified, a hybrid search is executed that combines results from each modality.\n\nAvailable modalities:\n- `general_content`: baseline for matching the content of the search item (file/segment) based on visual or spoken content similarity to provided short natural language query string\n- `speech_lexical`: performs keyword based search (e.g. query of `president` matching `president` or `presidential` strings) and exact match (e.g. specifically find mentions of `\"Barack Obama\"` or `\"Donald Trump\"`) against speech content present in search item\n- `ocr_lexical`: performs keyword based search and exact match against screen text content present in search item\n- `tag_semantic`: performs basic word semantic similarity search against tag values associated with search items (e.g. `query=animal` expected to match tags with value containing `dog` or `cat`)\n- `tag_lexical`: performs keyword based search and exact match against tag values associated with search items\n\nOnly applicable when search `scope=file` or `scope=segment`.\n"
       },
       "ThumbnailType": {
         "type": "string",
@@ -10689,7 +11949,7 @@
                     },
                     "created_at": {
                       "type": "number",
-                      "description": "Unix timestamp of when the job was created"
+                      "description": "Unix timestamp in milliseconds when the job was created"
                     },
                     "source_face_bounding_box": {
                       "allOf": [
@@ -10746,7 +12006,7 @@
                     },
                     "created_at": {
                       "type": "number",
-                      "description": "Unix timestamp of when the job was created"
+                      "description": "Unix timestamp in milliseconds when the job was created"
                     },
                     "total_faces": {
                       "type": "integer",
