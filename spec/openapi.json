@@ -6722,18 +6722,12 @@
             "description": "Collection IDs to search for relevant context"
           },
           "filter": {
-            "type": "object",
-            "description": "Optional filter to narrow down the search within collections",
-            "properties": {
-              "file_ids": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "format": "uuid"
-                },
-                "description": "Filter to specific file IDs"
+            "description": "Optional filter to narrow down the search within collections.\n\nSupports filtering by `metadata`, `video_info`, and `file` properties. Each filter is an array of criteria with `path`, `operator`, and `valueText` or `valueTextArray`.\n\nSupported operators: `Equal`, `NotEqual`, `LessThan`, `GreaterThan`, `In`, `ContainsAny`, `ContainsAll`.\n\nExamples:\n- Filter by file ID: `{\"file\": [{\"path\": \"id\", \"operator\": \"Equal\", \"valueText\": \"file-uuid\"}]}`\n- Filter by metadata: `{\"metadata\": [{\"path\": \"speaker\", \"operator\": \"Equal\", \"valueText\": \"Amy\"}]}`\n- Filter by duration: `{\"video_info\": [{\"path\": \"duration_seconds\", \"operator\": \"GreaterThan\", \"valueText\": \"60\"}]}`",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SearchFilter"
               }
-            }
+            ]
           }
         }
       },
