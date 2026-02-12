@@ -6622,7 +6622,7 @@
           "model": {
             "type": "string",
             "minLength": 1,
-            "examples": ["nimbus-001", "nimbus-002-preview"],
+            "example": "nimbus-001",
             "description": "The model to use for generating the response.\n\n- `nimbus-001`: Fast general question answering model. Default temperature: 0.7.\n- `nimbus-002-preview`: Light reasoning model capable of multi-step reasoning, cross-video synthesis, and structured entity data. Supports `entity_collections` in the knowledge base. Default temperature: 1."
           },
           "input": {
