@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.6.0"
+    "version": "0.6.1"
   },
   "servers": [
     {
@@ -6621,8 +6621,9 @@
         "properties": {
           "model": {
             "type": "string",
-            "enum": ["nimbus-001"],
-            "description": "The model to use for generating the response"
+            "minLength": 1,
+            "examples": ["nimbus-001", "nimbus-002-preview"],
+            "description": "The model to use for generating the response.\n\n- `nimbus-001`: Fast general question answering model. Default temperature: 0.7.\n- `nimbus-002-preview`: Light reasoning model capable of multi-step reasoning, cross-video synthesis, and structured entity data. Supports `entity_collections` in the knowledge base. Default temperature: 1."
           },
           "input": {
             "oneOf": [
@@ -6648,8 +6649,7 @@
             "type": "number",
             "minimum": 0,
             "maximum": 2,
-            "default": 0.7,
-            "description": "Sampling temperature for the model"
+            "description": "Sampling temperature for the model. Defaults to 0.7 for nimbus-001 and 1 for nimbus-002-preview."
           },
           "knowledge_base": {
             "$ref": "#/components/schemas/ResponseKnowledgeBase"
@@ -6666,6 +6666,11 @@
             "type": "boolean",
             "default": false,
             "description": "Set to true to process the response in the background. When true, the response is returned immediately with status 'in_progress'."
+          },
+          "stream": {
+            "type": "boolean",
+            "default": false,
+            "description": "Stream response via SSE. Mutually exclusive with background."
           }
         }
       },
@@ -6712,6 +6717,12 @@
         "description": "Configuration for the video collections to search against for response context",
         "required": ["collections"],
         "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["general_question_answering", "entity_backed_knowledge"],
+            "default": "general_question_answering",
+            "description": "The type of knowledge base interaction pattern.\n\n- `general_question_answering` (default): Search-and-answer over media collections.\n- `entity_backed_knowledge`: Enables structured entity lookups alongside video content. Requires `entity_backed_knowledge_config` and `nimbus-002-preview` model."
+          },
           "collections": {
             "type": "array",
             "items": {
@@ -6728,6 +6739,49 @@
                 "$ref": "#/components/schemas/SearchFilter"
               }
             ]
+          },
+          "entity_backed_knowledge_config": {
+            "$ref": "#/components/schemas/EntityBackedKnowledgeConfig"
+          }
+        }
+      },
+      "EntityBackedKnowledgeConfig": {
+        "type": "object",
+        "description": "Configuration for entity-backed knowledge. Required when `type` is `entity_backed_knowledge`. Contains entity collections with pre-extracted structured data and optional domain context.",
+        "required": ["entity_collections"],
+        "properties": {
+          "entity_collections": {
+            "type": "array",
+            "minItems": 1,
+            "description": "List of entity collections that provide pre-extracted structured data. Only supported with `nimbus-002-preview` model.\n\nEntity collections contain structured entities extracted from the same videos in the main collection (e.g., action items, speakers, topics). The model can use these for fast, structured lookups instead of searching raw content.",
+            "items": {
+              "$ref": "#/components/schemas/EntityCollectionConfig"
+            }
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "General context about the videos in this collection. Helps the model understand the domain.\n\nExamples:\n- \"Sales call recordings with enterprise prospects from Q4 2024\"\n- \"Product demo videos for the Acme Analytics platform\"\n- \"Weekly team standup recordings from the engineering org\""
+          }
+        }
+      },
+      "EntityCollectionConfig": {
+        "type": "object",
+        "description": "Configuration for an entity collection used with `nimbus-002-preview`. Contains structured, pre-extracted data from the same videos as the main media collection.",
+        "required": ["name", "description", "collection_id"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name for the entity collection (e.g., `action_items`, `speakers_and_roles`). Used by the model to decide which collection to query."
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what this entity collection contains. Helps the model decide when to use this collection."
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of the entity collection. Must be an existing collection of type `entities`."
           }
         }
       },
@@ -6825,6 +6879,7 @@
       },
       "ResponseAnnotation": {
         "type": "object",
+        "required": ["type", "collection_id", "file_id", "start_time"],
         "properties": {
           "type": {
             "type": "string",
@@ -6844,15 +6899,15 @@
           "segment_id": {
             "type": "string",
             "format": "uuid",
-            "description": "The specific segment cited"
+            "description": "The specific segment cited. Present when a matching segment is found."
           },
           "start_time": {
             "type": "number",
-            "description": "Start time of the cited segment in seconds"
+            "description": "Start time of the cited content in seconds"
           },
           "end_time": {
             "type": "number",
-            "description": "End time of the cited segment in seconds"
+            "description": "End time of the cited segment in seconds. Present when a matching segment is found."
           },
           "context": {
             "type": "string",
