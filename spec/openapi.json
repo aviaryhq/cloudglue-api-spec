@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.6.1"
+    "version": "0.6.2"
   },
   "servers": [
     {
@@ -6768,15 +6768,15 @@
       "EntityCollectionConfig": {
         "type": "object",
         "description": "Configuration for an entity collection used with `nimbus-002-preview`. Contains structured, pre-extracted data from the same videos as the main media collection.",
-        "required": ["name", "description", "collection_id"],
+        "required": ["collection_id"],
         "properties": {
           "name": {
             "type": "string",
-            "description": "Name for the entity collection (e.g., `action_items`, `speakers_and_roles`). Used by the model to decide which collection to query."
+            "description": "Name for the entity collection (e.g., `action_items`, `speakers_and_roles`). Used by the model to decide which collection to query. Falls back to the collection's stored name if omitted."
           },
           "description": {
             "type": "string",
-            "description": "Human-readable description of what this entity collection contains. Helps the model decide when to use this collection."
+            "description": "Human-readable description of what this entity collection contains. Helps the model decide when to use this collection. Falls back to the collection's stored description if omitted."
           },
           "collection_id": {
             "type": "string",
