@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.6.2"
+    "version": "0.6.3"
   },
   "servers": [
     {
@@ -12295,6 +12295,10 @@
           "share_url": {
             "type": "string",
             "description": "This is the url that can be used to share the shareable asset"
+          },
+          "stream_url": {
+            "type": "string",
+            "description": "The HLS stream url of the shareable asset. Available when the stream has finished processing."
           },
           "status": {
             "type": "string",
