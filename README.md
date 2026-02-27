@@ -10,7 +10,7 @@ This repo defines the structure, endpoints, and schemas of the Cloudglue API. Fo
 - 📄 [Terms of Service](https://cloudglue.dev/terms)
 - 🔐 [Privacy Policy](https://cloudglue.dev/privacy)
 - 💸 [Pricing](https://cloudglue.dev/pricing)
-- 🛠️ [Aviary GitHub Organization](https://github.com/aviaryhq) _(for SDKs & tools)_
+- 🛠️ [Cloudglue GitHub Organization](https://github.com/cloudglue) _(for SDKs & tools)_
 
 ---
 
@@ -18,5 +18,5 @@ This repo defines the structure, endpoints, and schemas of the Cloudglue API. Fo
 
 ## Contact
 
-* [Open an Issue](https://github.com/aviaryhq/cloudglue-api-spec/issues/new)
+* [Open an Issue](https://github.com/cloudglue/cloudglue-api-spec/issues/new)
 * [Email](mailto:support@cloudglue.dev)

@@ -42,4 +42,4 @@ Authentication uses Bearer tokens.
 ## External Resources
 
 - API Documentation: https://docs.cloudglue.dev
-- SDKs and Tools: https://github.com/aviaryhq
+- SDKs and Tools: https://github.com/cloudglue
