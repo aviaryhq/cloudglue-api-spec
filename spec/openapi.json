@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.6.4"
+    "version": "0.6.5"
   },
   "servers": [
     {
@@ -513,6 +513,16 @@
               "type": "integer",
               "default": 0,
               "minimum": 0
+            }
+          },
+          {
+            "name": "include_thumbnails",
+            "in": "query",
+            "description": "When true, include a file-level thumbnail_url in the data object and a per-segment thumbnail_url on each segment entity",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -3860,6 +3870,16 @@
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/ModalitiesSchema"
+            }
+          },
+          {
+            "name": "include_thumbnails",
+            "in": "query",
+            "description": "When true, include a file-level thumbnail_url on the response, per-segment thumbnail_url on each segment_summary entry, and inject thumbnail images into markdown output",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -7287,9 +7307,19 @@
                     "entities": {
                       "type": "object",
                       "description": "Entities extracted from the segment"
+                    },
+                    "thumbnail_url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL of the segment thumbnail, when available."
                     }
                   }
                 }
+              },
+              "thumbnail_url": {
+                "type": "string",
+                "format": "uri",
+                "description": "URL of the file-level thumbnail for the video. Only present when include_thumbnails=true."
               }
             }
           },
@@ -8243,6 +8273,11 @@
                 "entities": {
                   "type": "object",
                   "description": "Entities extracted from the segment"
+                },
+                "thumbnail_url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "URL of the segment thumbnail, when available."
                 }
               }
             }
@@ -8770,6 +8805,11 @@
                         "end_time": {
                           "type": "number",
                           "description": "End time of segment in seconds"
+                        },
+                        "thumbnail_url": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "URL of the segment thumbnail, when available."
                         }
                       }
                     }
@@ -9181,6 +9221,11 @@
             "type": "number",
             "description": "Duration of the video in seconds"
           },
+          "thumbnail_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the file-level thumbnail for the video. Only present when include_thumbnails=true."
+          },
           "created_at": {
             "type": "integer",
             "description": "Unix timestamp in milliseconds when the job was created"
@@ -9249,6 +9294,11 @@
                         "end_time": {
                           "type": "number",
                           "description": "End time of segment in seconds"
+                        },
+                        "thumbnail_url": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "URL of the segment thumbnail, when available."
                         }
                       }
                     }
@@ -9352,6 +9402,11 @@
                     "end_time": {
                       "type": "number",
                       "description": "End time of segment in seconds"
+                    },
+                    "thumbnail_url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL of the segment thumbnail, when available."
                     }
                   }
                 }
@@ -9414,6 +9469,11 @@
                     "end_time": {
                       "type": "number",
                       "description": "End time of segment in seconds"
+                    },
+                    "thumbnail_url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL of the segment thumbnail, when available."
                     }
                   }
                 }
@@ -9705,6 +9765,11 @@
                           "entities": {
                             "type": "object",
                             "description": "Entities extracted from the segment"
+                          },
+                          "thumbnail_url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "URL of the segment thumbnail, when available."
                           }
                         }
                       }
@@ -9791,6 +9856,11 @@
                               "end_time": {
                                 "type": "number",
                                 "description": "End time of segment in seconds"
+                              },
+                              "thumbnail_url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "URL of the segment thumbnail, when available."
                               }
                             }
                           }
@@ -9890,6 +9960,11 @@
                               "end_time": {
                                 "type": "number",
                                 "description": "End time of segment in seconds"
+                              },
+                              "thumbnail_url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "URL of the segment thumbnail, when available."
                               }
                             }
                           }
@@ -9951,21 +10026,28 @@
           "min_seconds": {
             "type": "number",
             "minimum": 1,
-            "maximum": 120,
+            "maximum": 600,
             "nullable": true,
-            "description": "The minimum length of a shot in seconds. Must be between 1 and 120 seconds."
+            "default": 1,
+            "description": "The minimum length of a shot in seconds. Defaults to 1."
           },
           "max_seconds": {
             "type": "number",
             "minimum": 1,
-            "maximum": 120,
+            "maximum": 600,
             "nullable": true,
-            "description": "The maximum length of a shot in seconds. Must be between 1 and 120 seconds."
+            "default": 300,
+            "description": "The maximum length of a shot in seconds. Defaults to 300."
           },
           "detector": {
             "type": "string",
             "enum": ["adaptive", "content"],
             "description": "The detector strategy to use:\n\n\u2022 **adaptive**: Designed for dynamic footage with camera movement, panning, or action. Examples: sports broadcasts, drone footage, handheld documentaries, action movies, live events.\n\u2022 **content**: Optimized for controlled footage with clear visual transitions. Examples: studio interviews, corporate videos, educational content, product demos, scripted content."
+          },
+          "fill_gaps": {
+            "type": "boolean",
+            "default": true,
+            "description": "When true, gaps between detected shots are filled: gaps greater than or equal to min_seconds become their own segments (split by max_seconds if needed), and shorter gaps are merged into the nearest adjacent segment. Defaults to true."
           }
         }
       },
@@ -11326,16 +11408,21 @@
           "max_duration_seconds": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 3600,
+            "maximum": 600,
             "default": 300,
-            "description": "Maximum duration for each segment in seconds (1 second to 1 hour, default: 5 minutes)"
+            "description": "Maximum duration for each segment in seconds (1 second to 10 minutes, default: 5 minutes)"
           },
           "min_duration_seconds": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 3600,
+            "maximum": 600,
             "default": 1,
-            "description": "Minimum duration for each segment in seconds (1 second to 1 hour, default: 1 second)"
+            "description": "Minimum duration for each segment in seconds (1 second to 10 minutes, default: 1 second)"
+          },
+          "fill_gaps": {
+            "type": "boolean",
+            "default": true,
+            "description": "When true, gaps between detected shots are filled: gaps greater than or equal to min_duration_seconds become their own segments (split by max_duration_seconds if needed), and shorter gaps are merged into the nearest adjacent segment. Defaults to true."
           }
         }
       },
