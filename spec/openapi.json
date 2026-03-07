@@ -2447,6 +2447,16 @@
               "default": 0,
               "minimum": 0
             }
+          },
+          {
+            "name": "include_thumbnails",
+            "in": "query",
+            "description": "When true, include a file-level thumbnail_url in the response and a per-segment thumbnail_url on each segment entity",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -3143,6 +3153,16 @@
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/ModalitiesSchema"
+            }
+          },
+          {
+            "name": "include_thumbnails",
+            "in": "query",
+            "description": "When true, include a file-level thumbnail_url on the response and per-segment thumbnail_url on each segment_summary entry",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -8252,6 +8272,11 @@
             "type": "string",
             "description": "ID of the file"
           },
+          "thumbnail_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the file-level thumbnail for the video. Only present when include_thumbnails=true."
+          },
           "entities": {
             "type": "object",
             "description": "Entities extracted from the file at the video level"
@@ -8805,11 +8830,6 @@
                         "end_time": {
                           "type": "number",
                           "description": "End time of segment in seconds"
-                        },
-                        "thumbnail_url": {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "URL of the segment thumbnail, when available."
                         }
                       }
                     }
@@ -9365,6 +9385,11 @@
                 "type": "string",
                 "description": "Unique identifier for the file"
               },
+              "thumbnail_url": {
+                "type": "string",
+                "format": "uri",
+                "description": "URL of the file-level thumbnail for the video. Only present when include_thumbnails=true."
+              },
               "content": {
                 "type": "string",
                 "description": "Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested"
@@ -9469,11 +9494,6 @@
                     "end_time": {
                       "type": "number",
                       "description": "End time of segment in seconds"
-                    },
-                    "thumbnail_url": {
-                      "type": "string",
-                      "format": "uri",
-                      "description": "URL of the segment thumbnail, when available."
                     }
                   }
                 }
@@ -9765,11 +9785,6 @@
                           "entities": {
                             "type": "object",
                             "description": "Entities extracted from the segment"
-                          },
-                          "thumbnail_url": {
-                            "type": "string",
-                            "format": "uri",
-                            "description": "URL of the segment thumbnail, when available."
                           }
                         }
                       }
@@ -9856,11 +9871,6 @@
                               "end_time": {
                                 "type": "number",
                                 "description": "End time of segment in seconds"
-                              },
-                              "thumbnail_url": {
-                                "type": "string",
-                                "format": "uri",
-                                "description": "URL of the segment thumbnail, when available."
                               }
                             }
                           }
@@ -9960,11 +9970,6 @@
                               "end_time": {
                                 "type": "number",
                                 "description": "End time of segment in seconds"
-                              },
-                              "thumbnail_url": {
-                                "type": "string",
-                                "format": "uri",
-                                "description": "URL of the segment thumbnail, when available."
                               }
                             }
                           }
