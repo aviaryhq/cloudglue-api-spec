@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.6.5"
+    "version": "0.6.6"
   },
   "servers": [
     {
@@ -113,7 +113,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100
             }
           },
@@ -123,8 +122,7 @@
             "description": "Number of tags to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           }
         ],
@@ -352,7 +350,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100
             }
           },
@@ -362,8 +359,7 @@
             "description": "Number of extract jobs to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -417,8 +413,7 @@
             "description": "Include the data in the response. If false, the response will only include the job information and not the data to minimize the response size.",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "default": true
+              "type": "boolean"
             }
           }
         ],
@@ -499,7 +494,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100,
               "minimum": 1
             }
@@ -511,7 +505,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 0,
               "minimum": 0
             }
           },
@@ -519,6 +512,25 @@
             "name": "include_thumbnails",
             "in": "query",
             "description": "When true, include a file-level thumbnail_url in the data object and a per-segment thumbnail_url on each segment entity",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "include_chapters",
+            "in": "query",
+            "description": "Include narrative chapters in the response (when segmentation strategy is 'narrative')",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "include_shots",
+            "in": "query",
+            "description": "Include shot boundaries in the response (when segmentation strategy is 'shot-detector')",
             "required": false,
             "schema": {
               "type": "boolean",
@@ -735,7 +747,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100
             }
           },
@@ -745,8 +756,7 @@
             "description": "Number of files to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -756,8 +766,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["created_at", "filename"],
-              "default": "created_at"
+              "enum": ["created_at", "filename"]
             }
           },
           {
@@ -767,8 +776,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "desc"
+              "enum": ["asc", "desc"]
             }
           },
           {
@@ -1063,8 +1071,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -1074,8 +1081,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -1136,8 +1142,7 @@
             "description": "Filter thumbnails by default status. If true, will only return the default thumbnail for the file",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "default": false
+              "type": "boolean"
             }
           },
           {
@@ -1158,8 +1163,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -1169,8 +1173,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           },
           {
@@ -1314,8 +1317,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -1325,8 +1327,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -1577,8 +1578,7 @@
             "description": "Filter by job status. Supports comma-separated values (e.g., 'completed,processing'). Defaults to 'completed'.",
             "required": false,
             "schema": {
-              "type": "string",
-              "default": "completed"
+              "type": "string"
             }
           },
           {
@@ -1588,8 +1588,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           },
           {
@@ -1598,8 +1597,7 @@
             "description": "Include the describe data in the response. If false, only job information is returned. Defaults to false.",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "default": false
+              "type": "boolean"
             }
           },
           {
@@ -1610,8 +1608,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -1621,8 +1618,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -1694,8 +1690,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           }
         ],
@@ -1806,7 +1801,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100
             }
           },
@@ -1816,8 +1810,7 @@
             "description": "Number of collections to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -1827,8 +1820,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["name", "created_at"],
-              "default": "created_at"
+              "enum": ["name", "created_at"]
             }
           },
           {
@@ -1838,8 +1830,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "desc"
+              "enum": ["asc", "desc"]
             }
           },
           {
@@ -2166,7 +2157,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100
             }
           },
@@ -2176,8 +2166,7 @@
             "description": "Number of files to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -2223,8 +2212,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["added_at", "filename"],
-              "default": "added_at"
+              "enum": ["added_at", "filename"]
             }
           },
           {
@@ -2234,8 +2222,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "desc"
+              "enum": ["asc", "desc"]
             }
           },
           {
@@ -2432,7 +2419,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100,
               "minimum": 1
             }
@@ -2444,7 +2430,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 0,
               "minimum": 0
             }
           },
@@ -2452,6 +2437,25 @@
             "name": "include_thumbnails",
             "in": "query",
             "description": "When true, include a file-level thumbnail_url in the response and a per-segment thumbnail_url on each segment entity",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "include_chapters",
+            "in": "query",
+            "description": "Include narrative chapters in the response (when segmentation strategy is 'narrative')",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "include_shots",
+            "in": "query",
+            "description": "Include shot boundaries in the response (when segmentation strategy is 'shot-detector')",
             "required": false,
             "schema": {
               "type": "boolean",
@@ -2535,8 +2539,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           },
           {
@@ -2563,6 +2566,16 @@
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/ModalitiesSchema"
+            }
+          },
+          {
+            "name": "include_word_timestamps",
+            "in": "query",
+            "description": "When true, include a words array on each speech entry with word-level start_time and end_time. Not available for YouTube sources. Only applies when response_format=json.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -2706,7 +2719,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100
             }
           },
@@ -2716,8 +2728,7 @@
             "description": "Number of files to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -2727,8 +2738,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["added_at", "filename"],
-              "default": "added_at"
+              "enum": ["added_at", "filename"]
             }
           },
           {
@@ -2738,8 +2748,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "desc"
+              "enum": ["asc", "desc"]
             }
           },
           {
@@ -2830,7 +2839,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 20,
               "maximum": 100
             }
           },
@@ -2840,8 +2848,7 @@
             "description": "Number of files to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -2851,8 +2858,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["added_at", "filename"],
-              "default": "added_at"
+              "enum": ["added_at", "filename"]
             }
           },
           {
@@ -2862,8 +2868,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "desc"
+              "enum": ["asc", "desc"]
             }
           },
           {
@@ -2893,8 +2898,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           },
           {
@@ -2973,7 +2977,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 20,
               "maximum": 100
             }
           },
@@ -2983,8 +2986,7 @@
             "description": "Number of files to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -2994,8 +2996,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["added_at", "filename"],
-              "default": "added_at"
+              "enum": ["added_at", "filename"]
             }
           },
           {
@@ -3005,8 +3006,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "desc"
+              "enum": ["asc", "desc"]
             }
           },
           {
@@ -3036,8 +3036,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           },
           {
@@ -3125,8 +3124,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           },
           {
@@ -3159,6 +3157,35 @@
             "name": "include_thumbnails",
             "in": "query",
             "description": "When true, include a file-level thumbnail_url on the response and per-segment thumbnail_url on each segment_summary entry",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "include_word_timestamps",
+            "in": "query",
+            "description": "When true, include a words array on each speech entry with word-level start_time and end_time. Not available for YouTube sources. Only applies when response_format=json.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "include_chapters",
+            "in": "query",
+            "description": "Include narrative chapters in the response (when segmentation strategy is 'narrative')",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "include_shots",
+            "in": "query",
+            "description": "Include shot boundaries in the response (when segmentation strategy is 'shot-detector')",
             "required": false,
             "schema": {
               "type": "boolean",
@@ -3293,7 +3320,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 20,
               "maximum": 100
             }
           },
@@ -3303,8 +3329,7 @@
             "description": "Number of chat completions to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -3466,7 +3491,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 20,
               "maximum": 100
             }
           },
@@ -3476,8 +3500,7 @@
             "description": "Number of transcription jobs to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -3532,8 +3555,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           }
         ],
@@ -3594,8 +3616,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           }
         ],
@@ -3716,7 +3737,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 20,
               "maximum": 100
             }
           },
@@ -3726,8 +3746,7 @@
             "description": "Number of description jobs to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -3782,8 +3801,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           },
           {
@@ -3792,8 +3810,7 @@
             "description": "Include the data in the response. If false, the response will only include the job information and not the data to minimize the response size.",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "default": true
+              "type": "boolean"
             }
           },
           {
@@ -3862,8 +3879,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           },
           {
@@ -3896,6 +3912,35 @@
             "name": "include_thumbnails",
             "in": "query",
             "description": "When true, include a file-level thumbnail_url on the response, per-segment thumbnail_url on each segment_summary entry, and inject thumbnail images into markdown output",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "include_word_timestamps",
+            "in": "query",
+            "description": "When true, include a words array on each speech entry with word-level start_time and end_time. Not available for YouTube sources. Only applies when response_format=json.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "include_chapters",
+            "in": "query",
+            "description": "Include narrative chapters in the response (when segmentation strategy is 'narrative')",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "include_shots",
+            "in": "query",
+            "description": "Include shot boundaries in the response (when segmentation strategy is 'shot-detector')",
             "required": false,
             "schema": {
               "type": "boolean",
@@ -4037,7 +4082,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100
             }
           },
@@ -4047,8 +4091,7 @@
             "description": "Number of webhooks to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -4058,8 +4101,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["created_at"],
-              "default": "created_at"
+              "enum": ["created_at"]
             }
           },
           {
@@ -4069,8 +4111,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "desc"
+              "enum": ["asc", "desc"]
             }
           }
         ],
@@ -4380,7 +4421,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100,
               "minimum": 1
             }
@@ -4392,7 +4432,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 0,
               "minimum": 0
             }
           },
@@ -4576,7 +4615,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100,
               "minimum": 1
             }
@@ -4588,7 +4626,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 0,
               "minimum": 0
             }
           },
@@ -4823,7 +4860,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100,
               "minimum": 1
             }
@@ -4835,7 +4871,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 0,
               "minimum": 0
             }
           }
@@ -4909,8 +4944,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 10
+              "maximum": 100
             }
           },
           {
@@ -4920,8 +4954,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -5125,8 +5158,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -5136,8 +5168,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -5200,8 +5231,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -5211,8 +5241,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -5391,7 +5420,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
               "maximum": 100
             }
           },
@@ -5401,8 +5429,7 @@
             "description": "Number of segmentation jobs to skip",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "integer"
             }
           },
           {
@@ -5633,8 +5660,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -5644,8 +5670,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           },
           {
@@ -5715,8 +5740,7 @@
             "description": "Include the describe data in the response. If false, only job information is returned. Defaults to false.",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "default": false
+              "type": "boolean"
             }
           },
           {
@@ -5726,8 +5750,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"],
-              "default": "json"
+              "enum": ["json", "markdown"]
             }
           },
           {
@@ -5738,8 +5761,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -5749,8 +5771,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -5872,8 +5893,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -5883,8 +5903,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           },
           {
@@ -5957,8 +5976,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -5968,8 +5986,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -6154,8 +6171,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -6165,8 +6181,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           },
           {
@@ -6239,8 +6254,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -6250,8 +6264,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           }
         ],
@@ -6448,8 +6461,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 50
+              "maximum": 100
             }
           },
           {
@@ -6458,8 +6470,7 @@
             "description": "Offset from the start of the shareable assets list",
             "schema": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 0
             }
           },
           {
@@ -6764,12 +6775,10 @@
           },
           "background": {
             "type": "boolean",
-            "default": false,
             "description": "Set to true to process the response in the background. When true, the response is returned immediately with status 'in_progress'."
           },
           "stream": {
             "type": "boolean",
-            "default": false,
             "description": "Stream response via SSE. Mutually exclusive with background."
           }
         }
@@ -6820,7 +6829,6 @@
           "type": {
             "type": "string",
             "enum": ["general_question_answering", "entity_backed_knowledge"],
-            "default": "general_question_answering",
             "description": "The type of knowledge base interaction pattern.\n\n- `general_question_answering` (default): Search-and-answer over media collections.\n- `entity_backed_knowledge`: Enables structured entity lookups alongside video content. Requires `entity_backed_knowledge_config` and `nimbus-002-preview` model."
           },
           "collections": {
@@ -7190,6 +7198,25 @@
           }
         }
       },
+      "WordTimestamp": {
+        "type": "object",
+        "description": "A single word with its timing information",
+        "properties": {
+          "word": {
+            "type": "string",
+            "description": "The word text"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Start time of the word in seconds"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "End time of the word in seconds"
+          }
+        },
+        "required": ["word", "start_time", "end_time"]
+      },
       "SpeechOutputPart": {
         "type": "object",
         "properties": {
@@ -7208,6 +7235,13 @@
           "end_time": {
             "type": "number",
             "description": "End time of speech in seconds"
+          },
+          "words": {
+            "type": "array",
+            "description": "Word-level timestamps. Only present when include_word_timestamps=true. Not available for YouTube sources.",
+            "items": {
+              "$ref": "#/components/schemas/WordTimestamp"
+            }
           }
         }
       },
@@ -7283,18 +7317,15 @@
               },
               "enable_video_level_entities": {
                 "type": "boolean",
-                "description": "Whether to extract entities at the video level. Mutually exclusive with enable_segment_level_entities - only one can be true.",
-                "default": false
+                "description": "Whether to extract entities at the video level. Mutually exclusive with enable_segment_level_entities - only one can be true."
               },
               "enable_segment_level_entities": {
                 "type": "boolean",
-                "description": "Whether to extract entities at the segment level. Mutually exclusive with enable_video_level_entities - only one can be true.",
-                "default": true
+                "description": "Whether to extract entities at the segment level. Mutually exclusive with enable_video_level_entities - only one can be true."
               },
               "enable_transcript_mode": {
                 "type": "boolean",
-                "description": "When enabled, extract entities from transcript only (similar to YouTube path). Useful for speech-heavy content.",
-                "default": false
+                "description": "When enabled, extract entities from transcript only (similar to YouTube path). Useful for speech-heavy content."
               }
             }
           },
@@ -7358,6 +7389,63 @@
           "error": {
             "type": "string",
             "description": "Error message if status is 'failed'"
+          },
+          "chapters": {
+            "type": "array",
+            "description": "Array of narrative chapters (only present when include_chapters=true and segmentation strategy is 'narrative')",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "end_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": ["index", "start_time", "end_time", "description"]
+            }
+          },
+          "shots": {
+            "type": "array",
+            "description": "Array of shot boundaries (only present when include_shots=true and segmentation strategy is 'shot-detector')",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "end_time": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": ["index", "start_time", "end_time"]
+            }
+          },
+          "total_chapters": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of chapters (only present when include_chapters=true and segmentation strategy is 'narrative')"
+          },
+          "total_shots": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of shots (only present when include_shots=true and segmentation strategy is 'shot-detector')"
           }
         }
       },
@@ -7411,21 +7499,28 @@
               },
               "enable_video_level_entities": {
                 "type": "boolean",
-                "description": "Whether to extract entities at the video level. Mutually exclusive with enable_segment_level_entities - only one can be true.",
-                "default": false
+                "description": "Whether to extract entities at the video level. Mutually exclusive with enable_segment_level_entities - only one can be true."
               },
               "enable_segment_level_entities": {
                 "type": "boolean",
-                "description": "Whether to extract entities at the segment level. Mutually exclusive with enable_video_level_entities - only one can be true.",
-                "default": true
+                "description": "Whether to extract entities at the segment level. Mutually exclusive with enable_video_level_entities - only one can be true."
               },
               "enable_transcript_mode": {
                 "type": "boolean",
-                "description": "When enabled, extract entities from transcript only (similar to YouTube path). Useful for speech-heavy content.",
-                "default": false
+                "description": "When enabled, extract entities from transcript only (similar to YouTube path). Useful for speech-heavy content."
               },
               "thumbnails_config": {
                 "$ref": "#/components/schemas/ThumbnailsConfig"
+              },
+              "include_chapters": {
+                "type": "boolean",
+                "description": "Include narrative chapters in the response when segmentation strategy is 'narrative'. Only affects cached completed results; newly created pending jobs do not include chapters.",
+                "default": false
+              },
+              "include_shots": {
+                "type": "boolean",
+                "description": "Include shot boundaries in the response when segmentation strategy is 'shot-detector'. Only affects cached completed results; newly created pending jobs do not include shots.",
+                "default": false
               }
             }
           },
@@ -7594,8 +7689,7 @@
           },
           "enable_segment_thumbnails": {
             "type": "boolean",
-            "description": "Whether to generate thumbnails for each segment",
-            "default": false
+            "description": "Whether to generate thumbnails for each segment"
           }
         },
         "required": ["file"]
@@ -7703,18 +7797,15 @@
               },
               "enable_video_level_entities": {
                 "type": "boolean",
-                "description": "Whether to extract entities at the video level. Mutually exclusive with enable_segment_level_entities - only one can be true.",
-                "default": false
+                "description": "Whether to extract entities at the video level. Mutually exclusive with enable_segment_level_entities - only one can be true."
               },
               "enable_segment_level_entities": {
                 "type": "boolean",
-                "description": "Whether to extract entities at the segment level. Mutually exclusive with enable_video_level_entities - only one can be true.",
-                "default": true
+                "description": "Whether to extract entities at the segment level. Mutually exclusive with enable_video_level_entities - only one can be true."
               },
               "enable_transcript_mode": {
                 "type": "boolean",
-                "description": "When enabled, extract entities from transcript only. Useful for speech-heavy content.",
-                "default": false
+                "description": "When enabled, extract entities from transcript only. Useful for speech-heavy content."
               }
             }
           },
@@ -7724,28 +7815,23 @@
             "properties": {
               "enable_summary": {
                 "type": "boolean",
-                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
-                "default": true
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles"
               },
               "enable_speech": {
                 "type": "boolean",
-                "description": "Whether to generate speech transcript",
-                "default": true
+                "description": "Whether to generate speech transcript"
               },
               "enable_scene_text": {
                 "type": "boolean",
-                "description": "Whether to generate scene text extraction",
-                "default": false
+                "description": "Whether to generate scene text extraction"
               },
               "enable_visual_scene_description": {
                 "type": "boolean",
-                "description": "Whether to generate visual scene description",
-                "default": false
+                "description": "Whether to generate visual scene description"
               },
               "enable_audio_description": {
                 "type": "boolean",
-                "description": "Whether to generate audio description",
-                "default": false
+                "description": "Whether to generate audio description"
               }
             }
           },
@@ -7755,28 +7841,23 @@
             "properties": {
               "enable_summary": {
                 "type": "boolean",
-                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
-                "default": true
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles"
               },
               "enable_speech": {
                 "type": "boolean",
-                "description": "Whether to generate speech transcript",
-                "default": true
+                "description": "Whether to generate speech transcript"
               },
               "enable_scene_text": {
                 "type": "boolean",
-                "description": "Whether to generate scene text extraction",
-                "default": true
+                "description": "Whether to generate scene text extraction"
               },
               "enable_visual_scene_description": {
                 "type": "boolean",
-                "description": "Whether to generate visual scene description",
-                "default": true
+                "description": "Whether to generate visual scene description"
               },
               "enable_audio_description": {
                 "type": "boolean",
-                "description": "Whether to generate audio description",
-                "default": false
+                "description": "Whether to generate audio description"
               }
             }
           },
@@ -7808,14 +7889,12 @@
                         "type": "number",
                         "minimum": 0.1,
                         "maximum": 30,
-                        "default": 1,
                         "description": "Number of frames to extract per second"
                       },
                       "max_width": {
                         "type": "number",
                         "minimum": 64,
                         "maximum": 4096,
-                        "default": 1024,
                         "description": "Maximum width of frames in pixels (aspect ratio preserved)"
                       }
                     }
@@ -7828,7 +7907,6 @@
                 "properties": {
                   "enable_frame_thumbnails": {
                     "type": "boolean",
-                    "default": true,
                     "description": "Whether to generate thumbnails for extracted frames"
                   }
                 }
@@ -7894,28 +7972,23 @@
             "properties": {
               "enable_summary": {
                 "type": "boolean",
-                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
-                "default": true
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles"
               },
               "enable_speech": {
                 "type": "boolean",
-                "description": "Whether to generate speech transcript",
-                "default": true
+                "description": "Whether to generate speech transcript"
               },
               "enable_scene_text": {
                 "type": "boolean",
-                "description": "Whether to generate scene text extraction",
-                "default": true
+                "description": "Whether to generate scene text extraction"
               },
               "enable_visual_scene_description": {
                 "type": "boolean",
-                "description": "Whether to generate visual scene description",
-                "default": true
+                "description": "Whether to generate visual scene description"
               },
               "enable_audio_description": {
                 "type": "boolean",
-                "description": "Whether to generate audio description",
-                "default": false
+                "description": "Whether to generate audio description"
               }
             }
           },
@@ -7933,18 +8006,15 @@
               },
               "enable_video_level_entities": {
                 "type": "boolean",
-                "description": "Whether to extract entities at the video level. Mutually exclusive with enable_segment_level_entities - only one can be true.",
-                "default": false
+                "description": "Whether to extract entities at the video level. Mutually exclusive with enable_segment_level_entities - only one can be true."
               },
               "enable_segment_level_entities": {
                 "type": "boolean",
-                "description": "Whether to extract entities at the segment level. Mutually exclusive with enable_video_level_entities - only one can be true.",
-                "default": true
+                "description": "Whether to extract entities at the segment level. Mutually exclusive with enable_video_level_entities - only one can be true."
               },
               "enable_transcript_mode": {
                 "type": "boolean",
-                "description": "When enabled, extract entities from transcript only. Useful for speech-heavy content.",
-                "default": false
+                "description": "When enabled, extract entities from transcript only. Useful for speech-heavy content."
               }
             }
           },
@@ -7954,28 +8024,23 @@
             "properties": {
               "enable_summary": {
                 "type": "boolean",
-                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
-                "default": true
+                "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles"
               },
               "enable_speech": {
                 "type": "boolean",
-                "description": "Whether to generate speech transcript",
-                "default": true
+                "description": "Whether to generate speech transcript"
               },
               "enable_scene_text": {
                 "type": "boolean",
-                "description": "Whether to generate scene text extraction",
-                "default": false
+                "description": "Whether to generate scene text extraction"
               },
               "enable_visual_scene_description": {
                 "type": "boolean",
-                "description": "Whether to generate visual scene description",
-                "default": false
+                "description": "Whether to generate visual scene description"
               },
               "enable_audio_description": {
                 "type": "boolean",
-                "description": "Whether to generate audio description",
-                "default": false
+                "description": "Whether to generate audio description"
               }
             }
           },
@@ -8006,14 +8071,12 @@
                         "type": "number",
                         "minimum": 0.1,
                         "maximum": 30,
-                        "default": 1,
                         "description": "Number of frames to extract per second"
                       },
                       "max_width": {
                         "type": "number",
                         "minimum": 64,
                         "maximum": 4096,
-                        "default": 1024,
                         "description": "Maximum width of frames in pixels (aspect ratio preserved)"
                       }
                     }
@@ -8026,7 +8089,6 @@
                 "properties": {
                   "enable_frame_thumbnails": {
                     "type": "boolean",
-                    "default": true,
                     "description": "Whether to generate thumbnails for extracted frames"
                   }
                 }
@@ -8318,6 +8380,63 @@
           "offset": {
             "type": "integer",
             "description": "Number of entities skipped"
+          },
+          "chapters": {
+            "type": "array",
+            "description": "Array of narrative chapters (only present when include_chapters=true and segmentation strategy is 'narrative')",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "end_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": ["index", "start_time", "end_time", "description"]
+            }
+          },
+          "shots": {
+            "type": "array",
+            "description": "Array of shot boundaries (only present when include_shots=true and segmentation strategy is 'shot-detector')",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "end_time": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": ["index", "start_time", "end_time"]
+            }
+          },
+          "total_chapters": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of chapters (only present when include_chapters=true and segmentation strategy is 'narrative')"
+          },
+          "total_shots": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of shots (only present when include_shots=true and segmentation strategy is 'shot-detector')"
           }
         },
         "required": [
@@ -8511,7 +8630,6 @@
                     "scope": {
                       "type": "string",
                       "enum": ["file", "segment"],
-                      "default": "file",
                       "description": "Scope of the filter. 'file' filters by source video properties, 'segment' filters by segment properties. Only duration_seconds is supported with segment scope."
                     },
                     "operator": {
@@ -8586,8 +8704,7 @@
             "type": "number",
             "description": "Sampling temperature to use, between 0 and 2",
             "minimum": 0,
-            "maximum": 2,
-            "default": 0.7
+            "maximum": 2
           }
         },
         "required": ["model", "messages", "collections"]
@@ -8859,28 +8976,23 @@
               },
               "enable_summary": {
                 "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
-                "type": "boolean",
-                "default": true
+                "type": "boolean"
               },
               "enable_speech": {
                 "description": "Whether to generate speech transcript",
-                "type": "boolean",
-                "default": true
+                "type": "boolean"
               },
               "enable_visual_scene_description": {
                 "description": "Whether to generate visual scene description",
-                "type": "boolean",
-                "default": false
+                "type": "boolean"
               },
               "enable_scene_text": {
                 "description": "Whether to generate scene text extraction",
-                "type": "boolean",
-                "default": false
+                "type": "boolean"
               },
               "enable_audio_description": {
                 "description": "Whether to generate audio description",
-                "type": "boolean",
-                "default": false
+                "type": "boolean"
               },
               "thumbnails_config": {
                 "$ref": "#/components/schemas/ThumbnailsConfig"
@@ -8924,28 +9036,23 @@
         "properties": {
           "enable_summary": {
             "type": "boolean",
-            "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
-            "default": true
+            "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles"
           },
           "enable_speech": {
             "type": "boolean",
-            "description": "Whether to generate speech transcript",
-            "default": true
+            "description": "Whether to generate speech transcript"
           },
           "enable_visual_scene_description": {
             "type": "boolean",
-            "description": "Whether to generate visual scene description",
-            "default": true
+            "description": "Whether to generate visual scene description"
           },
           "enable_scene_text": {
             "type": "boolean",
-            "description": "Whether to generate scene text extraction",
-            "default": true
+            "description": "Whether to generate scene text extraction"
           },
           "enable_audio_description": {
             "type": "boolean",
-            "description": "Whether to generate audio description",
-            "default": false
+            "description": "Whether to generate audio description"
           }
         }
       },
@@ -9183,31 +9290,36 @@
               },
               "enable_summary": {
                 "description": "Whether to generate video-level and segment-level (moment-level) summaries and titles",
-                "type": "boolean",
-                "default": true
+                "type": "boolean"
               },
               "enable_speech": {
                 "description": "Whether to generate speech transcript",
-                "type": "boolean",
-                "default": true
+                "type": "boolean"
               },
               "enable_visual_scene_description": {
                 "description": "Whether to generate visual scene description",
-                "type": "boolean",
-                "default": true
+                "type": "boolean"
               },
               "enable_scene_text": {
                 "description": "Whether to generate scene text extraction",
-                "type": "boolean",
-                "default": true
+                "type": "boolean"
               },
               "enable_audio_description": {
                 "description": "Whether to generate audio description",
-                "type": "boolean",
-                "default": false
+                "type": "boolean"
               },
               "thumbnails_config": {
                 "$ref": "#/components/schemas/ThumbnailsConfig"
+              },
+              "include_chapters": {
+                "type": "boolean",
+                "description": "Include narrative chapters in the response when segmentation strategy is 'narrative'. Only affects cached completed results; newly created pending jobs do not include chapters.",
+                "default": false
+              },
+              "include_shots": {
+                "type": "boolean",
+                "description": "Include shot boundaries in the response when segmentation strategy is 'shot-detector'. Only affects cached completed results; newly created pending jobs do not include shots.",
+                "default": false
               }
             }
           },
@@ -9338,6 +9450,63 @@
             "type": "string",
             "format": "uuid",
             "description": "The ID of the segmentation job if the describe was run with a segmentation"
+          },
+          "chapters": {
+            "type": "array",
+            "description": "Array of narrative chapters (only present when include_chapters=true and segmentation strategy is 'narrative')",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "end_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": ["index", "start_time", "end_time", "description"]
+            }
+          },
+          "shots": {
+            "type": "array",
+            "description": "Array of shot boundaries (only present when include_shots=true and segmentation strategy is 'shot-detector')",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_time": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "end_time": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": ["index", "start_time", "end_time"]
+            }
+          },
+          "total_chapters": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of chapters (only present when include_chapters=true and segmentation strategy is 'narrative')"
+          },
+          "total_shots": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of shots (only present when include_shots=true and segmentation strategy is 'shot-detector')"
           }
         }
       },
@@ -9435,6 +9604,63 @@
                     }
                   }
                 }
+              },
+              "chapters": {
+                "type": "array",
+                "description": "Array of narrative chapters (only present when include_chapters=true and segmentation strategy is 'narrative')",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["index", "start_time", "end_time", "description"]
+                }
+              },
+              "shots": {
+                "type": "array",
+                "description": "Array of shot boundaries (only present when include_shots=true and segmentation strategy is 'shot-detector')",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_time": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "end_time": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  },
+                  "required": ["index", "start_time", "end_time"]
+                }
+              },
+              "total_chapters": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Total number of chapters (only present when include_chapters=true and segmentation strategy is 'narrative')"
+              },
+              "total_shots": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Total number of shots (only present when include_shots=true and segmentation strategy is 'shot-detector')"
               }
             }
           },
@@ -10033,7 +10259,6 @@
             "minimum": 1,
             "maximum": 600,
             "nullable": true,
-            "default": 1,
             "description": "The minimum length of a shot in seconds. Defaults to 1."
           },
           "max_seconds": {
@@ -10041,7 +10266,6 @@
             "minimum": 1,
             "maximum": 600,
             "nullable": true,
-            "default": 300,
             "description": "The maximum length of a shot in seconds. Defaults to 300."
           },
           "detector": {
@@ -10051,7 +10275,6 @@
           },
           "fill_gaps": {
             "type": "boolean",
-            "default": true,
             "description": "When true, gaps between detected shots are filled: gaps greater than or equal to min_seconds become their own segments (split by max_seconds if needed), and shorter gaps are merged into the nearest adjacent segment. Defaults to true."
           }
         }
@@ -10071,7 +10294,6 @@
             "type": "number",
             "minimum": 144,
             "maximum": 4320,
-            "default": 280,
             "description": "The maximum width of the key frames in pixels"
           }
         }
@@ -10446,14 +10668,12 @@
             "type": "number",
             "minimum": 0.1,
             "maximum": 30,
-            "default": 1,
             "description": "Number of frames to extract per second of video"
           },
           "max_width": {
             "type": "number",
             "minimum": 64,
             "maximum": 4096,
-            "default": 1024,
             "description": "Maximum width of extracted frames in pixels. Aspect ratio is preserved."
           }
         }
@@ -10464,7 +10684,6 @@
         "properties": {
           "enable_frame_thumbnails": {
             "type": "boolean",
-            "default": true,
             "description": "Whether to generate CDN-hosted thumbnails for extracted frames"
           }
         }
@@ -10662,7 +10881,6 @@
           "limit": {
             "type": "integer",
             "minimum": 1,
-            "default": 10,
             "description": "Maximum number of search results to return (applies to total items across groups when grouping)"
           },
           "filter": {
@@ -10680,7 +10898,6 @@
           "sort_by": {
             "type": "string",
             "enum": ["score", "item_count"],
-            "default": "score",
             "description": "Sort order for results. Default: \"score\". When group_by_key is specified, can also use \"item_count\" to sort by number of items per group."
           },
           "search_modalities": {
@@ -10712,7 +10929,6 @@
                     "scope": {
                       "type": "string",
                       "enum": ["file", "segment"],
-                      "default": "file",
                       "description": "Specifies scope of eligible search items (file/segment) to check metadata filtering conditions"
                     }
                   }
@@ -10738,7 +10954,6 @@
                     "scope": {
                       "type": "string",
                       "enum": ["file", "segment"],
-                      "default": "file",
                       "description": "Scope of the filter. 'file' filters by source video properties, 'segment' filters by segment properties. Only duration_seconds is supported with segment scope."
                     }
                   }
@@ -11407,26 +11622,22 @@
           "detector": {
             "type": "string",
             "enum": ["content", "adaptive"],
-            "default": "adaptive",
             "description": "Detection algorithm:\n\u2022 **adaptive**: Designed for dynamic footage with camera movement and action (default)\n\u2022 **content**: Optimized for controlled footage with clear visual transitions"
           },
           "max_duration_seconds": {
             "type": "integer",
             "minimum": 1,
             "maximum": 600,
-            "default": 300,
             "description": "Maximum duration for each segment in seconds (1 second to 10 minutes, default: 5 minutes)"
           },
           "min_duration_seconds": {
             "type": "integer",
             "minimum": 1,
             "maximum": 600,
-            "default": 1,
             "description": "Minimum duration for each segment in seconds (1 second to 10 minutes, default: 1 second)"
           },
           "fill_gaps": {
             "type": "boolean",
-            "default": true,
             "description": "When true, gaps between detected shots are filled: gaps greater than or equal to min_duration_seconds become their own segments (split by max_duration_seconds if needed), and shorter gaps are merged into the nearest adjacent segment. Defaults to true."
           }
         }
@@ -11441,7 +11652,6 @@
           "strategy": {
             "type": "string",
             "enum": ["comprehensive", "balanced"],
-            "default": "balanced",
             "description": "Narrative segmentation strategy:\n\n\u2022 **comprehensive**: Uses a VLM to deeply analyze logical segments of video. Only available for video files (not YouTube or audio).\n\n\u2022 **balanced** (default): Balanced analysis approach using multiple modalities. Supports YouTube URLs and audio files.\n\n**Note**: YouTube URLs and audio files automatically use the 'balanced' strategy regardless of the strategy field value. The 'comprehensive' strategy is not supported for YouTube URLs or audio files."
           },
           "number_of_chapters": {
@@ -11717,7 +11927,6 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 4000,
-            "default": 50,
             "description": "Maximum number of faces to return"
           },
           "face_detection_id": {
