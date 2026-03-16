@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.6.6"
+    "version": "0.6.7"
   },
   "servers": [
     {
@@ -4036,6 +4036,77 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": ["Describe"],
+        "summary": "Update describe job",
+        "operationId": "updateDescribe",
+        "description": "Toggle the `use_in_default_index` flag on an existing describe job. Enabling this makes the file searchable by default in the deep search and response APIs.",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the description job",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["use_in_default_index"],
+                "properties": {
+                  "use_in_default_index": {
+                    "type": "boolean",
+                    "description": "When true, the video's search documents will be added to the account's default index. When false, existing default index search documents are removed."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Describe"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/data-connectors": {
@@ -4057,6 +4128,155 @@
           },
           "500": {
             "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data-connectors/{id}/files": {
+      "get": {
+        "tags": ["Data Connectors"],
+        "summary": "List files in a data connector",
+        "operationId": "listDataConnectorFiles",
+        "description": "Browse files available in a connected data source. Returns URIs compatible with Cloudglue's file import system. Supports pagination and provider-specific filtering.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the data connector",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of files to return (1-100)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "description": "Opaque cursor for pagination. Use the `next_page_token` from a previous response.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Start date for filtering (YYYY-MM-DD). Applies to Zoom connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "End date for filtering (YYYY-MM-DD). Applies to Zoom connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "folder_id",
+            "in": "query",
+            "description": "Google Drive folder ID to list contents of. Applies to Google Drive connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "description": "Dropbox folder path to list contents of (default: root). Applies to Dropbox connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "description": "Bucket name. Required for S3 and GCS connectors.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "description": "Key prefix filter. Applies to S3 and GCS connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of files and folders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataConnectorFileList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing required bucket parameter, unsupported connector type)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data connector not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Error communicating with the external service",
             "content": {
               "application/json": {
                 "schema": {
@@ -4807,6 +5027,292 @@
           },
           "404": {
             "description": "Response not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deepSearch": {
+      "post": {
+        "tags": ["Deep Search"],
+        "summary": "Create a deep search",
+        "operationId": "createDeepSearch",
+        "description": "Create a new deep search over one or more collections. Deep search uses agentic retrieval and LLM summarization to find specific moments across your video data.\n\nThe search can be processed synchronously (default), streamed via SSE, or run in the background.",
+        "requestBody": {
+          "description": "Deep search creation parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeepSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Deep search created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeepSearch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Deep Search"],
+        "summary": "List deep searches",
+        "operationId": "listDeepSearches",
+        "description": "List all deep searches with pagination and filtering options.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of deep searches to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of deep searches to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by deep search status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["in_progress", "completed", "failed", "cancelled"]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter deep searches created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter deep searches created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of deep searches",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeepSearchList"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deepSearch/{id}": {
+      "get": {
+        "tags": ["Deep Search"],
+        "summary": "Get a deep search by ID",
+        "operationId": "getDeepSearch",
+        "description": "Retrieve a specific deep search by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the deep search to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deep search details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeepSearch"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Deep search not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Deep Search"],
+        "summary": "Delete a deep search",
+        "operationId": "deleteDeepSearch",
+        "description": "Delete a deep search by ID. This operation is idempotent - deleting a non-existent deep search returns success.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the deep search to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deep search deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteDeepSearchResult"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deepSearch/{id}/cancel": {
+      "post": {
+        "tags": ["Deep Search"],
+        "summary": "Cancel a deep search",
+        "operationId": "cancelDeepSearch",
+        "description": "Cancel a background deep search that is in progress. If the deep search is already completed, failed, or cancelled, this returns the deep search as-is.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the deep search to cancel",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deep search cancelled or current status returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeepSearch"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Deep search not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -6728,13 +7234,13 @@
     "schemas": {
       "CreateResponseRequest": {
         "type": "object",
-        "required": ["model", "input", "knowledge_base"],
+        "required": ["model", "input"],
         "properties": {
           "model": {
             "type": "string",
             "minLength": 1,
             "example": "nimbus-001",
-            "description": "The model to use for generating the response.\n\n- `nimbus-001`: Fast general question answering model. Default temperature: 0.7.\n- `nimbus-002-preview`: Light reasoning model capable of multi-step reasoning, cross-video synthesis, and structured entity data. Supports `entity_collections` in the knowledge base. Default temperature: 1."
+            "description": "The model to use for generating the response.\n\n- `nimbus-001`: Fast general question answering model. Requires `knowledge_base`. Default temperature: 0.7.\n- `nimbus-002-preview`: Light reasoning model capable of multi-step reasoning, cross-video synthesis, and structured entity data. Requires `knowledge_base`. Supports `entity_collections` in the knowledge base. Default temperature: 1."
           },
           "input": {
             "oneOf": [
@@ -6763,6 +7269,7 @@
             "description": "Sampling temperature for the model. Defaults to 0.7 for nimbus-001 and 1 for nimbus-002-preview."
           },
           "knowledge_base": {
+            "description": "Knowledge base configuration. Required for `nimbus-001` and `nimbus-002-preview`.",
             "$ref": "#/components/schemas/ResponseKnowledgeBase"
           },
           "include": {
@@ -6772,6 +7279,19 @@
               "enum": ["cloudglue_citations.media_descriptions"]
             },
             "description": "Additional data to include in the response annotations"
+          },
+          "tools": {
+            "type": "array",
+            "description": "Tool definitions for function calling.",
+            "items": {
+              "$ref": "#/components/schemas/ResponseToolDefinition"
+            }
+          },
+          "max_output_tokens": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 128000,
+            "description": "Maximum number of output tokens."
           },
           "background": {
             "type": "boolean",
@@ -6822,10 +7342,37 @@
         }
       },
       "ResponseKnowledgeBase": {
+        "description": "Knowledge base configuration. Determines which content the model searches for context.\n\nThree source modes are supported:\n- `collections`: Search within specific collections (default, backward-compatible)\n- `files`: Search specific files by URL or file ID (uses default index)\n- `default`: Search all default-indexed files for the account",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/KnowledgeBaseCollections"
+          },
+          {
+            "$ref": "#/components/schemas/KnowledgeBaseFiles"
+          },
+          {
+            "$ref": "#/components/schemas/KnowledgeBaseDefault"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "source",
+          "mapping": {
+            "collections": "#/components/schemas/KnowledgeBaseCollections",
+            "files": "#/components/schemas/KnowledgeBaseFiles",
+            "default": "#/components/schemas/KnowledgeBaseDefault"
+          }
+        }
+      },
+      "KnowledgeBaseCollections": {
         "type": "object",
-        "description": "Configuration for the video collections to search against for response context",
+        "description": "Search within specific collections. This is the default source mode and is backward-compatible — the `source` field can be omitted.",
         "required": ["collections"],
         "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["collections"],
+            "description": "Source mode. Can be omitted for backward compatibility (defaults to `collections`)."
+          },
           "type": {
             "type": "string",
             "enum": ["general_question_answering", "entity_backed_knowledge"],
@@ -6850,6 +7397,38 @@
           },
           "entity_backed_knowledge_config": {
             "$ref": "#/components/schemas/EntityBackedKnowledgeConfig"
+          }
+        }
+      },
+      "KnowledgeBaseFiles": {
+        "type": "object",
+        "description": "Search specific files by URL or file ID. Files must have been described or added to a collection to be searchable.",
+        "required": ["source", "files"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["files"],
+            "description": "Source mode identifier."
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "File references to search. Can be file UUIDs, cloudglue URIs (`cloudglue://files/...`), data connector URLs, or HTTP URLs."
+          }
+        }
+      },
+      "KnowledgeBaseDefault": {
+        "type": "object",
+        "description": "Search all default-indexed files for the account. Includes any file that has been described (with `use_in_default_index: true`) or added to a collection.",
+        "required": ["source"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["default"],
+            "description": "Source mode identifier."
           }
         }
       },
@@ -6987,7 +7566,7 @@
       },
       "ResponseAnnotation": {
         "type": "object",
-        "required": ["type", "collection_id", "file_id", "start_time"],
+        "required": ["type", "file_id", "start_time"],
         "properties": {
           "type": {
             "type": "string",
@@ -6997,7 +7576,7 @@
           "collection_id": {
             "type": "string",
             "format": "uuid",
-            "description": "The collection containing the cited content"
+            "description": "The collection containing the cited content. Present when using `collections` source; omitted for `files` and `default` sources."
           },
           "file_id": {
             "type": "string",
@@ -7055,6 +7634,36 @@
               "type": "string"
             },
             "description": "Audio descriptions (included when 'cloudglue_citations.media_descriptions' is requested)"
+          }
+        }
+      },
+      "ResponseToolDefinition": {
+        "type": "object",
+        "description": "Tool definition for function calling.",
+        "required": ["type", "name", "parameters"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["function"],
+            "description": "The type of tool (always `function`)"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The name of the function"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of what the function does"
+          },
+          "parameters": {
+            "type": "object",
+            "description": "JSON Schema describing the function parameters",
+            "additionalProperties": true
+          },
+          "strict": {
+            "type": "boolean",
+            "description": "Whether to enable strict schema validation"
           }
         }
       },
@@ -9320,6 +9929,10 @@
                 "type": "boolean",
                 "description": "Include shot boundaries in the response when segmentation strategy is 'shot-detector'. Only affects cached completed results; newly created pending jobs do not include shots.",
                 "default": false
+              },
+              "use_in_default_index": {
+                "type": "boolean",
+                "description": "When true, the video's search documents will be added to the account's default index, making them searchable via the Response API and Deep Search API with `source: 'default'`."
               }
             }
           },
@@ -9387,6 +10000,10 @@
                 "description": "Whether the user requested to generate audio description"
               }
             }
+          },
+          "use_in_default_index": {
+            "type": "boolean",
+            "description": "Whether this describe job's search documents are included in the default index."
           },
           "data": {
             "allOf": [
@@ -9857,6 +10474,101 @@
           }
         },
         "required": ["object", "data", "total", "limit", "offset"]
+      },
+      "DataConnectorFile": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["data_connector_file"],
+            "description": "Object type, always 'data_connector_file'"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["file", "folder"],
+            "description": "Whether this entry is a file or a folder"
+          },
+          "uri": {
+            "type": "string",
+            "nullable": true,
+            "description": "URI for importing the file into Cloudglue. Null for folders."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the file or folder"
+          },
+          "mime_type": {
+            "type": "string",
+            "nullable": true,
+            "description": "MIME type of the file, if available"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "nullable": true,
+            "description": "File size in bytes, if available"
+          },
+          "created_at": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Creation timestamp in milliseconds since epoch, if available"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "folder_id": {
+                "type": "string",
+                "description": "Google Drive folder ID. Pass back as the `folder_id` query parameter to drill into this folder."
+              },
+              "path": {
+                "type": "string",
+                "description": "Dropbox folder path. Pass back as the `path` query parameter to drill into this folder."
+              },
+              "prefix": {
+                "type": "string",
+                "description": "S3/GCS key prefix. Pass back as the `prefix` query parameter to drill into this virtual folder."
+              }
+            },
+            "additionalProperties": true,
+            "description": "Provider-specific metadata. Folder entries expose the navigation key to pass back on the next request."
+          }
+        },
+        "required": [
+          "object",
+          "type",
+          "uri",
+          "name",
+          "mime_type",
+          "size_bytes",
+          "created_at",
+          "metadata"
+        ]
+      },
+      "DataConnectorFileList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type, always 'list'"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataConnectorFile"
+            },
+            "description": "Array of file and folder objects"
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether more results are available"
+          },
+          "next_page_token": {
+            "type": "string",
+            "nullable": true,
+            "description": "Opaque cursor to pass as page_token for the next page. Null when there are no more results."
+          }
+        },
+        "required": ["object", "data", "has_more", "next_page_token"]
       },
       "WebhookList": {
         "type": "object",
@@ -12832,6 +13544,428 @@
           ]
         },
         "description": "The modalities to output in the response. Can be used to return smaller data sets. Comma separated list of strings. Defaults to all modalities available / previously extracted. Accepted values are speech,visual_scene_description,scene_text, audio_description, summary, segment_summary, title"
+      },
+      "CreateDeepSearchRequest": {
+        "type": "object",
+        "required": ["query", "knowledge_base"],
+        "properties": {
+          "knowledge_base": {
+            "description": "Knowledge base configuration. Determines which content to search.\n\nThree source modes are supported:\n- `collections`: Search within specific collections\n- `files`: Search specific files by URL or file ID (uses default index)\n- `default`: Search all default-indexed files for the account",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DeepSearchKBCollections"
+              },
+              {
+                "$ref": "#/components/schemas/DeepSearchKBFiles"
+              },
+              {
+                "$ref": "#/components/schemas/DeepSearchKBDefault"
+              }
+            ]
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The search query."
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["segment", "file"],
+            "default": "segment",
+            "description": "The scope of results to return. 'segment' returns individual segments, 'file' returns file-level results."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 20,
+            "description": "Maximum number of results to return. Actual count may be lower when exclude_weak_results is enabled."
+          },
+          "exclude_weak_results": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, removes results tagged as weak matches by the synthesis LLM."
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["search_queries"]
+            },
+            "description": "Additional fields to include in the response. 'search_queries' includes the intermediate search query plan."
+          },
+          "stream": {
+            "type": "boolean",
+            "default": false,
+            "description": "Stream the response via SSE. Mutually exclusive with background."
+          },
+          "background": {
+            "type": "boolean",
+            "default": false,
+            "description": "Process in the background. Returns immediately with status 'in_progress'. Mutually exclusive with stream."
+          }
+        }
+      },
+      "DeepSearchKBCollections": {
+        "type": "object",
+        "description": "Search within specific collections.",
+        "required": ["source", "collections"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["collections"],
+            "description": "Source mode identifier."
+          },
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "description": "Collection IDs to search. Collections must be of type rich-transcripts or media-descriptions."
+          },
+          "filter": {
+            "description": "Optional filter to narrow down the search within collections.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SearchFilter"
+              }
+            ]
+          }
+        }
+      },
+      "DeepSearchKBFiles": {
+        "type": "object",
+        "description": "Search specific files by URL or file ID. Files must have been described or added to a collection to be searchable.",
+        "required": ["source", "files"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["files"],
+            "description": "Source mode identifier."
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "File references to search. Can be file UUIDs, cloudglue URIs (`cloudglue://files/...`), data connector URLs, or HTTP URLs."
+          }
+        }
+      },
+      "DeepSearchKBDefault": {
+        "type": "object",
+        "description": "Search all default-indexed files for the account. Includes any file that has been described (with `use_in_default_index: true`) or added to a collection.",
+        "required": ["source"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["default"],
+            "description": "Source mode identifier."
+          }
+        }
+      },
+      "DeepSearchResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["segment", "file"],
+            "description": "The type of result"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Result ID"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The file ID this result belongs to"
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The collection ID this result belongs to. Present when using `collections` source; omitted for `files` and `default` sources."
+          },
+          "score": {
+            "type": "number",
+            "description": "Relevance score"
+          },
+          "context": {
+            "type": "string",
+            "description": "LLM-generated context explaining why this result is relevant"
+          },
+          "segment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Segment ID (present when type is 'segment')"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Start time in seconds (present when type is 'segment')"
+          },
+          "end_time": {
+            "type": "number",
+            "description": "End time in seconds (present when type is 'segment')"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true,
+            "description": "Segment title"
+          },
+          "filename": {
+            "type": "string",
+            "nullable": true,
+            "description": "Original filename"
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL to a thumbnail image"
+          },
+          "metadata": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional metadata"
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true,
+            "description": "File summary (present when type is 'file')"
+          },
+          "generated_title": {
+            "type": "string",
+            "nullable": true,
+            "description": "Generated title (present when type is 'file')"
+          }
+        }
+      },
+      "DeepSearchUsage": {
+        "type": "object",
+        "properties": {
+          "input_tokens": {
+            "type": "integer",
+            "description": "Number of input tokens used"
+          },
+          "output_tokens": {
+            "type": "integer",
+            "description": "Number of output tokens used"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "description": "Total number of tokens used"
+          },
+          "search_calls": {
+            "type": "integer",
+            "description": "Number of search calls made"
+          }
+        }
+      },
+      "DeepSearchSearchQueryPlan": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The search query"
+          },
+          "search_modalities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Modalities used for this search"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Search scope"
+          },
+          "filter": {
+            "type": "object",
+            "nullable": true,
+            "description": "Optional filter applied"
+          },
+          "result_count": {
+            "type": "integer",
+            "description": "Number of results returned for this query"
+          }
+        }
+      },
+      "DeepSearch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Deep search ID"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["deep_search"],
+            "description": "Object type identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["in_progress", "completed", "failed", "cancelled"],
+            "description": "Current status of the deep search"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp of when the deep search was created"
+          },
+          "query": {
+            "type": "string",
+            "description": "The original search query"
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["segment", "file"],
+            "description": "The scope of the search results"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true,
+            "description": "LLM-generated synthesis text summarizing the results"
+          },
+          "results": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DeepSearchResult"
+            },
+            "description": "Array of search results"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of results"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of results requested"
+          },
+          "search_queries": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DeepSearchSearchQueryPlan"
+            },
+            "description": "Intermediate search query plans (included when requested via include=['search_queries'])"
+          },
+          "usage": {
+            "nullable": true,
+            "$ref": "#/components/schemas/DeepSearchUsage",
+            "description": "Token and search call usage"
+          },
+          "error": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              }
+            },
+            "description": "Error details if the deep search failed"
+          }
+        }
+      },
+      "DeepSearchListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Deep search ID"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["deep_search"],
+            "description": "Object type identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["in_progress", "completed", "failed", "cancelled"],
+            "description": "Current status"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp of creation"
+          },
+          "query": {
+            "type": "string",
+            "description": "The original search query"
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["segment", "file"],
+            "description": "Search scope"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of results"
+          },
+          "usage": {
+            "nullable": true,
+            "$ref": "#/components/schemas/DeepSearchUsage",
+            "description": "Token and search call usage"
+          }
+        }
+      },
+      "DeepSearchList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type identifier"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeepSearchListItem"
+            },
+            "description": "Array of deep search items"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of deep searches"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of items returned"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of items skipped"
+          }
+        }
+      },
+      "DeleteDeepSearchResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the deleted deep search"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["deep_search"],
+            "description": "Object type identifier"
+          },
+          "deleted": {
+            "type": "boolean",
+            "enum": [true],
+            "description": "Indicates successful deletion"
+          }
+        }
       }
     },
     "securitySchemes": {
