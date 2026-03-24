@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.6.7"
+    "version": "0.6.8"
   },
   "servers": [
     {
@@ -3875,11 +3875,18 @@
           {
             "name": "response_format",
             "in": "query",
-            "description": "Format for the response",
+            "description": "Format for the response. Use speech_srt or speech_vtt for subtitle formats, speech_markdown for a diarized transcript, or speech_text for plain timestamped text.",
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["json", "markdown"]
+              "enum": [
+                "json",
+                "markdown",
+                "speech_srt",
+                "speech_vtt",
+                "speech_markdown",
+                "speech_text"
+              ]
             }
           },
           {
