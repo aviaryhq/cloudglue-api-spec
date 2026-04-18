@@ -4239,6 +4239,33 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "title_search",
+            "in": "query",
+            "description": "Title search filter. Applies to Grain connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "team",
+            "in": "query",
+            "description": "Team filter. Applies to Grain connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "meeting_type",
+            "in": "query",
+            "description": "Meeting type filter. Applies to Grain connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -8284,7 +8311,8 @@
               "zoom",
               "gong",
               "recall",
-              "gcs"
+              "gcs",
+              "grain"
             ],
             "description": "Source of the file"
           }
@@ -10426,7 +10454,8 @@
               "zoom",
               "gong",
               "recall",
-              "gcs"
+              "gcs",
+              "grain"
             ],
             "description": "The type of data connector"
           },
