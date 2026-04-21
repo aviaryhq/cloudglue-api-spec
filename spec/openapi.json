@@ -4243,7 +4243,7 @@
           {
             "name": "title_search",
             "in": "query",
-            "description": "Title search filter. Applies to Grain connectors only.",
+            "description": "Title search filter. Applies to Grain connectors only. See the [Grain documentation](https://developers.grain.com/#recording-filter) for more details.",
             "required": false,
             "schema": {
               "type": "string"
@@ -4252,7 +4252,7 @@
           {
             "name": "team",
             "in": "query",
-            "description": "Team filter. Applies to Grain connectors only.",
+            "description": "Team filter. Applies to Grain connectors only. See the [Grain documentation](https://developers.grain.com/#recording-filter) for more details.",
             "required": false,
             "schema": {
               "type": "string"
@@ -4261,7 +4261,7 @@
           {
             "name": "meeting_type",
             "in": "query",
-            "description": "Meeting type filter. Applies to Grain connectors only.",
+            "description": "Meeting type filter. Applies to Grain connectors only. See the [Grain documentation](https://developers.grain.com/#recording-filter) for more details.",
             "required": false,
             "schema": {
               "type": "string"
