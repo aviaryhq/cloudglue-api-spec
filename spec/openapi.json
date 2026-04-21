@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.6.8"
+    "version": "0.6.9"
   },
   "servers": [
     {
@@ -4187,7 +4187,7 @@
           {
             "name": "from",
             "in": "query",
-            "description": "Start date for filtering (YYYY-MM-DD). Applies to Zoom connectors only.",
+            "description": "Start date for filtering (YYYY-MM-DD). Applies to Zoom and Grain connectors only.",
             "required": false,
             "schema": {
               "type": "string",
@@ -4197,7 +4197,7 @@
           {
             "name": "to",
             "in": "query",
-            "description": "End date for filtering (YYYY-MM-DD). Applies to Zoom connectors only.",
+            "description": "End date for filtering (YYYY-MM-DD). Applies to Zoom and Grain connectors only.",
             "required": false,
             "schema": {
               "type": "string",
@@ -4235,6 +4235,33 @@
             "name": "prefix",
             "in": "query",
             "description": "Key prefix filter. Applies to S3 and GCS connectors only.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "title_search",
+            "in": "query",
+            "description": "Title search filter. Applies to Grain connectors only. See the [Grain documentation](https://developers.grain.com/#recording-filter) for more details.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "team",
+            "in": "query",
+            "description": "Team filter. Applies to Grain connectors only. See the [Grain documentation](https://developers.grain.com/#recording-filter) for more details.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "meeting_type",
+            "in": "query",
+            "description": "Meeting type filter. Applies to Grain connectors only. See the [Grain documentation](https://developers.grain.com/#recording-filter) for more details.",
             "required": false,
             "schema": {
               "type": "string"
@@ -8284,7 +8311,8 @@
               "zoom",
               "gong",
               "recall",
-              "gcs"
+              "gcs",
+              "grain"
             ],
             "description": "Source of the file"
           }
@@ -10426,7 +10454,8 @@
               "zoom",
               "gong",
               "recall",
-              "gcs"
+              "gcs",
+              "grain"
             ],
             "description": "The type of data connector"
           },
