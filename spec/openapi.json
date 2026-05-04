@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.0"
+    "version": "0.7.1"
   },
   "servers": [
     {
@@ -8129,7 +8129,7 @@
             "type": "object",
             "properties": {
               "url": {
-                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public TikTok video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information.",
+                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public TikTok video URLs, public Loom share URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information.",
                 "type": "string"
               },
               "prompt": {
@@ -8312,7 +8312,9 @@
               "gong",
               "recall",
               "gcs",
-              "grain"
+              "tiktok",
+              "grain",
+              "loom"
             ],
             "description": "Source of the file"
           }
@@ -8807,7 +8809,7 @@
                 "properties": {
                   "url": {
                     "type": "string",
-                    "description": "The URL of the video to add to the collection. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public TikTok video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information."
+                    "description": "The URL of the video to add to the collection. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public TikTok video URLs, public Loom share URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information."
                   }
                 },
                 "required": ["url"]
@@ -9615,7 +9617,7 @@
             "required": ["url"],
             "properties": {
               "url": {
-                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public TikTok video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information.",
+                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public TikTok video URLs, public Loom share URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information.",
                 "type": "string"
               },
               "enable_summary": {
@@ -9929,7 +9931,7 @@
             "required": ["url"],
             "properties": {
               "url": {
-                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public TikTok video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information.",
+                "description": "Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public TikTok video URLs, public Loom share URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.\n\nNote that YouTube videos are currently limited to speech level understanding only. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information.",
                 "type": "string"
               },
               "enable_summary": {
@@ -12347,7 +12349,7 @@
         "properties": {
           "url": {
             "type": "string",
-            "description": "Input video or audio file URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public HTTP URLs, YouTube URLs (narrative criteria only), public TikTok video URLs, and files which have been granted access to Cloudglue via data connectors.\n\n**\u26a0\ufe0f Important: YouTube URLs and audio files are ONLY supported for narrative-based segmentation.** Shot-based segmentation requires direct video file access and does not support YouTube URLs or audio files. For YouTube URLs and audio files with narrative segmentation, only the 'balanced' and 'transcript' strategies are accepted; the 'comprehensive' strategy will be rejected with an error. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information."
+            "description": "Input video or audio file URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public HTTP URLs, YouTube URLs (narrative criteria only), public TikTok video URLs, public Loom share URLs, and files which have been granted access to Cloudglue via data connectors.\n\n**\u26a0\ufe0f Important: YouTube URLs and audio files are ONLY supported for narrative-based segmentation.** Shot-based segmentation requires direct video file access and does not support YouTube URLs or audio files. For YouTube URLs and audio files with narrative segmentation, only the 'balanced' and 'transcript' strategies are accepted; the 'comprehensive' strategy will be rejected with an error. Public TikTok video URLs will be scraped and stored automatically — subject to charges. For files via our Data connectors, see our documentation on data connectors for setup information."
           },
           "criteria": {
             "type": "string",
