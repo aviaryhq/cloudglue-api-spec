@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.12"
+    "version": "0.7.15"
   },
   "servers": [
     {
@@ -1086,7 +1086,7 @@
         "tags": ["Files"],
         "summary": "Refresh a file's connector source metadata",
         "operationId": "syncFileSourceMetadata",
-        "description": "Re-fetches the file's source_metadata live from its data connector (google-drive, dropbox, zoom, gong, recall, grain, or iconik) and updates the stored value. If the file belongs to any metadata collections, their search documents are re-indexed with the refreshed metadata. Works for both metadata-only files and fully ingested connector files. Free — no media is downloaded or processed.",
+        "description": "Re-fetches the file's source_metadata live from its data connector (google-drive, dropbox, zoom, gong, recall, grain, or iconik) and updates the stored value. If the file belongs to any metadata collections, their search documents are re-indexed with the refreshed metadata. For iconik files without a thumbnail, the asset's poster keyframe is also copied and set as the file's thumbnail_url. Works for both metadata-only files and fully ingested connector files. Free — no media is downloaded or processed.",
         "parameters": [
           {
             "name": "file_id",
@@ -7724,6 +7724,353 @@
           }
         }
       }
+    },
+    "/query": {
+      "post": {
+        "tags": ["Query"],
+        "summary": "Run a structured query",
+        "operationId": "runQuery",
+        "description": "Run a synchronous read-only SQL query over the structured data extracted from one or more collections. Queries execute against three virtual tables — files, entities, and segment_entities — built from each file's most recent completed extraction.\n\nEach query costs 2 credits. Results are returned inline and stored, so completed runs can be re-fetched via GET /query/{id}. Use GET /query/schema to discover the queryable tables and per-collection fields.",
+        "requestBody": {
+          "description": "Query execution parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunQueryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Query executed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters or rejected SQL (multiple statements, a non-SELECT statement, SQL that could not be parsed, or a face-analysis collection in scope)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient credit balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "One or more collections not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Query exceeded the execution time limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The selected collections exceed the maximum queryable dataset size",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many concurrent queries, or the per-minute rate limit was exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "A natural-language query could not be compiled into valid SQL — refine the question or send sql directly",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Query"],
+        "summary": "List query results",
+        "operationId": "listQueries",
+        "description": "List all query runs with pagination and filtering options. List items omit the columns and rows payloads — fetch an individual run via GET /query/{id} for the full result.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of query results to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of query results to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by query status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["completed", "failed", "in_progress", "cancelled"]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Filter query results created before a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter query results created after a specific date (YYYY-MM-DD format), in UTC timezone",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of query results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query/schema": {
+      "get": {
+        "tags": ["Query"],
+        "summary": "Get the query schema",
+        "operationId": "getQuerySchema",
+        "description": "Introspect the virtual tables and per-collection extracted fields available to SQL queries over the given collections. Use this to discover column names, entity field names, types, and levels, plus each collection's verbatim extract schema and prompt, before writing a query.\n\nFields with level 'file' appear as rows in the entities table; fields with level 'segment' live inside the segment_entities.entities JSON column.",
+        "parameters": [
+          {
+            "name": "collections",
+            "in": "query",
+            "description": "Comma-separated list of collection IDs (1-20) to introspect",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The queryable schema for the given collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuerySchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "One or more collections not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query/{id}": {
+      "get": {
+        "tags": ["Query"],
+        "summary": "Get a query result by ID",
+        "operationId": "getQuery",
+        "description": "Retrieve a stored query run by its ID, including its result rows. Results larger than the inline storage cap are replayed truncated (truncated: true).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the query result to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Query result details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Query result not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query/{id}/cancel": {
+      "post": {
+        "tags": ["Query"],
+        "summary": "Cancel a background export",
+        "operationId": "cancelQueryExport",
+        "description": "Cancel an in-progress background export. The run is marked cancelled synchronously, the export stream is aborted mid-flight (the partial upload is discarded), and the reserved credits are refunded. A run that has already completed or failed is returned unchanged.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the query export to cancel",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The query result, with status 'cancelled' when the cancel took effect (or the run's real status if it had already finished)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Query result not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -8003,9 +8350,13 @@
             "type": "array",
             "nullable": true,
             "items": {
-              "$ref": "#/components/schemas/ResponseOutputMessage"
+              "oneOf": [
+                { "$ref": "#/components/schemas/ResponseOutputMessage" },
+                { "$ref": "#/components/schemas/ResponseFunctionCall" },
+                { "$ref": "#/components/schemas/ResponseQueryCall" }
+              ]
             },
-            "description": "The generated output messages"
+            "description": "The generated output items: assistant message(s), any echoed function_call items, and one cloudglue_query_call per read-only SQL query the agent ran over structured data. Clients should tolerate unknown output-item types."
           },
           "usage": {
             "$ref": "#/components/schemas/ResponseUsage",
@@ -8036,6 +8387,75 @@
               "$ref": "#/components/schemas/ResponseOutputContent"
             },
             "description": "The content items in the output"
+          }
+        }
+      },
+      "ResponseFunctionCall": {
+        "type": "object",
+        "description": "A function/tool call the model emitted (echoed back in output for client-executed tools).",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["function_call"],
+            "description": "The type of output item"
+          },
+          "id": {
+            "type": "string",
+            "description": "Identifier for this output item"
+          },
+          "call_id": {
+            "type": "string",
+            "description": "Correlates the call with its function_call_output"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the called function"
+          },
+          "arguments": {
+            "type": "string",
+            "description": "JSON-encoded arguments to the function"
+          }
+        }
+      },
+      "ResponseQueryCall": {
+        "type": "object",
+        "description": "A read-only SQL query the nimbus-002 agent ran over the structured (extracted) data. Result rows are not included in v1.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["cloudglue_query_call"],
+            "description": "The type of output item"
+          },
+          "id": {
+            "type": "string",
+            "description": "Identifier for this query call (query_<toolCallId>)"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed", "failed"],
+            "description": "Whether the query executed successfully"
+          },
+          "sql": {
+            "type": "string",
+            "description": "The SQL SELECT that was executed"
+          },
+          "row_count": {
+            "type": "integer",
+            "description": "Rows returned to the model after truncation"
+          },
+          "total_rows": {
+            "type": "integer",
+            "nullable": true,
+            "description": "True total when the engine saw the whole result; null when truncated"
+          },
+          "truncated": {
+            "type": "boolean",
+            "description": "Whether the result was truncated (row or byte cap) before reaching the model"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true,
+            "description": "Error message when status is failed; null otherwise"
           }
         }
       },
@@ -11123,6 +11543,11 @@
             "type": "integer",
             "nullable": true,
             "description": "Creation timestamp in milliseconds since epoch, if available"
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Ephemeral preview image for the file — a signed provider URL that expires within hours. Display-only: never store it. Currently populated for iconik (the asset's poster keyframe, honoring a custom keyframe when one is set); null or absent for other connectors."
           },
           "metadata": {
             "type": "object",
@@ -15547,6 +15972,390 @@
           }
         },
         "required": ["source_type", "iconik_asset_id"]
+      },
+      "RunQueryRequest": {
+        "type": "object",
+        "required": ["collections"],
+        "properties": {
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "maxItems": 20,
+            "description": "Collection IDs to query over. All collections must belong to your account; face-analysis collections are not supported."
+          },
+          "sql": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000,
+            "description": "A single read-only SQL SELECT statement over the virtual tables (files, entities, segment_entities). Exactly one of sql or query must be provided."
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "A natural-language question to run instead of sql. Cloudglue compiles it to SQL against the same virtual schema, runs it, and returns the compiled statement in the response's sql field. Exactly one of sql or query must be provided. Costs 4 credits (refunded if compilation fails); returns 422 if it cannot be compiled."
+          },
+          "format": {
+            "type": "string",
+            "enum": ["json", "csv", "jsonl"],
+            "default": "json",
+            "description": "Result format. 'json' returns rows inline (synchronous). 'csv' and 'jsonl' are for background exports only and require background: true."
+          },
+          "max_rows": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "default": 1000,
+            "description": "Maximum number of result rows to return inline. Results with more rows are truncated (truncated: true). Does not apply to background exports, which stream the full result."
+          },
+          "background": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, run the query as a background export: the full result streams to a gzipped csv/jsonl file and the response returns immediately with status 'in_progress' and an id to poll. Requires format 'csv' or 'jsonl'. Reserves 4 credits, reconciled to +1 per 100MB of compressed output. Cannot be combined with dry_run."
+          },
+          "dry_run": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, validate (and, for a natural-language query, compile) the statement and return the effective SQL plus its output column schema without executing it over any data. No rows are produced and it is billed at a reduced rate. Cannot be combined with background."
+          }
+        }
+      },
+      "QueryUsage": {
+        "type": "object",
+        "properties": {
+          "files_scanned": {
+            "type": "integer",
+            "description": "Number of files loaded into the files virtual table"
+          },
+          "entity_rows": {
+            "type": "integer",
+            "description": "Number of rows loaded into the entities virtual table"
+          },
+          "segment_entity_rows": {
+            "type": "integer",
+            "description": "Number of rows loaded into the segment_entities virtual table"
+          },
+          "engine_ms": {
+            "type": "number",
+            "description": "SQL execution time in milliseconds"
+          },
+          "total_ms": {
+            "type": "number",
+            "description": "Total processing time in milliseconds, including dataset preparation"
+          }
+        }
+      },
+      "QueryResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Query result ID"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["query_result"],
+            "description": "Object type identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed", "failed", "in_progress", "cancelled"],
+            "description": "Current status of the query. Synchronous queries return 'completed' or 'failed'."
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp of when the query was created"
+          },
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Collection IDs the query ran over"
+          },
+          "sql": {
+            "type": "string",
+            "nullable": true,
+            "description": "The effective SQL that was executed (echoes the request's sql)"
+          },
+          "columns": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Column name"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "SQL type of the column"
+                }
+              }
+            },
+            "description": "Result columns in select order"
+          },
+          "rows": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "Result rows as objects keyed by column name"
+          },
+          "row_count": {
+            "type": "integer",
+            "description": "Number of rows returned"
+          },
+          "truncated": {
+            "type": "boolean",
+            "description": "Whether the result was truncated by max_rows or the stored-result size cap"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "description": "True when the query was only validated/compiled (dry_run request): columns holds the output schema and rows is null."
+          },
+          "usage": {
+            "nullable": true,
+            "$ref": "#/components/schemas/QueryUsage",
+            "description": "Dataset and timing usage for the run"
+          },
+          "error": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "description": "Error details if the query failed"
+          },
+          "format": {
+            "type": "string",
+            "nullable": true,
+            "enum": ["json", "csv", "jsonl"],
+            "description": "The result format ('csv'/'jsonl' for background exports)"
+          },
+          "download_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Signed URL to download a completed background export. Valid for 24 hours and not refreshed on read (re-run the export if it expires); null for synchronous runs and until a background export completes"
+          },
+          "download_expires_at": {
+            "type": "number",
+            "nullable": true,
+            "description": "Unix timestamp (ms) when download_url expires"
+          },
+          "output_bytes": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Compressed size of a completed background export, in bytes"
+          }
+        }
+      },
+      "QueryListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Query result ID"
+          },
+          "object": {
+            "type": "string",
+            "enum": ["query_result"],
+            "description": "Object type identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed", "failed", "in_progress", "cancelled"],
+            "description": "Current status"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp of creation"
+          },
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Collection IDs the query ran over"
+          },
+          "sql": {
+            "type": "string",
+            "nullable": true,
+            "description": "The effective SQL that was executed"
+          },
+          "row_count": {
+            "type": "integer",
+            "description": "Number of rows returned"
+          },
+          "truncated": {
+            "type": "boolean",
+            "description": "Whether the result was truncated"
+          },
+          "usage": {
+            "nullable": true,
+            "$ref": "#/components/schemas/QueryUsage",
+            "description": "Dataset and timing usage for the run"
+          },
+          "error": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "description": "Error details if the query failed"
+          }
+        }
+      },
+      "QueryListResponse": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"],
+            "description": "Object type identifier"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryListItem"
+            },
+            "description": "Array of query result items (without columns or rows)"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of query results"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of items returned"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of items skipped"
+          }
+        }
+      },
+      "QuerySchemaTable": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Virtual table name (files, entities, or segment_entities)"
+          },
+          "description": {
+            "type": "string",
+            "description": "What the table contains and how to join it"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Column name"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "SQL column type"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "What the column contains"
+                }
+              }
+            },
+            "description": "Columns of the virtual table"
+          }
+        }
+      },
+      "QuerySchemaCollection": {
+        "type": "object",
+        "properties": {
+          "collection_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Collection ID"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Entity field name from the collection's extract schema"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Field value type from the extract schema (e.g. string, list)"
+                },
+                "level": {
+                  "type": "string",
+                  "enum": ["file", "segment"],
+                  "description": "Where the field lives: 'file' fields appear as rows in the entities table; 'segment' fields live inside the segment_entities.entities JSON column"
+                }
+              }
+            },
+            "description": "Flat summary of the collection's extracted fields"
+          },
+          "extract_schema": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "The collection's extract schema verbatim, showing nested value shapes. Null for collections without one (e.g. metadata collections, which are queried via the files table's metadata and source_metadata JSON columns)."
+          },
+          "prompt": {
+            "type": "string",
+            "nullable": true,
+            "description": "The collection's extraction prompt verbatim, if one was configured"
+          }
+        }
+      },
+      "QuerySchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["query_schema"],
+            "description": "Object type identifier"
+          },
+          "tables": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuerySchemaTable"
+            },
+            "description": "The virtual tables available to SQL queries"
+          },
+          "collections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuerySchemaCollection"
+            },
+            "description": "Per-collection extracted field summaries and extract configs"
+          }
+        }
       }
     },
     "securitySchemes": {
