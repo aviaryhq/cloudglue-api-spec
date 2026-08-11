@@ -7513,7 +7513,7 @@
         "tags": ["Share"],
         "summary": "Get a shareable asset",
         "operationId": "getShareableAsset",
-        "description": "Get a shareable asset",
+        "description": "Get a shareable asset. Optionally pass an instant-clip window (clip_start/clip_end) to receive a stream_url that plays only that window.",
         "parameters": [
           {
             "name": "id",
@@ -7523,6 +7523,27 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "clip_start",
+            "in": "query",
+            "required": false,
+            "description": "Instant-clip window start in seconds. Must be provided together with clip_end. When set, the returned stream_url plays only the [clip_start, clip_end] window — the share itself is untouched, and reads without the params keep returning the full-asset stream.",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "clip_end",
+            "in": "query",
+            "required": false,
+            "description": "Instant-clip window end in seconds; must be greater than clip_start. Must be provided together with clip_start.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "exclusiveMinimum": true
             }
           }
         ],
@@ -14537,7 +14558,7 @@
           },
           "stream_url": {
             "type": "string",
-            "description": "The HLS stream url of the shareable asset. Available when the stream has finished processing. For private assets this is a signed, token-gated url that should be treated as short-lived."
+            "description": "The HLS stream url of the shareable asset. Available when the stream has finished processing. For private assets this is a signed, token-gated url that should be treated as short-lived. When the asset was fetched with a clip window (clip_start/clip_end on GET /share/{id}), the stream plays only that window."
           },
           "status": {
             "type": "string",
