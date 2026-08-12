@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.15"
+    "version": "0.7.16"
   },
   "servers": [
     {
@@ -7513,7 +7513,7 @@
         "tags": ["Share"],
         "summary": "Get a shareable asset",
         "operationId": "getShareableAsset",
-        "description": "Get a shareable asset",
+        "description": "Get a shareable asset. Optionally pass an instant-clip window (clip_start/clip_end) to receive a stream_url that plays only that window.",
         "parameters": [
           {
             "name": "id",
@@ -7523,6 +7523,27 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "clip_start",
+            "in": "query",
+            "required": false,
+            "description": "Instant-clip window start in seconds. Must be provided together with clip_end. When set, the returned stream_url plays only the [clip_start, clip_end] window — the share itself is untouched, and reads without the params keep returning the full-asset stream.",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "clip_end",
+            "in": "query",
+            "required": false,
+            "description": "Instant-clip window end in seconds; must be greater than clip_start. Must be provided together with clip_start.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "exclusiveMinimum": true
             }
           }
         ],
@@ -8083,7 +8104,7 @@
             "type": "string",
             "minLength": 1,
             "example": "nimbus-001",
-            "description": "The model to use for generating the response.\n\n- `nimbus-001`: Fast general question answering model. Requires `knowledge_base`. Default temperature: 0.7.\n- `nimbus-002-preview`: Light reasoning model capable of multi-step reasoning, cross-video synthesis, and structured entity data. Requires `knowledge_base`. Supports `entity_collections` in the knowledge base. Default temperature: 1.\n\nMetadata collections (`collection_type: 'metadata'`) in the knowledge base are only supported by `nimbus-002-preview` — its agent retrieves them at file granularity; `nimbus-001` rejects them (400)."
+            "description": "The model to use for generating the response.\n\n- `nimbus-001`: Fast general question answering model. Requires `knowledge_base`. Default temperature: 0.7.\n- `nimbus-002-preview`: Light reasoning model capable of multi-step reasoning, cross-video synthesis, and structured entity data. Requires `knowledge_base`. Supports `entity_collections` in the knowledge base. Default temperature: 1.\n\nMetadata collections (`collection_type: 'metadata'`) and entities collections (`collection_type: 'entities'`) in the knowledge base are only supported by `nimbus-002-preview` — its agent picks the retrieval scope per search call (metadata docs and file-level entity docs at file granularity, segment-level entity docs at segment granularity); `nimbus-001` rejects both (400)."
           },
           "input": {
             "oneOf": [
@@ -8228,7 +8249,7 @@
               "format": "uuid"
             },
             "minItems": 1,
-            "description": "Collection IDs to search for relevant context"
+            "description": "Collection IDs to search for relevant context. Collections must be of type 'rich-transcripts', 'media-descriptions', 'metadata', or 'entities'. Metadata and entities collections require the `nimbus-002-preview` model (its agent picks the retrieval scope per search call); `nimbus-001` rejects them (400). Entities collections are valid at both extraction levels: file-level extraction (enable_video_level_entities or enable_metadata_mode) is retrieved as file-level entity docs, segment-level extraction as per-segment entity docs with real timestamps."
           },
           "filter": {
             "description": "Optional filter to narrow down the search within collections.\n\nSupports filtering by `metadata`, `video_info`, and `file` properties. Each filter is an array of criteria with `path`, `operator`, and `valueText` or `valueTextArray`.\n\nSupported operators: `Equal`, `NotEqual`, `LessThan`, `GreaterThan`, `In`, `ContainsAny`, `ContainsAll`.\n\nExamples:\n- Filter by file ID: `{\"file\": [{\"path\": \"id\", \"operator\": \"Equal\", \"valueText\": \"file-uuid\"}]}`\n- Filter by metadata: `{\"metadata\": [{\"path\": \"speaker\", \"operator\": \"Equal\", \"valueText\": \"Amy\"}]}`\n- Filter by duration: `{\"video_info\": [{\"path\": \"duration_seconds\", \"operator\": \"GreaterThan\", \"valueText\": \"60\"}]}`",
@@ -9793,6 +9814,11 @@
               "not_applicable"
             ],
             "description": "Overall processing status of the file in this collection"
+          },
+          "searchable_status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"],
+            "description": "Indexing status of the file's search documents in this collection. Only present for media-descriptions, rich-transcripts, metadata, and entities collections. For entities collections it tracks entity indexing: file-level collections index one document per file, segment-level collections one per segment."
           },
           "file": {
             "$ref": "#/components/schemas/File",
@@ -12622,7 +12648,7 @@
               "format": "uuid"
             },
             "minItems": 1,
-            "description": "List of collection IDs to search within. \n\nFor text search (scope='file' or 'segment'): All collections must be of collection_type 'media-descriptions' or 'rich-transcripts'. For file-level search, collections must have 'enable_summary: true' in transcribe_config.\n\nFor face search (scope='face'): All collections must be of collection_type 'face-analysis'."
+            "description": "List of collection IDs to search within. \n\nFor text search (scope='file' or 'segment'): All collections must be of collection_type 'media-descriptions', 'rich-transcripts', 'metadata', or 'entities'. For file-level search, 'media-descriptions' and 'rich-transcripts' collections must have 'enable_summary: true' in their config. 'metadata' collections only support scope='file'. 'entities' collections are searchable at the scope matching their extraction level: file-level extraction (enable_video_level_entities or enable_metadata_mode) supports scope='file' only, segment-level extraction (enable_segment_level_entities) supports scope='segment' only.\n\nFor face search (scope='face'): All collections must be of collection_type 'face-analysis'."
           },
           "query": {
             "type": "string",
@@ -14002,7 +14028,7 @@
           ]
         },
         "maxItems": 5,
-        "description": "Specifies the type(s) of search to execute. When multiple modalities are specified, a hybrid search is executed that combines results from each modality.\n\nAvailable modalities:\n- `general_content`: baseline for matching the content of the search item (file/segment) based on visual or spoken content similarity to provided short natural language query string\n- `speech_lexical`: performs keyword based search (e.g. query of `president` matching `president` or `presidential` strings) and exact match (e.g. specifically find mentions of `\"Barack Obama\"` or `\"Donald Trump\"`) against speech content present in search item\n- `ocr_lexical`: performs keyword based search and exact match against screen text content present in search item\n- `tag_semantic`: performs basic word semantic similarity search against tag values associated with search items (e.g. `query=animal` expected to match tags with value containing `dog` or `cat`)\n- `tag_lexical`: performs keyword based search and exact match against tag values associated with search items\n- `doc_lexical`: performs keyword based search and exact match against file-level documents (metadata-collection docs and generated summaries). Only applicable when search `scope=file`.\n\nOnly applicable when search `scope=file` or `scope=segment`.\n"
+        "description": "Specifies the type(s) of search to execute. When multiple modalities are specified, a hybrid search is executed that combines results from each modality.\n\nAvailable modalities:\n- `general_content`: baseline for matching the content of the search item (file/segment) based on visual or spoken content similarity to provided short natural language query string\n- `speech_lexical`: performs keyword based search (e.g. query of `president` matching `president` or `presidential` strings) and exact match (e.g. specifically find mentions of `\"Barack Obama\"` or `\"Donald Trump\"`) against speech content present in search item\n- `ocr_lexical`: performs keyword based search and exact match against screen text content present in search item\n- `tag_semantic`: performs basic word semantic similarity search against tag values associated with search items (e.g. `query=animal` expected to match tags with value containing `dog` or `cat`)\n- `tag_lexical`: performs keyword based search and exact match against tag values associated with search items\n- `doc_lexical`: performs keyword based search and exact match against file-level documents (generated summaries, metadata-collection docs, and entity-collection docs). Only applicable when search `scope=file`.\n\nOnly applicable when search `scope=file` or `scope=segment`.\n"
       },
       "ThumbnailType": {
         "type": "string",
@@ -14510,8 +14536,8 @@
           },
           "link_preview": {
             "type": "string",
-            "enum": ["none", "full"],
-            "description": "Controls rich link-preview (Open Graph) metadata for unfurl bots on private shares. 'none' (default) emits no preview metadata; 'full' emits title, description, and thumbnail. Public shares always emit full metadata regardless of this value."
+            "enum": ["none", "full", "player"],
+            "description": "Controls rich link-preview (Open Graph) metadata for unfurl bots on private shares. 'none' (default) emits no preview metadata; 'full' emits title, description, and thumbnail; 'player' additionally lets the share play inline when its link is unfurled by the Cloudglue Slack app — anyone who can see the Slack message can play it. Public shares always emit full metadata (and unfurl playable where the Slack app is installed) regardless of this value."
           },
           "preview_url": {
             "type": "string",
@@ -14532,7 +14558,7 @@
           },
           "stream_url": {
             "type": "string",
-            "description": "The HLS stream url of the shareable asset. Available when the stream has finished processing. For private assets this is a signed, token-gated url that should be treated as short-lived."
+            "description": "The HLS stream url of the shareable asset. Available when the stream has finished processing. For private assets this is a signed, token-gated url that should be treated as short-lived. When the asset was fetched with a clip window (clip_start/clip_end on GET /share/{id}), the stream plays only that window."
           },
           "status": {
             "type": "string",
@@ -14589,9 +14615,9 @@
           },
           "link_preview": {
             "type": "string",
-            "enum": ["none", "full"],
+            "enum": ["none", "full", "player"],
             "default": "none",
-            "description": "Rich link-preview metadata for unfurl bots. Only affects private shares: 'none' (default) keeps today's no-preview behavior; 'full' emits title, description, and thumbnail Open Graph tags. Public shares always emit full metadata."
+            "description": "Rich link-preview metadata for unfurl bots. Only affects private shares: 'none' (default) keeps today's no-preview behavior; 'full' emits title, description, and thumbnail Open Graph tags; 'player' additionally lets the share play inline when unfurled by the Cloudglue Slack app — anyone who can see the Slack message can play it. Public shares always emit full metadata."
           }
         }
       },
@@ -14612,8 +14638,8 @@
           },
           "link_preview": {
             "type": "string",
-            "enum": ["none", "full"],
-            "description": "Rich link-preview metadata for unfurl bots. Only affects private shares: 'none' keeps today's no-preview behavior; 'full' emits title, description, and thumbnail Open Graph tags. Public shares always emit full metadata."
+            "enum": ["none", "full", "player"],
+            "description": "Rich link-preview metadata for unfurl bots. Only affects private shares: 'none' keeps today's no-preview behavior; 'full' emits title, description, and thumbnail Open Graph tags; 'player' additionally lets the share play inline when unfurled by the Cloudglue Slack app — anyone who can see the Slack message can play it. Downgrading from 'player' revokes playback in already-posted unfurls. Public shares always emit full metadata."
           }
         }
       },
@@ -14659,8 +14685,7 @@
           "scope": {
             "type": "string",
             "enum": ["segment", "file"],
-            "default": "segment",
-            "description": "The scope of results to return. 'segment' returns individual segments, 'file' returns file-level results. When the knowledge base contains any metadata collections, scope must be 'file' (metadata collections only index file-level documents)."
+            "description": "The scope of results to return. 'segment' returns individual segments, 'file' returns file-level results — explicit values behave exactly as before, and every collection in the knowledge base must be searchable at the requested scope (metadata and file-level entities collections require 'file'; segment-level entities collections require 'segment'). Omit for auto: the search planner picks a scope per search plan, each collection is searched at the scopes its documents support, and results from both scopes are fused — so a knowledge base can mix collection types (e.g. rich-transcripts + metadata + entities) without a scope."
           },
           "limit": {
             "type": "integer",
@@ -14711,7 +14736,7 @@
               "format": "uuid"
             },
             "minItems": 1,
-            "description": "Collection IDs to search. Collections must be of type rich-transcripts or media-descriptions."
+            "description": "Collection IDs to search. Collections must be of type rich-transcripts, media-descriptions, metadata, or entities. With an explicit scope, every collection must be searchable at it: metadata collections only have file-level docs and require scope='file'; entities collections follow their extraction level — file-level extraction (enable_video_level_entities or enable_metadata_mode) requires scope='file', segment-level extraction (enable_segment_level_entities) requires scope='segment'. When scope is omitted (auto), collection types can be mixed freely: each collection is searched at the scopes its documents support."
           },
           "filter": {
             "description": "Optional filter to narrow down the search within collections.",
@@ -14910,7 +14935,8 @@
           "scope": {
             "type": "string",
             "enum": ["segment", "file"],
-            "description": "The scope of the search results"
+            "nullable": true,
+            "description": "The scope the caller requested. Null when the request omitted scope (auto: the planner chose scopes per search plan, so results may mix segment and file types)."
           },
           "text": {
             "type": "string",
@@ -14993,7 +15019,8 @@
           "scope": {
             "type": "string",
             "enum": ["segment", "file"],
-            "description": "Search scope"
+            "nullable": true,
+            "description": "The scope the caller requested; null when the request omitted scope (auto)"
           },
           "total": {
             "type": "integer",
