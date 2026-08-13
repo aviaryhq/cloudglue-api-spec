@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.16"
+    "version": "0.7.17"
   },
   "servers": [
     {
@@ -7746,6 +7746,446 @@
         }
       }
     },
+    "/collections/{collection_id}/imports": {
+      "post": {
+        "tags": ["Metadata Imports"],
+        "summary": "Create a metadata import",
+        "operationId": "createMetadataImport",
+        "description": "Create a bulk metadata import for a metadata collection: a saved definition that lists a data connector's source files and imports each one's source metadata as a collection file, with no media download or processing. Runs consume no credits. By default the first run starts immediately (`start: false` saves the definition only). The response's `latest_run` is the triggered run; it is null when `start` is false or when another import's run currently holds the one-active-run-per-collection slot (the definition is saved and can be run once that finishes), and it is returned with status `failed` when the run could not be enqueued (trigger a new run to retry). Runs page the connector with the account's default active API key and fail with a clear error when the account has none.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata collection",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMetadataImportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created import, with `latest_run` reflecting the immediately-triggered first run when applicable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataImport"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — the collection is not a metadata collection, the connector does not exist, the connector type does not support metadata imports, or a filter key is not supported by the connector type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Metadata Imports"],
+        "summary": "List metadata imports",
+        "operationId": "listMetadataImports",
+        "description": "List a collection's metadata imports, newest first, each with its latest run inline.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata collection",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of imports to return (default 50)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Number of imports to skip",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Imports for the collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataImportList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/imports/{import_id}": {
+      "get": {
+        "tags": ["Metadata Imports"],
+        "summary": "Get a metadata import",
+        "operationId": "getMetadataImport",
+        "description": "Get a metadata import definition with one page of its run history (newest first).",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata collection",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "import_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata import",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of runs to return (default 20)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Number of runs to skip",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The import with paged run history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataImportDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or import not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Metadata Imports"],
+        "summary": "Delete a metadata import",
+        "operationId": "deleteMetadataImport",
+        "description": "Delete an import definition and its run history. Any active run is cancelled first. Imported files and collection memberships are never deleted by this operation.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata collection",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "import_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata import",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The import was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataImportDelete"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or import not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/imports/{import_id}/runs": {
+      "post": {
+        "tags": ["Metadata Imports"],
+        "summary": "Run a metadata import",
+        "operationId": "createMetadataImportRun",
+        "description": "Trigger a new run of a saved import. `mode` and `delete_missing` default to the definition's saved values. Only one run may be active per collection at a time — concurrent runs would corrupt each other's delete-missing bookkeeping — so triggering while any run in the collection is active returns a 409.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata collection",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "import_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata import",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMetadataImportRunRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created run",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataImportRun"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection or import not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A run of this import is already active, or another import in this collection has an active run",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The run could not be enqueued and was marked failed — trigger a new run to retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/imports/{import_id}/runs/{run_id}/cancel": {
+      "post": {
+        "tags": ["Metadata Imports"],
+        "summary": "Cancel a metadata import run",
+        "operationId": "cancelMetadataImportRun",
+        "description": "Cancel an in-flight run. Files already imported by the run are kept. Cancelling an already-finished run is a no-op that returns the current state.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata collection",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "import_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the metadata import",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the import run",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The run in its post-cancel state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataImportRun"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection, import, or run not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected error occurred on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/query": {
       "post": {
         "tags": ["Query"],
@@ -8372,9 +8812,15 @@
             "nullable": true,
             "items": {
               "oneOf": [
-                { "$ref": "#/components/schemas/ResponseOutputMessage" },
-                { "$ref": "#/components/schemas/ResponseFunctionCall" },
-                { "$ref": "#/components/schemas/ResponseQueryCall" }
+                {
+                  "$ref": "#/components/schemas/ResponseOutputMessage"
+                },
+                {
+                  "$ref": "#/components/schemas/ResponseFunctionCall"
+                },
+                {
+                  "$ref": "#/components/schemas/ResponseQueryCall"
+                }
               ]
             },
             "description": "The generated output items: assistant message(s), any echoed function_call items, and one cloudglue_query_call per read-only SQL query the agent ran over structured data. Clients should tolerate unknown output-item types."
@@ -16381,6 +16827,416 @@
               "$ref": "#/components/schemas/QuerySchemaCollection"
             },
             "description": "Per-collection extracted field summaries and extract configs"
+          }
+        }
+      },
+      "MetadataImportFilterSet": {
+        "type": "object",
+        "description": "One listing pass over the connector's source — the same query params as GET /data-connectors/{id}/files. Which keys a connector honors is validated at import creation (an unsupported key is rejected with a 400, never silently dropped): google-drive supports from/to/title_search/folder_id; dropbox from/to/title_search/path; zoom and gong from/to/title_search; grain from/to/title_search/team/meeting_type; recall from/to; iconik from/to/title_search. Zoom and Gong listings default to a 6-month lookback when no `from` is given; creation pins that date into the stored filters (six months before the set's `to` when one is given, else before creation time) so every run lists the same stable window — pass an explicit `from` to control the window yourself. iconik returns at most the first 10,000 results per filter set — split larger imports into multiple date-window sets.",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date",
+            "description": "Only include source files from on/after this date (YYYY-MM-DD, UTC)"
+          },
+          "to": {
+            "type": "string",
+            "format": "date",
+            "description": "Only include source files from on/before this date (YYYY-MM-DD, UTC)"
+          },
+          "folder_id": {
+            "type": "string",
+            "description": "Restrict listing to a folder's direct children (Google Drive only). Omit to list the entire corpus."
+          },
+          "path": {
+            "type": "string",
+            "description": "Restrict listing to a folder path (Dropbox only). Dropbox listing is non-recursive: an import ingests only the direct children of this path (or of the root when omitted — typically all folders, i.e. nothing). Use one filter set per folder to cover a tree."
+          },
+          "title_search": {
+            "type": "string",
+            "description": "Only include files whose title matches this search"
+          },
+          "team": {
+            "type": "string",
+            "description": "Restrict to a team (Grain only)"
+          },
+          "meeting_type": {
+            "type": "string",
+            "description": "Restrict to a meeting type (Grain only)"
+          }
+        }
+      },
+      "MetadataImportRunProgress": {
+        "type": "object",
+        "description": "Best-effort progress counters for display. Run completion is decided from the actual per-file indexing state, never from these counters, so they can drift slightly under retries without affecting correctness.",
+        "properties": {
+          "pages_listed": {
+            "type": "integer",
+            "description": "Connector list pages fetched"
+          },
+          "files_listed": {
+            "type": "integer",
+            "description": "Source files seen across all filter sets"
+          },
+          "files_created": {
+            "type": "integer",
+            "description": "New Cloudglue files created"
+          },
+          "files_updated": {
+            "type": "integer",
+            "description": "Existing files re-imported (refresh mode)"
+          },
+          "files_skipped": {
+            "type": "integer",
+            "description": "Already-imported files left untouched (append mode)"
+          },
+          "files_failed": {
+            "type": "integer",
+            "description": "Files whose metadata indexing failed"
+          },
+          "files_queued": {
+            "type": "integer",
+            "description": "Files handed to indexing — the denominator for progress (indexed + failed settle against it)"
+          },
+          "files_indexed": {
+            "type": "integer",
+            "description": "Files whose metadata finished indexing"
+          },
+          "files_removed": {
+            "type": "integer",
+            "description": "Files removed by the delete-missing sweep"
+          }
+        }
+      },
+      "MetadataImportRun": {
+        "type": "object",
+        "description": "One execution of a metadata import.",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["metadata_import_run"]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "import_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["append", "refresh"],
+            "description": "append imports new files and retries previously-failed ones; refresh re-imports everything the filters match"
+          },
+          "delete_missing": {
+            "type": "boolean",
+            "description": "Whether this run sweeps files this import previously brought in that the source no longer returns (refresh runs only)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "progress": {
+            "$ref": "#/components/schemas/MetadataImportRunProgress"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true,
+            "description": "User-facing failure reason when status is failed"
+          },
+          "started_at": {
+            "type": "number",
+            "nullable": true,
+            "description": "Unix timestamp in milliseconds"
+          },
+          "completed_at": {
+            "type": "number",
+            "nullable": true,
+            "description": "Unix timestamp in milliseconds"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds"
+          },
+          "max_files": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The cap this run executed with; null means unbounded"
+          },
+          "include_thumbnails": {
+            "type": "boolean",
+            "description": "Whether this run copied poster thumbnails"
+          }
+        }
+      },
+      "MetadataImport": {
+        "type": "object",
+        "description": "A saved bulk metadata import: which connector to list, how to filter it, and how runs behave. Definitions are immutable — delete and recreate to change one.",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["metadata_import"]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "connector_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetadataImportFilterSet"
+            },
+            "description": "Listing passes; an empty array means one unfiltered pass. Overlapping passes are deduplicated on import."
+          },
+          "default_mode": {
+            "type": "string",
+            "enum": ["append", "refresh"],
+            "description": "Mode used when a run does not specify one"
+          },
+          "delete_missing": {
+            "type": "boolean",
+            "description": "Default delete-missing behavior for refresh runs"
+          },
+          "rate_limit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Upstream list requests per second; null means the per-connector safe default. Clamped to a per-connector ceiling at run time."
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds"
+          },
+          "latest_run": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MetadataImportRun"
+              }
+            ],
+            "nullable": true,
+            "description": "Most recent run, or null when the import has never run"
+          },
+          "max_files": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Per-run ceiling on files processed from the listing; null means unbounded"
+          },
+          "include_thumbnails": {
+            "type": "boolean",
+            "description": "Whether runs copy connector poster images as default thumbnails for imported files (Grain and iconik today)"
+          }
+        }
+      },
+      "MetadataImportDetail": {
+        "type": "object",
+        "description": "A metadata import with one page of its run history (newest first). total_runs/limit/offset make truncation visible.",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["metadata_import"]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "connector_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetadataImportFilterSet"
+            }
+          },
+          "default_mode": {
+            "type": "string",
+            "enum": ["append", "refresh"]
+          },
+          "delete_missing": {
+            "type": "boolean"
+          },
+          "rate_limit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Upstream list requests per second; null means the per-connector safe default. Clamped to a per-connector ceiling at run time."
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds"
+          },
+          "runs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetadataImportRun"
+            },
+            "description": "One page of run history, newest first"
+          },
+          "total_runs": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "max_files": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Per-run ceiling on files processed from the listing; null means unbounded"
+          },
+          "include_thumbnails": {
+            "type": "boolean",
+            "description": "Whether runs copy connector poster images as default thumbnails for imported files (Grain and iconik today)"
+          }
+        }
+      },
+      "MetadataImportList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["list"]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetadataImport"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "MetadataImportDelete": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["metadata_import"]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deleted": {
+            "type": "boolean",
+            "enum": [true]
+          }
+        }
+      },
+      "CreateMetadataImportRequest": {
+        "type": "object",
+        "required": ["name", "connector_id"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "Display name for the import"
+          },
+          "connector_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Data connector to list files from. Supported types: google-drive, dropbox, zoom, gong, recall, grain, iconik."
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetadataImportFilterSet"
+            },
+            "maxItems": 20,
+            "default": [],
+            "description": "Listing passes; empty (the default) means one unfiltered pass"
+          },
+          "default_mode": {
+            "type": "string",
+            "enum": ["append", "refresh"],
+            "default": "append",
+            "description": "Mode used when a run does not specify one. append imports new files and retries previously-failed ones; refresh re-imports everything the filters match."
+          },
+          "delete_missing": {
+            "type": "boolean",
+            "default": false,
+            "description": "On refresh runs, remove files this import previously brought in that the source no longer returns. Only files imported by this import are ever removed — manually-added files and other imports are untouched."
+          },
+          "rate_limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "description": "Upstream list requests per second. Defaults to a per-connector safe rate (e.g. gong 2, zoom 6, google-drive/dropbox 8) and is clamped to a per-connector ceiling (gong 3, iconik 12, zoom/grain/recall 10, google-drive/dropbox 20) sized to keep the whole account inside each provider's published rate budget."
+          },
+          "start": {
+            "type": "boolean",
+            "default": true,
+            "description": "Trigger the first run immediately. false saves the definition only."
+          },
+          "max_files": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000,
+            "description": "Stop each run after processing this many files from the listing. A capped run stops listing at the limit and never runs the delete-missing sweep — a truncated listing is incomplete by definition, so nothing is removed based on it."
+          },
+          "include_thumbnails": {
+            "type": "boolean",
+            "default": false,
+            "description": "Copy connector poster images as default thumbnails for imported files, for sources that provide one (Grain and iconik today). Off by default: iconik posters need one rate-limited API lookup per file, which materially slows large imports."
+          }
+        }
+      },
+      "CreateMetadataImportRunRequest": {
+        "type": "object",
+        "description": "All fields default to the values saved on the import definition.",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": ["append", "refresh"]
+          },
+          "delete_missing": {
+            "type": "boolean"
+          },
+          "max_files": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000,
+            "description": "Override the definition's max_files for this run"
+          },
+          "include_thumbnails": {
+            "type": "boolean",
+            "description": "Override the definition's include_thumbnails for this run"
           }
         }
       }
