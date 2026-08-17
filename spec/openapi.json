@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.17"
+    "version": "0.7.20"
   },
   "servers": [
     {
@@ -4472,6 +4472,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "recursive",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false"]
+            },
+            "description": "Dropbox only: 'true' lists the whole subtree under `path` (or the whole account when no `path` is given) instead of its direct children. Ignored by every other connector. Built for bulk metadata imports; interactive browsing should stay non-recursive."
           },
           {
             "name": "bucket",
@@ -16832,7 +16842,7 @@
       },
       "MetadataImportFilterSet": {
         "type": "object",
-        "description": "One listing pass over the connector's source — the same query params as GET /data-connectors/{id}/files. Which keys a connector honors is validated at import creation (an unsupported key is rejected with a 400, never silently dropped): google-drive supports from/to/title_search/folder_id; dropbox from/to/title_search/path; zoom and gong from/to/title_search; grain from/to/title_search/team/meeting_type; recall from/to; iconik from/to/title_search. Zoom and Gong listings default to a 6-month lookback when no `from` is given; creation pins that date into the stored filters (six months before the set's `to` when one is given, else before creation time) so every run lists the same stable window — pass an explicit `from` to control the window yourself. iconik returns at most the first 10,000 results per filter set — split larger imports into multiple date-window sets.",
+        "description": "One listing pass over the connector's source — the same query params as GET /data-connectors/{id}/files. Which keys a connector honors is validated at import creation (an unsupported key is rejected with a 400, never silently dropped): google-drive supports from/to/title_search/folder_id; dropbox from/to/title_search/path/recursive; zoom and gong from/to/title_search; grain from/to/title_search/team/meeting_type; recall from/to; iconik from/to/title_search. Zoom and Gong listings default to a 6-month lookback when no `from` is given; creation pins that date into the stored filters (six months before the set's `to` when one is given, else before creation time) so every run lists the same stable window — pass an explicit `from` to control the window yourself. iconik listings automatically window by date past iconik's 10,000-result search cap, so a single unfiltered set can cover any source size; only the degenerate case of 10,000+ assets sharing one creation timestamp still requires splitting into multiple date-window sets.",
         "additionalProperties": false,
         "properties": {
           "from": {
@@ -16864,6 +16874,11 @@
           "meeting_type": {
             "type": "string",
             "description": "Restrict to a meeting type (Grain only)"
+          },
+          "recursive": {
+            "type": "string",
+            "enum": ["true", "false"],
+            "description": "Dropbox only: 'true' imports the whole subtree under `path` (or the whole account when no `path` is given) instead of direct children."
           }
         }
       },
@@ -16906,6 +16921,10 @@
           "files_removed": {
             "type": "integer",
             "description": "Files removed by the delete-missing sweep"
+          },
+          "files_enriched": {
+            "type": "integer",
+            "description": "Files whose source_metadata an enrichment batch backfilled (enrich_metadata runs only)."
           }
         }
       },
@@ -16974,6 +16993,10 @@
           "include_thumbnails": {
             "type": "boolean",
             "description": "Whether this run copied poster thumbnails"
+          },
+          "enrich_metadata": {
+            "type": "boolean",
+            "description": "Whether this run backfills omitted source-metadata fields (see the import-level property)."
           }
         }
       },
@@ -17042,6 +17065,10 @@
           "include_thumbnails": {
             "type": "boolean",
             "description": "Whether runs copy connector poster images as default thumbnails for imported files (Grain and iconik today)"
+          },
+          "enrich_metadata": {
+            "type": "boolean",
+            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work."
           }
         }
       },
@@ -17114,6 +17141,10 @@
           "include_thumbnails": {
             "type": "boolean",
             "description": "Whether runs copy connector poster images as default thumbnails for imported files (Grain and iconik today)"
+          },
+          "enrich_metadata": {
+            "type": "boolean",
+            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work."
           }
         }
       },
@@ -17213,7 +17244,12 @@
           "include_thumbnails": {
             "type": "boolean",
             "default": false,
-            "description": "Copy connector poster images as default thumbnails for imported files, for sources that provide one (Grain and iconik today). Off by default: iconik posters need one rate-limited API lookup per file, which materially slows large imports."
+            "description": "Copy connector poster images as default thumbnails for imported files, for sources that provide one (Grain, iconik, Google Drive, and Dropbox today). Off by default. Poster copying runs asynchronously behind indexing at a provider-safe pace, so it does not slow the import itself."
+          },
+          "enrich_metadata": {
+            "type": "boolean",
+            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work.",
+            "default": false
           }
         }
       },
@@ -17237,6 +17273,10 @@
           "include_thumbnails": {
             "type": "boolean",
             "description": "Override the definition's include_thumbnails for this run"
+          },
+          "enrich_metadata": {
+            "type": "boolean",
+            "description": "Override the definition default for this run."
           }
         }
       }
