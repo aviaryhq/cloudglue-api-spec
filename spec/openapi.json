@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.20"
+    "version": "0.7.21"
   },
   "servers": [
     {
@@ -7758,10 +7758,10 @@
     },
     "/collections/{collection_id}/imports": {
       "post": {
-        "tags": ["Metadata Imports"],
-        "summary": "Create a metadata import",
+        "tags": ["Bulk Imports"],
+        "summary": "Create a bulk import",
         "operationId": "createMetadataImport",
-        "description": "Create a bulk metadata import for a metadata collection: a saved definition that lists a data connector's source files and imports each one's source metadata as a collection file, with no media download or processing. Runs consume no credits. By default the first run starts immediately (`start: false` saves the definition only). The response's `latest_run` is the triggered run; it is null when `start` is false or when another import's run currently holds the one-active-run-per-collection slot (the definition is saved and can be run once that finishes), and it is returned with status `failed` when the run could not be enqueued (trigger a new run to retry). Runs page the connector with the account's default active API key and fail with a clear error when the account has none.",
+        "description": "Create a bulk import: a saved definition that lists a data connector's source files and brings each match into the collection. What a run ingests follows the collection's type (see `import_type` on the response). For a **metadata collection** it imports each file's source metadata as a collection file, with no media download or processing, and runs consume no credits. For **any other collection type** it imports the media itself: each matching file is ingested and processed exactly like a manual add, so it is **billed per file** and counts against the account's file usage limits. A media run that exhausts credits or a usage limit stops with a user-facing error and keeps everything it already imported — rerun in `append` mode to resume. By default the first run starts immediately (`start: false` saves the definition only). The response's `latest_run` is the triggered run; it is null when `start` is false or when another run is already active in the collection (the definition is saved, and can be run once that one finishes), and it is returned with status `failed` when the run could not be started (trigger a new run to retry). Runs page the connector — and, for media imports, add each file — with the account's default active API key, and fail with a clear error when the account has none.",
         "parameters": [
           {
             "name": "collection_id",
@@ -7796,7 +7796,7 @@
             }
           },
           "400": {
-            "description": "Invalid request — the collection is not a metadata collection, the connector does not exist, the connector type does not support metadata imports, or a filter key is not supported by the connector type",
+            "description": "Invalid request — the connector does not exist, the connector type does not support imports, a filter key is not supported by the connector type, or `include_thumbnails` or `enrich_metadata` was set on a media import (imported media gets real thumbnails from the processing pipeline, and a media run has no metadata-only record to enrich)",
             "content": {
               "application/json": {
                 "schema": {
@@ -7828,8 +7828,8 @@
         }
       },
       "get": {
-        "tags": ["Metadata Imports"],
-        "summary": "List metadata imports",
+        "tags": ["Bulk Imports"],
+        "summary": "List bulk imports",
         "operationId": "listMetadataImports",
         "description": "List a collection's metadata imports, newest first, each with its latest run inline.",
         "parameters": [
@@ -7901,8 +7901,8 @@
     },
     "/collections/{collection_id}/imports/{import_id}": {
       "get": {
-        "tags": ["Metadata Imports"],
-        "summary": "Get a metadata import",
+        "tags": ["Bulk Imports"],
+        "summary": "Get a bulk import",
         "operationId": "getMetadataImport",
         "description": "Get a metadata import definition with one page of its run history (newest first).",
         "parameters": [
@@ -7982,8 +7982,8 @@
         }
       },
       "delete": {
-        "tags": ["Metadata Imports"],
-        "summary": "Delete a metadata import",
+        "tags": ["Bulk Imports"],
+        "summary": "Delete a bulk import",
         "operationId": "deleteMetadataImport",
         "description": "Delete an import definition and its run history. Any active run is cancelled first. Imported files and collection memberships are never deleted by this operation.",
         "parameters": [
@@ -8044,10 +8044,10 @@
     },
     "/collections/{collection_id}/imports/{import_id}/runs": {
       "post": {
-        "tags": ["Metadata Imports"],
-        "summary": "Run a metadata import",
+        "tags": ["Bulk Imports"],
+        "summary": "Run a bulk import",
         "operationId": "createMetadataImportRun",
-        "description": "Trigger a new run of a saved import. `mode` and `delete_missing` default to the definition's saved values. Only one run may be active per collection at a time — concurrent runs would corrupt each other's delete-missing bookkeeping — so triggering while any run in the collection is active returns a 409.",
+        "description": "Trigger a new run of a saved import. `mode` and `delete_missing` default to the definition's saved values. Only one run may be active per collection at a time, so triggering while any run in the collection is active returns a 409. Rerunning is also how a media import resumes after it stopped on exhausted credits or a usage limit: an `append` run skips files it already imported and retries the rest.",
         "parameters": [
           {
             "name": "collection_id",
@@ -8091,6 +8091,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request — `include_thumbnails` or `enrich_metadata` was set on a media import (imported media gets real thumbnails from the processing pipeline, and a media run has no metadata-only record to enrich)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Collection or import not found",
             "content": {
@@ -8126,8 +8136,8 @@
     },
     "/collections/{collection_id}/imports/{import_id}/runs/{run_id}/cancel": {
       "post": {
-        "tags": ["Metadata Imports"],
-        "summary": "Cancel a metadata import run",
+        "tags": ["Bulk Imports"],
+        "summary": "Cancel a bulk import run",
         "operationId": "cancelMetadataImportRun",
         "description": "Cancel an in-flight run. Files already imported by the run are kept. Cancelling an already-finished run is a no-op that returns the current state.",
         "parameters": [
@@ -16916,7 +16926,11 @@
           },
           "files_indexed": {
             "type": "integer",
-            "description": "Files whose metadata finished indexing"
+            "description": "Files whose metadata finished indexing (metadata imports)"
+          },
+          "files_imported": {
+            "type": "integer",
+            "description": "Files whose media was ingested and added to the collection (media imports)"
           },
           "files_removed": {
             "type": "integer",
@@ -16944,10 +16958,15 @@
             "type": "string",
             "format": "uuid"
           },
+          "import_type": {
+            "type": "string",
+            "enum": ["metadata", "media"],
+            "description": "What this run ingests, inherited from the import definition: metadata indexes source metadata only (free); media ingests and processes the actual files (billed per file)."
+          },
           "mode": {
             "type": "string",
             "enum": ["append", "refresh"],
-            "description": "append imports new files and retries previously-failed ones; refresh re-imports everything the filters match"
+            "description": "append imports new files and retries previously-failed ones; refresh re-imports everything the filters match. For media imports, refresh re-syncs the source metadata of files it already imported — media bytes are never re-downloaded."
           },
           "delete_missing": {
             "type": "boolean",
@@ -17002,7 +17021,7 @@
       },
       "MetadataImport": {
         "type": "object",
-        "description": "A saved bulk metadata import: which connector to list, how to filter it, and how runs behave. Definitions are immutable — delete and recreate to change one.",
+        "description": "A saved bulk import: which connector to list, how to filter it, and how runs behave. What a run ingests depends on the collection — see import_type. Definitions are immutable — delete and recreate to change one.",
         "properties": {
           "object": {
             "type": "string",
@@ -17019,6 +17038,11 @@
           "connector_id": {
             "type": "string",
             "format": "uuid"
+          },
+          "import_type": {
+            "type": "string",
+            "enum": ["metadata", "media"],
+            "description": "Inferred from the collection's type at creation and fixed for the import's lifetime. metadata (metadata collections): source metadata is indexed, no media is downloaded, runs are free. media (every other collection type): each matching file is ingested and processed exactly like a manual add, billed per file."
           },
           "name": {
             "type": "string"
@@ -17068,13 +17092,13 @@
           },
           "enrich_metadata": {
             "type": "boolean",
-            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work."
+            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work. Metadata imports only — setting it on a media import is a 400, since a media run ingests each file in full and has no metadata-only record to enrich."
           }
         }
       },
       "MetadataImportDetail": {
         "type": "object",
-        "description": "A metadata import with one page of its run history (newest first). total_runs/limit/offset make truncation visible.",
+        "description": "An import with one page of its run history (newest first). total_runs/limit/offset make truncation visible.",
         "properties": {
           "object": {
             "type": "string",
@@ -17091,6 +17115,11 @@
           "connector_id": {
             "type": "string",
             "format": "uuid"
+          },
+          "import_type": {
+            "type": "string",
+            "enum": ["metadata", "media"],
+            "description": "Inferred from the collection's type at creation and fixed for the import's lifetime. metadata (metadata collections): source metadata is indexed, no media is downloaded, runs are free. media (every other collection type): each matching file is ingested and processed exactly like a manual add, billed per file."
           },
           "name": {
             "type": "string"
@@ -17144,7 +17173,7 @@
           },
           "enrich_metadata": {
             "type": "boolean",
-            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work."
+            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work. Metadata imports only — setting it on a media import is a 400, since a media run ingests each file in full and has no metadata-only record to enrich."
           }
         }
       },
@@ -17239,16 +17268,16 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 1000000,
-            "description": "Stop each run after processing this many files from the listing. A capped run stops listing at the limit and never runs the delete-missing sweep — a truncated listing is incomplete by definition, so nothing is removed based on it."
+            "description": "Stop each run after processing this many files from the listing. A capped run stops listing at the limit and never runs the delete-missing sweep — a truncated listing is incomplete by definition, so nothing is removed based on it. Media imports additionally cap every run at 10,000 files, whatever this is set to."
           },
           "include_thumbnails": {
             "type": "boolean",
             "default": false,
-            "description": "Copy connector poster images as default thumbnails for imported files, for sources that provide one (Grain, iconik, Google Drive, and Dropbox today). Off by default. Poster copying runs asynchronously behind indexing at a provider-safe pace, so it does not slow the import itself."
+            "description": "Copy connector poster images as default thumbnails for imported files, for sources that provide one (Grain, iconik, Google Drive, and Dropbox today). Off by default. Posters are copied in the background, so they do not slow the import itself and may appear shortly after a file is indexed. Metadata imports only — setting it on a media import is a 400, since imported media gets real thumbnails from the processing pipeline."
           },
           "enrich_metadata": {
             "type": "boolean",
-            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work.",
+            "description": "Backfill source-metadata fields the connector's list endpoint omits, after each index batch settles: Gong parties + Call Spotlight content (batched - enriched docs are re-embedded so the content is searchable) and Dropbox media_info duration/dimensions (per-file). No-op for other connectors. Off by default: it spends upstream API budget and, for Gong, embedding work. Metadata imports only — setting it on a media import is a 400, since a media run ingests each file in full and has no metadata-only record to enrich.",
             "default": false
           }
         }
@@ -17272,7 +17301,7 @@
           },
           "include_thumbnails": {
             "type": "boolean",
-            "description": "Override the definition's include_thumbnails for this run"
+            "description": "Override the definition's include_thumbnails for this run. Metadata imports only — setting it on a media import is a 400."
           },
           "enrich_metadata": {
             "type": "boolean",
