@@ -13861,7 +13861,7 @@
           "group_by_key": {
             "type": "string",
             "enum": ["file"],
-            "description": "Group results by file. Cannot be used with scope=\"file\". When specified, results are grouped by file_id."
+            "description": "Group results by file. Cannot be used with scope=\"file\" or scope=\"moment\" — grouped moment search is not supported and returns a 400. When specified, results are grouped by file_id."
           },
           "sort_by": {
             "type": "string",
