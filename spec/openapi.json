@@ -8663,7 +8663,13 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["pending", "processing", "completed", "failed", "cancelled"]
+              "enum": [
+                "pending",
+                "processing",
+                "completed",
+                "failed",
+                "cancelled"
+              ]
             }
           },
           {
@@ -18222,7 +18228,13 @@
           },
           "status": {
             "type": "string",
-            "enum": ["pending", "processing", "completed", "failed", "cancelled"]
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
           },
           "created_at": {
             "type": "integer",
