@@ -18245,7 +18245,49 @@
           },
           "find_moments_config": {
             "type": "object",
-            "description": "Echo of the request plus criterion_hash and the resolved describe_job_id."
+            "description": "Echo of the request as the run resolved it, plus criterion_hash, the resolved describe_job_id, and the engine version. Defaults the request omitted are filled in here.",
+            "properties": {
+              "criterion": {
+                "$ref": "#/components/schemas/MomentCriterion"
+              },
+              "criterion_hash": {
+                "type": "string",
+                "description": "Stable hash of the snapshotted criterion; identical criteria share a hash."
+              },
+              "describe_job_id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The describe the run actually used, whether reused, pinned, or created internally."
+              },
+              "signals_required": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "boundary_policy": {
+                "type": "string",
+                "enum": ["sentence", "tight", "loose"]
+              },
+              "speaker_filter": {
+                "type": "object",
+                "description": "Speaker restriction, present when the request set one."
+              },
+              "min_duration_seconds": {
+                "type": "number"
+              },
+              "max_duration_seconds": {
+                "type": "number"
+              },
+              "cache_policy": {
+                "type": "string",
+                "enum": ["reuse", "refresh"]
+              },
+              "engine_version": {
+                "type": "integer",
+                "description": "Version of the moment-discovery engine that produced the run."
+              }
+            }
           },
           "moments": {
             "type": "array",
@@ -18501,10 +18543,32 @@
             "type": "string"
           },
           "criterion": {
-            "type": "object"
+            "$ref": "#/components/schemas/MomentCriterion"
           },
           "options": {
-            "type": "object"
+            "type": "object",
+            "description": "The per-attachment run knobs, as supplied on NewMomentCriterionAttachment.",
+            "properties": {
+              "signals_required": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "boundary_policy": {
+                "type": "string",
+                "enum": ["sentence", "tight", "loose"]
+              },
+              "speaker_filter": {
+                "type": "object"
+              },
+              "min_duration_seconds": {
+                "type": "number"
+              },
+              "max_duration_seconds": {
+                "type": "number"
+              }
+            }
           },
           "backfill_status": {
             "type": "string",
