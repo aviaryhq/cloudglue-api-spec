@@ -18624,7 +18624,8 @@
                     "criterion_name": {
                       "type": "string"
                     }
-                  }
+                  },
+                  "required": ["file_id", "job_id", "criterion_name"]
                 }
               ]
             }
@@ -18663,7 +18664,8 @@
                     "criterion_name": {
                       "type": "string"
                     }
-                  }
+                  },
+                  "required": ["file_id", "job_id", "criterion_name"]
                 }
               ]
             }
