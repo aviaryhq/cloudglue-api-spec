@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.21"
+    "version": "0.7.23"
   },
   "servers": [
     {
@@ -2015,7 +2015,8 @@
                 "entities",
                 "rich-transcripts",
                 "face-analysis",
-                "metadata"
+                "metadata",
+                "moments"
               ]
             }
           },
@@ -8552,6 +8553,692 @@
           }
         }
       }
+    },
+    "/find-moments": {
+      "post": {
+        "tags": ["Find Moments"],
+        "summary": "Find moments in a video",
+        "operationId": "createFindMoments",
+        "description": "Runs exhaustive moment discovery for one criterion over one video. Every accepted moment is persisted; ranking and truncation are read-time parameters on GET. Reuses a compatible describe or creates one internally - a missing describe is never an error.",
+        "requestBody": {
+          "description": "Find-moments run parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewFindMoments"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The created run, or an existing matching run at cost 0 (cache hit).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindMoments"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Criterion dialect violations carry a stable code and a field-addressable path; unknown execution fields (e.g. mode, max_moments) are rejected naming the field.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient credit balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Monthly find-moments runs limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Find Moments"],
+        "summary": "List find-moments runs",
+        "operationId": "listFindMoments",
+        "description": "Lists runs, newest first, with cursor pagination. Pagination is over runs, never over joined moment rows.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor from a previous page's next_cursor.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "processing", "completed", "failed"]
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Runs, newest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindMomentsList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/find-moments/{job_id}": {
+      "get": {
+        "tags": ["Find Moments"],
+        "summary": "Get a find-moments run",
+        "operationId": "getFindMoments",
+        "description": "Returns the run; when completed, includes moments and findings shaped by the read parameters. Selection never destroys accepted results: total_moments is always the full accepted count.",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Top-k read: return only the k best moments by the active sort. total_moments is unaffected.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "min_score",
+            "in": "query",
+            "description": "Only moments whose criterion score is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["rank_score", "start_time"],
+              "default": "rank_score"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The run; when completed, includes moments and findings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindMoments"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Run not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Find Moments"],
+        "summary": "Delete a find-moments run",
+        "operationId": "deleteFindMoments",
+        "description": "Deletes the run and its moments and findings. An in-flight run is cancelled and refunded; a completed run is not refunded.",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFindMomentsResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Run not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/moments": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "List moments in a moments collection",
+        "operationId": "listCollectionMoments",
+        "description": "Moments across current collection members, with exact total. Default sort is positional (file_id, then start_time); criterion_score and rank_score sorts require a single-criterion filter. Removing a file from the collection drops its moments from this enumeration; the underlying runs persist.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "criterion_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attachment_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "description": "Restrict to one video.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "min_score",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "criterion_score and rank_score require a single-criterion filter.",
+            "schema": {
+              "type": "string",
+              "enum": ["position", "criterion_score", "rank_score"],
+              "default": "position"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Moments across current collection members, with exact total.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionMomentsList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not a moments collection, or a score sort without a single-criterion filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/moments/findings": {
+      "get": {
+        "tags": ["Collections"],
+        "summary": "List findings in a moments collection",
+        "operationId": "listCollectionMomentFindings",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "criterion_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["absence", "observation"]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Findings across current collection members.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionMomentFindingsList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not a moments collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/moment-criteria": {
+      "post": {
+        "tags": ["Collections"],
+        "summary": "Attach a criterion to a moments collection",
+        "operationId": "createCollectionMomentCriterion",
+        "description": "Adds a criterion attachment and backfills existing members. The attach response charges nothing (cost header 0); per-file runs charge as they execute, and a matching prior run satisfies a pair at no extra execution.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewMomentCriterionAttachment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The attachment, backfill pending.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MomentCriterionAttachment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid criterion, or not a moments collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Balance cannot cover the backfill precheck",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{collection_id}/moment-criteria/{attachment_id}": {
+      "delete": {
+        "tags": ["Collections"],
+        "summary": "Detach a criterion from a moments collection",
+        "operationId": "deleteCollectionMomentCriterion",
+        "description": "Removes the attachment; its moments and findings leave collection enumeration. Underlying runs persist as job history.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "attachment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "attachment_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["attachment_id", "deleted"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not a moments collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attachment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -9812,9 +10499,22 @@
               "entities",
               "rich-transcripts",
               "face-analysis",
-              "metadata"
+              "metadata",
+              "moments"
             ],
             "description": "Type of collection, determines how videos are processed and what data is extracted"
+          },
+          "moments_config": {
+            "type": "object",
+            "description": "Moments collections only: the criteria echo with per-attachment state (live counters on single GETs).",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/MomentCriterionAttachment"
+                }
+              }
+            }
           },
           "extract_config": {
             "type": "object",
@@ -9991,9 +10691,13 @@
               "entities",
               "rich-transcripts",
               "face-analysis",
-              "metadata"
+              "metadata",
+              "moments"
             ],
             "description": "Type of collection, determines how videos are processed and what data is extracted.\n\n**Collection Types:**\n- **media-descriptions**: Generate comprehensive media descriptions with speech, visual, and text analysis (use `describe_config`)\n- **entities**: Extract structured data/entities from videos (requires `extract_config`)\n- **rich-transcripts**: Generate rich transcriptions with speech and visual descriptions (use `transcribe_config`). For backward compatibility only, new collections should use `media-descriptions` instead.\n- **face-analysis**: Detect and index faces in videos for face matching and search (use `face_detection_config`)\n- **metadata**: Index connector source metadata + user metadata into file-level search documents WITHOUT downloading or processing the media. Free to index. Supports google-drive, dropbox, zoom, gong, recall, grain, and iconik URLs. No processing configs are accepted.\n\n⚠️ **Important**: Only provide the config that matches your collection_type. Other configs will be ignored."
+          },
+          "moments_config": {
+            "$ref": "#/components/schemas/MomentsConfig"
           },
           "name": {
             "type": "string",
@@ -12148,7 +12852,10 @@
           "collection.file.job.deleted",
           "segment.job.processing",
           "segment.job.completed",
-          "segment.job.failed"
+          "segment.job.failed",
+          "find_moments.job.processing",
+          "find_moments.job.completed",
+          "find_moments.job.failed"
         ],
         "description": "Webhook events that can be subscribed to"
       },
@@ -13104,8 +13811,8 @@
         "properties": {
           "scope": {
             "type": "string",
-            "enum": ["file", "segment", "face"],
-            "description": "Search scope - 'file' searches at file level (requires collections with enable_summary=true), 'segment' searches at segment level, 'face' searches for faces in videos using image matching"
+            "enum": ["file", "segment", "face", "moment"],
+            "description": "Search scope - 'file' searches at file level (requires collections with enable_summary=true), 'segment' searches at segment level, 'face' searches for faces in videos using image matching, 'moment' searches moments produced by find-moments criteria in moments collections"
           },
           "collections": {
             "type": "array",
@@ -13114,12 +13821,16 @@
               "format": "uuid"
             },
             "minItems": 1,
-            "description": "List of collection IDs to search within. \n\nFor text search (scope='file' or 'segment'): All collections must be of collection_type 'media-descriptions', 'rich-transcripts', 'metadata', or 'entities'. For file-level search, 'media-descriptions' and 'rich-transcripts' collections must have 'enable_summary: true' in their config. 'metadata' collections only support scope='file'. 'entities' collections are searchable at the scope matching their extraction level: file-level extraction (enable_video_level_entities or enable_metadata_mode) supports scope='file' only, segment-level extraction (enable_segment_level_entities) supports scope='segment' only.\n\nFor face search (scope='face'): All collections must be of collection_type 'face-analysis'."
+            "description": "List of collection IDs to search within. \n\nFor text search (scope='file' or 'segment'): All collections must be of collection_type 'media-descriptions', 'rich-transcripts', 'metadata', or 'entities'. For file-level search, 'media-descriptions' and 'rich-transcripts' collections must have 'enable_summary: true' in their config. 'metadata' collections only support scope='file'. 'entities' collections are searchable at the scope matching their extraction level: file-level extraction (enable_video_level_entities or enable_metadata_mode) supports scope='file' only, segment-level extraction (enable_segment_level_entities) supports scope='segment' only.\n\nFor face search (scope='face'): All collections must be of collection_type 'face-analysis'.\n\nFor moment search (scope='moment'): All collections must be of collection_type 'moments'."
           },
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "Text search query to find relevant content (required for scope='file' or 'segment')"
+            "description": "Text search query to find relevant content (required for scope='file', 'segment', or 'moment')"
+          },
+          "criterion_name": {
+            "type": "string",
+            "description": "Narrow moment search to one criterion by name (scope='moment' only)"
           },
           "source_image": {
             "type": "object",
@@ -13320,7 +14031,7 @@
                 },
                 "scope": {
                   "type": "string",
-                  "enum": ["file", "segment", "face"],
+                  "enum": ["file", "segment", "face", "moment"],
                   "description": "The search scope that was used"
                 },
                 "group_by_key": {
@@ -13380,7 +14091,7 @@
           },
           "scope": {
             "type": "string",
-            "enum": ["file", "segment", "face"],
+            "enum": ["file", "segment", "face", "moment"],
             "description": "The search scope that was used"
           },
           "group_by_key": {
@@ -13408,6 +14119,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/FaceSearchResult"
+                },
+                {
+                  "$ref": "#/components/schemas/MomentSearchResult"
                 },
                 {
                   "$ref": "#/components/schemas/SegmentGroupResult"
@@ -13758,6 +14472,56 @@
             "description": "The highest score among all items in this group"
           }
         }
+      },
+      "MomentSearchResult": {
+        "description": "A moment search hit (scope='moment'): the full moment record plus provenance and a query-relevance search_score.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Moment"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["moment"]
+              },
+              "file_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "collection_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "job_id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The find-moments run that produced this moment"
+              },
+              "criterion_name": {
+                "type": "string"
+              },
+              "search_score": {
+                "type": "number",
+                "description": "Query relevance for this search only — unrelated to the moment's criterion_score and rank_score"
+              },
+              "filename": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "type",
+              "file_id",
+              "collection_id",
+              "job_id",
+              "criterion_name",
+              "search_score",
+              "filename"
+            ]
+          }
+        ]
       },
       "FaceGroupResult": {
         "type": "object",
@@ -17308,6 +18072,534 @@
             "description": "Override the definition default for this run."
           }
         }
+      },
+      "MomentCriterion": {
+        "type": "object",
+        "description": "An inline criterion: rubric instructions plus typed output declarations. Snapshotted and hashed onto the run.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "maxLength": 64
+          },
+          "instructions": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The complete rubric, including any seed lists and worked examples."
+          },
+          "moment_schema": {
+            "$ref": "#/components/schemas/MomentSchemaDefinition"
+          },
+          "finding_schema": {
+            "$ref": "#/components/schemas/MomentSchemaDefinition"
+          },
+          "anchors": {
+            "type": "object",
+            "description": "Named intra-moment timestamps. A non-required anchor that does not exist is omitted from the moment - never null.",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "required": {
+                  "type": "boolean"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "scoring": {
+            "type": "object",
+            "description": "The rubric's single canonical score: what rank-ordered reads sort by and what min_score filters on. Exactly one scoring key per criterion.",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              },
+              "higher_is_better": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": ["key", "min", "max"]
+          }
+        },
+        "required": ["name", "instructions"]
+      },
+      "MomentSchemaDefinition": {
+        "type": "object",
+        "description": "A validated JSON Schema subset (the moment schema dialect): a root object of string/number/integer/boolean/array-of-those fields, optional enums, one nesting level, per-field descriptions. Rejected shapes get a field-addressable 400 with a stable code."
+      },
+      "NewFindMoments": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "cloudglue://files/<id> or an ingestible URL (same resolution rules as describe/extract)."
+          },
+          "describe_job_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Optional pin to a specific describe. It must exist for the file and its config must cover signals_required."
+          },
+          "criterion": {
+            "$ref": "#/components/schemas/MomentCriterion"
+          },
+          "signals_required": {
+            "type": "array",
+            "minItems": 1,
+            "default": ["speech"],
+            "items": {
+              "type": "string",
+              "enum": [
+                "speech",
+                "visual_scene_description",
+                "scene_text",
+                "audio_description"
+              ]
+            }
+          },
+          "boundary_policy": {
+            "type": "string",
+            "enum": ["sentence", "tight", "loose"],
+            "default": "sentence"
+          },
+          "speaker_filter": {
+            "type": "object",
+            "properties": {
+              "include": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "exclude": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "match": {
+                "type": "string",
+                "enum": ["any", "all"]
+              }
+            }
+          },
+          "min_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "default": 5
+          },
+          "max_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "default": 300
+          },
+          "cache_policy": {
+            "type": "string",
+            "enum": ["reuse", "refresh"],
+            "default": "reuse"
+          }
+        },
+        "required": ["url", "criterion"],
+        "additionalProperties": false
+      },
+      "FindMoments": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"]
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp in milliseconds when the run was created"
+          },
+          "url": {
+            "type": "string"
+          },
+          "find_moments_config": {
+            "type": "object",
+            "description": "Echo of the request plus criterion_hash and the resolved describe_job_id."
+          },
+          "moments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Moment"
+            }
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MomentFinding"
+            }
+          },
+          "total_moments": {
+            "type": "integer",
+            "description": "Full accepted count, independent of the limit read parameter."
+          },
+          "error": {
+            "type": "string",
+            "description": "Curated failure message, present on failed runs."
+          }
+        },
+        "required": ["job_id", "status", "created_at", "url"]
+      },
+      "FindMomentsList": {
+        "type": "object",
+        "properties": {
+          "runs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FindMoments"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Present when more runs exist; pass as the cursor parameter."
+          }
+        },
+        "required": ["runs", "total"]
+      },
+      "Moment": {
+        "type": "object",
+        "properties": {
+          "moment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "start_time": {
+            "type": "number",
+            "description": "Seconds from source start."
+          },
+          "end_time": {
+            "type": "number"
+          },
+          "anchors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Declared anchors only; an anchor that was not found is absent, never null."
+          },
+          "title": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "speakers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "criterion_score": {
+            "$ref": "#/components/schemas/CriterionScore"
+          },
+          "rank_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Normalized ordering within the run; what the default sort uses."
+          },
+          "properties": {
+            "type": "object",
+            "description": "Validates against the criterion's moment_schema."
+          },
+          "evidence": {
+            "type": "object",
+            "properties": {
+              "signals": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "moment_id",
+          "start_time",
+          "end_time",
+          "title",
+          "reason",
+          "rank_score"
+        ]
+      },
+      "CriterionScore": {
+        "type": "object",
+        "description": "The rubric's judgment on its own declared scale.",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          }
+        },
+        "required": ["key", "value", "min", "max"]
+      },
+      "MomentFinding": {
+        "type": "object",
+        "description": "A non-temporal finding, produced whenever the criterion declares a finding_schema.",
+        "properties": {
+          "finding_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["absence", "observation"]
+          },
+          "properties": {
+            "type": "object",
+            "description": "Validates against the criterion's finding_schema."
+          }
+        },
+        "required": ["finding_id", "kind", "properties"]
+      },
+      "DeleteFindMomentsResult": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "refunded": {
+            "type": "boolean",
+            "description": "True when the run was in flight and its charge was refunded."
+          }
+        },
+        "required": ["job_id", "deleted", "refunded"]
+      },
+      "MomentsConfig": {
+        "type": "object",
+        "description": "Moments collections: the criteria to run over every current and future member. Each entry becomes a criterion attachment; the attachment rows are the operational source of truth after creation.",
+        "properties": {
+          "criteria": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/NewMomentCriterionAttachment"
+            }
+          }
+        },
+        "required": ["criteria"]
+      },
+      "NewMomentCriterionAttachment": {
+        "type": "object",
+        "properties": {
+          "criterion": {
+            "$ref": "#/components/schemas/MomentCriterion"
+          },
+          "signals_required": {
+            "type": "array",
+            "minItems": 1,
+            "default": ["speech"],
+            "items": {
+              "type": "string",
+              "enum": [
+                "speech",
+                "visual_scene_description",
+                "scene_text",
+                "audio_description"
+              ]
+            }
+          },
+          "boundary_policy": {
+            "type": "string",
+            "enum": ["sentence", "tight", "loose"],
+            "default": "sentence"
+          },
+          "speaker_filter": {
+            "type": "object",
+            "properties": {
+              "include": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "exclude": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "match": {
+                "type": "string",
+                "enum": ["any", "all"]
+              }
+            }
+          },
+          "min_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "default": 5
+          },
+          "max_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "default": 300
+          }
+        },
+        "required": ["criterion"],
+        "additionalProperties": false
+      },
+      "MomentCriterionAttachment": {
+        "type": "object",
+        "properties": {
+          "attachment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "criterion_name": {
+            "type": "string"
+          },
+          "criterion_hash": {
+            "type": "string"
+          },
+          "criterion": {
+            "type": "object"
+          },
+          "options": {
+            "type": "object"
+          },
+          "backfill_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "completed_with_failures"
+            ]
+          },
+          "files_total": {
+            "type": "integer"
+          },
+          "files_completed": {
+            "type": "integer"
+          },
+          "files_failed": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp in milliseconds"
+          }
+        },
+        "required": [
+          "attachment_id",
+          "criterion_name",
+          "criterion_hash",
+          "backfill_status"
+        ]
+      },
+      "CollectionMomentsList": {
+        "type": "object",
+        "properties": {
+          "moments": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Moment"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "file_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "job_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "criterion_name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Exact total across current members."
+          },
+          "next_cursor": {
+            "type": "string"
+          }
+        },
+        "required": ["moments", "total"]
+      },
+      "CollectionMomentFindingsList": {
+        "type": "object",
+        "properties": {
+          "findings": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/MomentFinding"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "file_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "job_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "criterion_name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "next_cursor": {
+            "type": "string"
+          }
+        },
+        "required": ["findings", "total"]
       }
     },
     "securitySchemes": {
