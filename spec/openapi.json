@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.23"
+    "version": "0.7.30"
   },
   "servers": [
     {
@@ -9382,8 +9382,7 @@
       },
       "KnowledgeBaseCollections": {
         "type": "object",
-        "description": "Search within specific collections. This is the default source mode and is backward-compatible — the `source` field can be omitted.",
-        "required": ["collections"],
+        "description": "Search within specific collections. This is the default source mode and is backward-compatible — the `source` field can be omitted. Since 0.7.30, `collections` itself is optional when `type` is `entity_backed_knowledge` and `entity_backed_knowledge_config.entity_collections` carries at least one collection — an entity/moments-only knowledge base answers from the structured-data tools (and moment search for moments collections) with no transcript corpus. At least one of `collections` or `entity_backed_knowledge_config.entity_collections` must be present.",
         "properties": {
           "source": {
             "type": "string",
@@ -9402,7 +9401,7 @@
               "format": "uuid"
             },
             "minItems": 1,
-            "description": "Collection IDs to search for relevant context. Collections must be of type 'rich-transcripts', 'media-descriptions', 'metadata', or 'entities'. Metadata and entities collections require the `nimbus-002-preview` model (its agent picks the retrieval scope per search call); `nimbus-001` rejects them (400). Entities collections are valid at both extraction levels: file-level extraction (enable_video_level_entities or enable_metadata_mode) is retrieved as file-level entity docs, segment-level extraction as per-segment entity docs with real timestamps."
+            "description": "Collection IDs to search for relevant context. Collections must be of type 'rich-transcripts', 'media-descriptions', 'metadata', or 'entities'. Metadata and entities collections require the `nimbus-002-preview` model. Optional when `type` is `entity_backed_knowledge` with at least one entity collection — omit it for an entity/moments-only knowledge base."
           },
           "filter": {
             "description": "Optional filter to narrow down the search within collections.\n\nSupports filtering by `metadata`, `video_info`, and `file` properties. Each filter is an array of criteria with `path`, `operator`, and `valueText` or `valueTextArray`.\n\nSupported operators: `Equal`, `NotEqual`, `LessThan`, `GreaterThan`, `In`, `ContainsAny`, `ContainsAll`.\n\nExamples:\n- Filter by file ID: `{\"file\": [{\"path\": \"id\", \"operator\": \"Equal\", \"valueText\": \"file-uuid\"}]}`\n- Filter by metadata: `{\"metadata\": [{\"path\": \"speaker\", \"operator\": \"Equal\", \"valueText\": \"Amy\"}]}`\n- Filter by duration: `{\"video_info\": [{\"path\": \"duration_seconds\", \"operator\": \"GreaterThan\", \"valueText\": \"60\"}]}`",
