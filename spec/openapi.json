@@ -7,7 +7,7 @@
       "name": "Apache License 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.7.30"
+    "version": "0.7.31"
   },
   "servers": [
     {
@@ -9235,6 +9235,160 @@
           },
           "500": {
             "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/route-previews": {
+      "get": {
+        "tags": ["Sites"],
+        "summary": "List site route previews",
+        "operationId": "listSiteRoutePreviews",
+        "description": "List the site's per-route unfurl previews, ordered by route.",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the site",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The route previews registered for the site",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteRoutePreviewList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Site not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Sites"],
+        "summary": "Replace site route previews",
+        "operationId": "replaceSiteRoutePreviews",
+        "description": "Replace the site's complete set of per-route unfurl previews. Each entry maps a route within the site (e.g. a clip page) to its own preview card and hero share, so links to that page unfurl distinctly in Slack instead of with the site-wide hero. An optional startSeconds/endSeconds window makes the unfurled player serve only that segment of the hero (trimmed at the asset’s HLS segment boundaries — see the field descriptions). The set is replaced wholesale — typically written by the same pipeline that publishes the site — and an empty array clears all route previews. Routes are stored in canonical form: hash-router prefixes ('#/'), query strings, and surrounding slashes are stripped, so '/clip/intro', 'clip/intro/', and '#/clip/intro' all name the same route. Links to routes with no registered preview fall back to the site-level preview fields.",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the site",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The site's complete set of route previews",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceSiteRoutePreviewsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The stored route previews (routes in canonical form)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteRoutePreviewList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid route previews (empty or duplicate canonical routes, non-video heroes, private heroes on a public site, or an invalid clip window)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Site not found, or a previewShareId does not reference a share in this account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/route-previews/{preview_id}": {
+      "delete": {
+        "tags": ["Sites"],
+        "summary": "Delete a site route preview",
+        "operationId": "deleteSiteRoutePreview",
+        "description": "Delete one route preview. Links to that route fall back to the site-level preview fields at their next unfurl.",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the site",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "preview_id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the route preview to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted route preview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteRoutePreview"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Site or route preview not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -18677,6 +18831,129 @@
           }
         },
         "required": ["findings", "total"]
+      },
+      "SiteRoutePreviewInput": {
+        "type": "object",
+        "required": ["route", "previewShareId"],
+        "properties": {
+          "route": {
+            "type": "string",
+            "maxLength": 512,
+            "description": "The site route this preview applies to. Stored and matched in canonical form: hash-router prefixes ('#/'), query strings, and surrounding slashes are stripped, so '/clip/intro', 'clip/intro/', and '#/clip/intro' all name the same route. Must not be empty after canonicalization — the site root unfurls with the site-level preview fields.",
+            "example": "clip/intro-to-x"
+          },
+          "previewTitle": {
+            "type": "string",
+            "description": "Preview card title. Falls back to the hero share's own title (then its filename) when unset."
+          },
+          "previewDescription": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Preview card description. Falls back to the hero share's own description when unset. Slack truncates at 200 characters."
+          },
+          "previewImageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Preview card image. Must be a publicly fetchable URL (e.g. a share's preview_url) — site asset URLs sit behind the private-site gate and won't render. Falls back to the hero share's thumbnail when unset."
+          },
+          "previewShareId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The route's hero share: what a link to this page plays when unfurled by the Cloudglue Slack app. Must be a video share owned by the same account; on a public site it must be a public share."
+          },
+          "startSeconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clip window start, in seconds (fractional allowed). Requires endSeconds; the unfurled player then plays only the [startSeconds, endSeconds] window of the hero share. Precision note: the stream is trimmed with Mux instant clipping, which cuts at the asset's HLS segment boundaries (start rounds down, end rounds up) — not frame-accurate, so the served clip can include a few extra seconds on either side depending on the asset's segment length."
+          },
+          "endSeconds": {
+            "type": "number",
+            "description": "Clip window end, in seconds (fractional allowed). Requires startSeconds and must be greater than it. Served at HLS segment granularity — see startSeconds."
+          }
+        }
+      },
+      "SiteRoutePreview": {
+        "type": "object",
+        "required": ["id", "route", "previewShareId", "createdAt", "updatedAt"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "route": {
+            "type": "string",
+            "maxLength": 512,
+            "description": "The site route this preview applies to. Stored and matched in canonical form: hash-router prefixes ('#/'), query strings, and surrounding slashes are stripped, so '/clip/intro', 'clip/intro/', and '#/clip/intro' all name the same route. Must not be empty after canonicalization — the site root unfurls with the site-level preview fields.",
+            "example": "clip/intro-to-x"
+          },
+          "previewTitle": {
+            "type": "string",
+            "description": "Preview card title. Falls back to the hero share's own title (then its filename) when unset.",
+            "nullable": true
+          },
+          "previewDescription": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Preview card description. Falls back to the hero share's own description when unset. Slack truncates at 200 characters.",
+            "nullable": true
+          },
+          "previewImageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Preview card image. Must be a publicly fetchable URL (e.g. a share's preview_url) — site asset URLs sit behind the private-site gate and won't render. Falls back to the hero share's thumbnail when unset.",
+            "nullable": true
+          },
+          "previewShareId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The route's hero share: what a link to this page plays when unfurled by the Cloudglue Slack app. Must be a video share owned by the same account; on a public site it must be a public share."
+          },
+          "startSeconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clip window start, in seconds (fractional allowed). Requires endSeconds; the unfurled player then plays only the [startSeconds, endSeconds] window of the hero share. Precision note: the stream is trimmed with Mux instant clipping, which cuts at the asset's HLS segment boundaries (start rounds down, end rounds up) — not frame-accurate, so the served clip can include a few extra seconds on either side depending on the asset's segment length.",
+            "nullable": true
+          },
+          "endSeconds": {
+            "type": "number",
+            "description": "Clip window end, in seconds (fractional allowed). Requires startSeconds and must be greater than it. Served at HLS segment granularity — see startSeconds.",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SiteRoutePreviewList": {
+        "type": "object",
+        "required": ["previews"],
+        "properties": {
+          "previews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteRoutePreview"
+            }
+          }
+        }
+      },
+      "ReplaceSiteRoutePreviewsRequest": {
+        "type": "object",
+        "required": ["previews"],
+        "properties": {
+          "previews": {
+            "type": "array",
+            "maxItems": 1000,
+            "description": "The site's complete set of route previews. Replaces whatever was stored before — routes omitted here lose their preview (and fall back to the site-level hero). An empty array clears all route previews.",
+            "items": {
+              "$ref": "#/components/schemas/SiteRoutePreviewInput"
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
